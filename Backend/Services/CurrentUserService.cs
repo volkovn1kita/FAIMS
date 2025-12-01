@@ -1,0 +1,32 @@
+using System;
+using System.Security.Claims;
+
+namespace Backend.Services;
+
+public class CurrentUserService : ICurrentUserService
+{
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+    {
+        _httpContextAccessor = httpContextAccessor;
+    }
+    public Guid GetUserId()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        
+        var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+        if (Guid.TryParse(userIdClaim, out var userId))
+        {
+            return userId;
+        }
+        
+        return Guid.Empty;
+    }
+
+    public string? GetUserRole()
+    {
+        return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
+    }
+}

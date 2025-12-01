@@ -1,0 +1,11 @@
+﻿using System.Text.Json.Serialization;
+namespace Domain;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ExpirationStatus
+{
+    Good,
+    Warning,
+    Critical,
+    Expired
+}
