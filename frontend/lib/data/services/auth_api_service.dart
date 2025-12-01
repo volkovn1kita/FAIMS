@@ -36,4 +36,27 @@ class AuthApiService {
       rethrow;
     }
   }
+
+  Future<void> updateFcmToken(String authToken, String fcmToken) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/users/update-fcm-token'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $authToken', // Обов'язково передаємо токен авторизації
+        },
+        body: jsonEncode({'token': fcmToken}),
+      );
+
+      if (response.statusCode == 200) {
+        print('✅ FCM Token updated successfully on server');
+      } else {
+        print('⚠️ Failed to update FCM Token. Status: ${response.statusCode}, Body: ${response.body}');
+      }
+    } catch (e) {
+      print('❌ Error updating FCM Token: $e');
+      // Ми не кидаємо помилку далі (rethrow), щоб не ламати процес логіну
+    }
+  }
+
 }

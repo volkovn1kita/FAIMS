@@ -20,3 +20,4 @@ E:\Diploma\App\Domain\obj\Debug\net9.0\Domain.dll
 E:\Diploma\App\Domain\obj\Debug\net9.0\refint\Domain.dll
 E:\Diploma\App\Domain\obj\Debug\net9.0\Domain.pdb
 E:\Diploma\App\Domain\obj\Debug\net9.0\ref\Domain.dll
+E:\Diploma\App\Domain\obj\Debug\net9.0\Domain.sourcelink.json

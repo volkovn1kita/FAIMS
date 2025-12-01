@@ -28,3 +28,4 @@ E:\Diploma\App\Application\obj\Debug\net9.0\Application.dll
 E:\Diploma\App\Application\obj\Debug\net9.0\refint\Application.dll
 E:\Diploma\App\Application\obj\Debug\net9.0\Application.pdb
 E:\Diploma\App\Application\obj\Debug\net9.0\ref\Application.dll
+E:\Diploma\App\Application\obj\Debug\net9.0\Application.sourcelink.json

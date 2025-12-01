@@ -209,6 +209,9 @@ namespace Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("FcmToken")
+                        .HasColumnType("text");
+
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("text");

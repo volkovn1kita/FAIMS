@@ -73,6 +73,11 @@ builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
 
+builder.Services.AddHostedService<ExpirationCheckHostedService>();
+
+builder.Services.AddSingleton<INotificationService, FcmService>();
+builder.Services.AddScoped<IExpirationAlertService, ExpirationAlertService>();
+
 builder.Services.Configure<JwtSettings>(
     builder.Configuration.GetSection("JwtSettings"));
 

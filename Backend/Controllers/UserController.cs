@@ -252,5 +252,20 @@ namespace Backend.Controllers
             }
         }
 
+        [HttpPost("update-fcm-token")]
+        public async Task<IActionResult> UpdateFcmToken([FromBody] UpdateFcmTokenRequest request)
+        {
+            var userId = _currentUserService.GetUserId();
+            if (userId == Guid.Empty)
+            {
+                return Unauthorized(new { Message = "User not authenticated." });
+            }
+
+            // Передаємо виконання у сервіс
+            await _userService.UpdateFcmTokenAsync(userId, request.Token);
+            
+            return Ok(new { Message = "FCM token updated successfully." });
+        }
+
     }
 }

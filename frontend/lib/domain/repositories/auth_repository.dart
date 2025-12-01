@@ -1,4 +1,5 @@
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:frontend/data/dtos/login_dto.dart';
 import 'package:frontend/data/models/auth_result.dart';
 import 'package:frontend/data/services/auth_api_service.dart';
@@ -11,6 +12,18 @@ class AuthRepository {
   Future<AuthResult> login(LoginDto dto) async {
     final authResult = await _apiService.login(dto);
     await _tokenStorageService.saveToken(authResult.token);
+
+    try {
+      final fcmToken = await FirebaseMessaging.instance.getToken();
+      if (fcmToken != null) {
+        print("📲 Phone FCM Token: $fcmToken");
+        // Відправляємо на сервер, використовуючи токен авторизації, який ми щойно отримали
+        await _apiService.updateFcmToken(authResult.token, fcmToken);
+      }
+    } catch (e) {
+      print("⚠️ FCM Token Error during login: $e");
+    }
+
     return authResult;
   }
 

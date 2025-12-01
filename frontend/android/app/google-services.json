@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "352090524800",
+    "project_id": "faims-baaab",
+    "storage_bucket": "faims-baaab.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:352090524800:android:55ef094db8368e4a052a65",
+        "android_client_info": {
+          "package_name": "com.faims.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlyg8MeqryhV6LFnyDEU5wH0IH0IEjF40"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

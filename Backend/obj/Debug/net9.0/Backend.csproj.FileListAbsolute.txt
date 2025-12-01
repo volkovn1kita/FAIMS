@@ -293,3 +293,14 @@ E:\Diploma\App\Backend\obj\Debug\net9.0\Backend.pdb
 E:\Diploma\App\Backend\obj\Debug\net9.0\Backend.genruntimeconfig.cache
 E:\Diploma\App\Backend\obj\Debug\net9.0\ref\Backend.dll
 E:\Diploma\App\backend\bin\Debug\net9.0\Backend.staticwebassets.runtime.json
+E:\Diploma\App\Backend\obj\Debug\net9.0\Backend.sourcelink.json
+E:\Diploma\App\backend\bin\Debug\net9.0\firebase-admin-sdk.json
+E:\Diploma\App\backend\bin\Debug\net9.0\FirebaseAdmin.dll
+E:\Diploma\App\backend\bin\Debug\net9.0\Google.Api.Gax.dll
+E:\Diploma\App\backend\bin\Debug\net9.0\Google.Api.Gax.Rest.dll
+E:\Diploma\App\backend\bin\Debug\net9.0\Google.Apis.dll
+E:\Diploma\App\backend\bin\Debug\net9.0\Google.Apis.Auth.dll
+E:\Diploma\App\backend\bin\Debug\net9.0\Google.Apis.Core.dll
+E:\Diploma\App\backend\bin\Debug\net9.0\Newtonsoft.Json.dll
+E:\Diploma\App\backend\bin\Debug\net9.0\System.Management.dll
+E:\Diploma\App\backend\bin\Debug\net9.0\runtimes\win\lib\net7.0\System.Management.dll

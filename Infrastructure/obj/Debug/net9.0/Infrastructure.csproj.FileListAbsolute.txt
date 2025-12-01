@@ -32,3 +32,4 @@ E:\Diploma\App\Infrastructure\obj\Debug\net9.0\Infrastructure.dll
 E:\Diploma\App\Infrastructure\obj\Debug\net9.0\refint\Infrastructure.dll
 E:\Diploma\App\Infrastructure\obj\Debug\net9.0\Infrastructure.pdb
 E:\Diploma\App\Infrastructure\obj\Debug\net9.0\ref\Infrastructure.dll
+E:\Diploma\App\Infrastructure\obj\Debug\net9.0\Infrastructure.sourcelink.json
