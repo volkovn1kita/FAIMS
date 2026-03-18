@@ -66,7 +66,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
       ),
     );
     if (result == true) {
-      _loadDepartments(); // Refresh list if department was added
+      _loadDepartments();
     }
   }
 
@@ -80,15 +80,14 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
       ),
     );
     if (result == true) {
-      _loadDepartments(); // Refresh list if department was edited
+      _loadDepartments();
     }
   }
 
   Future<void> _deleteDepartment(String departmentId) async {
     final l10n = AppLocalizations.of(context)!;
-    // ---- Початок нової логіки перевірки наявності кімнат ----
     setState(() {
-      _isLoading = true; // Показуємо індикатор завантаження під час перевірки
+      _isLoading = true;
       _errorMessage = '';
     });
     try {
@@ -99,11 +98,11 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
             SnackBar(
               content: Text(l10n.cannotDeleteDepartmentWithExistingRooms,
                   style: GoogleFonts.notoSans()),
-              backgroundColor: Colors.orange, // Попереджувальний колір
+              backgroundColor: Colors.orange,
             ),
           );
         }
-        return; // Виходимо, якщо є кімнати
+        return;
       }
     } catch (e) {
       if (mounted) {
@@ -119,15 +118,15 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
           );
         });
       }
-      return; // Виходимо у випадку помилки перевірки
+      return;
     } finally {
       if (mounted) {
         setState(() {
-          _isLoading = false; // Приховуємо індикатор
+          _isLoading = false;
         });
       }
     }
-    // ---- Кінець нової логіки перевірки ----
+    
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -164,7 +163,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
               backgroundColor: Colors.green,
             ),
           );
-          _loadDepartments(); // Refresh the list
+          _loadDepartments();
         }
       } catch (e) {
         if (mounted) {
@@ -194,129 +193,142 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           l10n.manageDepartments,
-          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
         ),
+        centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.black87),
-            onPressed: _addDepartment,
-            tooltip: l10n.addNewDepartment,
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
-              ? Center(child: Text(_errorMessage, style: GoogleFonts.notoSans(color: Colors.red, fontSize: 16)))
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(_errorMessage, textAlign: TextAlign.center, style: GoogleFonts.notoSans(color: Colors.red, fontSize: 16)),
+                  ),
+                )
               : _departments.isEmpty
                   ? Center(
                       child: Text(
                         l10n.noDepartmentsFound,
-                        style: GoogleFonts.notoSans(fontSize: 16, color: Colors.grey),
+                        style: GoogleFonts.notoSans(fontSize: 15, color: Colors.grey.shade500),
                         textAlign: TextAlign.center,
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0).copyWith(bottom: 80),
                       itemCount: _departments.length,
                       itemBuilder: (context, index) {
                         final department = _departments[index];
-                        return Dismissible(
-                          key: Key(department.id), // Унікальний ключ для Dismissible
-                          direction: DismissDirection.horizontal,
-                          confirmDismiss: (direction) async {
-                            if (direction == DismissDirection.endToStart) {
-                              // Свайп вліво (видалення)
-                              await _deleteDepartment(department.id);
-                              return false; // Запобігаємо автоматичному видаленню елемента
-                            } else if (direction == DismissDirection.startToEnd) {
-                              // Свайп вправо (редагування)
-                              await _editDepartment(department);
-                              return false; // Запобігаємо автоматичному видаленню елемента
-                            }
-                            return false;
-                          },
-                          // --- Змінений background ---
-                          background: Card( // Обгортаємо в Card
-                            margin: const EdgeInsets.only(bottom: 12), // Те ж маргін, що і у дочірнього Card
-                            elevation: 2, // Можете поставити 0, якщо не хочете тіні на фоні
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Заокруглені кути
-                            color: Colors.blue.shade600, // Колір при свайпі вправо (редагування)
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: const Icon(Icons.edit, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                          // --- Змінений secondaryBackground ---
-                          secondaryBackground: Card( // Обгортаємо в Card
-                            margin: const EdgeInsets.only(bottom: 12), // Те ж маргін
-                            elevation: 2, // Можете поставити 0
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Заокруглені кути
-                            color: Colors.red, // Колір при свайпі вліво (видалення)
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: const Icon(Icons.delete, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                          child: Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                              title: Text(
-                                department.name,
-                                style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.w600),
-                              ),
-                              leading: Icon(Icons.business, color: Colors.deepPurple.shade300),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.edit, color: Colors.grey.shade600),
-                                    onPressed: () => _editDepartment(department),
-                                    tooltip: l10n.editDepartment,
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _deleteDepartment(department.id),
-                                    tooltip: l10n.deleteDepartment,
-                                  ),
-                                ],
-                              ),
-                              onTap: () async {
-                                final result = await Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => DepartmentDetailScreen(
-                                      departmentId: department.id,
-                                      departmentName: department.name,
-                                    ),
-                                  ),
-                                );
-                                if (result == true) {
-                                  _loadDepartments(); // Refresh if rooms were changed in detail screen
-                                }
-                              },
-                            ),
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Dismissible(
+                            key: Key(department.id),
+                            direction: DismissDirection.horizontal,
+                            background: _buildSwipeBackground(Icons.edit_outlined, Colors.blue.shade400, Alignment.centerLeft),
+                            secondaryBackground: _buildSwipeBackground(Icons.delete_outline, Colors.redAccent, Alignment.centerRight),
+                            confirmDismiss: (direction) async {
+                              if (direction == DismissDirection.endToStart) {
+                                await _deleteDepartment(department.id);
+                                return false;
+                              } else if (direction == DismissDirection.startToEnd) {
+                                await _editDepartment(department);
+                                return false;
+                              }
+                              return false;
+                            },
+                            child: _buildDepartmentCard(department),
                           ),
                         );
                       },
                     ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addDepartment,
+        backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
+      ),
+    );
+  }
+
+  Widget _buildDepartmentCard(DepartmentDto department) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            final result = await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => DepartmentDetailScreen(
+                  departmentId: department.id,
+                  departmentName: department.name,
+                ),
+              ),
+            );
+            if (result == true) {
+              _loadDepartments();
+            }
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.deepPurple.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(Icons.business_rounded, color: Colors.deepPurple.shade300, size: 24),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    department.name,
+                    style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 28),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSwipeBackground(IconData icon, Color color, Alignment alignment) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Align(
+        alignment: alignment,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Icon(icon, color: Colors.white, size: 28),
+        ),
+      ),
     );
   }
 }

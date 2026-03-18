@@ -330,6 +330,8 @@ public class FirstAidKitService : IFirstAidKitService
 
     public async Task<Guid> AddMedicationAsync(MedicationCreateDto dto)
     {
+        dto = dto with { ExpirationDate = DateTime.SpecifyKind(dto.ExpirationDate, DateTimeKind.Utc) };
+
         var kit = await _kitRepository.GetKitByIdAsync(dto.FirstAidKitId);
         if (kit == null)
         {

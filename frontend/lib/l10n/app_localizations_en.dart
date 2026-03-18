@@ -184,7 +184,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get medicationName => 'Medication Name';
 
   @override
-  String get minimumQuantity => 'Minimum Quantity';
+  String get minimumQuantity => 'Min. Quantity';
 
   @override
   String get unit => 'Unit';

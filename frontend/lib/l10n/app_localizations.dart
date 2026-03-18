@@ -437,7 +437,7 @@ abstract class AppLocalizations {
   /// No description provided for @minimumQuantity.
   ///
   /// In en, this message translates to:
-  /// **'Minimum Quantity'**
+  /// **'Min. Quantity'**
   String get minimumQuantity;
 
   /// No description provided for @unit.

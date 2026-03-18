@@ -184,7 +184,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get medicationName => 'Назва медикаменту';
 
   @override
-  String get minimumQuantity => 'Мінімальна кількість';
+  String get minimumQuantity => 'Мін. кількість';
 
   @override
   String get unit => 'Одиниця виміру';
@@ -548,16 +548,17 @@ class AppLocalizationsUk extends AppLocalizations {
   String get enterEmailAndPassword => 'Please enter email and password';
 
   @override
-  String get welcomeBack => 'Welcome back';
+  String get welcomeBack => 'З поверненням';
 
   @override
-  String get signInLabel => 'Sign in to manage kits, medications and alerts';
+  String get signInLabel =>
+      'Увійдіть, щоб керувати наборами, ліками та сповіщеннями';
 
   @override
   String get processing => 'Processing';
 
   @override
-  String get login => 'Login';
+  String get login => 'Увійти';
 
   @override
   String get cannotDeleteDepartmentWithExistingRooms =>

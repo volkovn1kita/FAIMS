@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/department_dto.dart'; // Для вибору департаменту
+import 'package:frontend/data/dtos/department_dto.dart';
 import 'package:frontend/data/dtos/room_create_dto.dart';
 import 'package:frontend/data/dtos/room_update_dto.dart';
 import 'package:frontend/domain/repositories/department_repository.dart';
@@ -7,10 +7,10 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 
 class AddEditRoomScreen extends StatefulWidget {
-  final String? roomId; // Null for add, not null for edit
-  final String? initialName; // Initial name for editing
-  final String? initialDepartmentId; // Initial department for editing
-  final String? currentDepartmentId; // Department ID if adding a room to a specific department
+  final String? roomId; 
+  final String? initialName; 
+  final String? initialDepartmentId; 
+  final String? currentDepartmentId; 
 
   const AddEditRoomScreen({
     super.key,
@@ -32,6 +32,8 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
   String _errorMessage = '';
   List<DepartmentDto> _departments = [];
   DepartmentDto? _selectedDepartment;
+  
+  bool _isSaving = false;
 
   bool get isEditing => widget.roomId != null;
 
@@ -57,16 +59,15 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
         if (isEditing) {
           _selectedDepartment = _departments.firstWhere(
             (dept) => dept.id == widget.initialDepartmentId,
-            orElse: () => _departments.first, // Fallback if not found
+            orElse: () => _departments.first, 
           );
         } else if (widget.currentDepartmentId != null) {
-          // If adding a room to a specific department, pre-select it
           _selectedDepartment = _departments.firstWhere(
             (dept) => dept.id == widget.currentDepartmentId,
             orElse: () => _departments.first,
           );
         } else {
-          _selectedDepartment = _departments.first; // Default to first department
+          _selectedDepartment = _departments.first; 
         }
       });
     } catch (e) {
@@ -75,12 +76,6 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           _errorMessage = e.toString().contains('Exception:')
               ? e.toString().replaceAll('Exception: ', '')
               : 'Failed to load departments: ${e.toString()}';
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(_errorMessage, style: GoogleFonts.notoSans()),
-              backgroundColor: Colors.red,
-            ),
-          );
         });
       }
     } finally {
@@ -108,7 +103,8 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(l10n.selectDepartment, style: GoogleFonts.notoSans()),
-            backgroundColor: Colors.red,
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
@@ -116,7 +112,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
     }
 
     setState(() {
-      _isLoading = true;
+      _isSaving = true;
       _errorMessage = '';
     });
 
@@ -128,19 +124,14 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           departmentId: _selectedDepartment!.id,
         );
         await _departmentRepository.updateRoom(widget.roomId!, updateDto);
-        if (mounted) {
-          Navigator.of(context).pop(true); // Indicate success
-        }
       } else {
         final createDto = RoomCreateDto(
           name: _nameController.text.trim(),
           departmentId: _selectedDepartment!.id,
         );
         await _departmentRepository.addRoom(createDto);
-        if (mounted) {
-          Navigator.of(context).pop(true); // Indicate success
-        }
       }
+      
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -148,9 +139,11 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
               isEditing ? l10n.roomUpdatedSuccessfully : l10n.roomAddedSuccessfully,
               style: GoogleFonts.notoSans(),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
           ),
         );
+        Navigator.of(context).pop(true);
       }
     } catch (e) {
       if (mounted) {
@@ -158,18 +151,12 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           _errorMessage = e.toString().contains('Exception:')
               ? e.toString().replaceAll('Exception: ', '')
               : 'Failed to save room: ${e.toString()}';
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(_errorMessage, style: GoogleFonts.notoSans()),
-              backgroundColor: Colors.red,
-            ),
-          );
         });
       }
     } finally {
       if (mounted) {
         setState(() {
-          _isLoading = false;
+          _isSaving = false;
         });
       }
     }
@@ -178,98 +165,260 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           isEditing ? l10n.editRoom : l10n.addRoom,
-          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+          style: GoogleFonts.notoSans(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
         ),
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: _isLoading && _departments.isEmpty // Show loading indicator if departments are still loading
-          ? const Center(child: CircularProgressIndicator())
-          : Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    TextFormField(
-                      controller: _nameController,
-                      decoration: InputDecoration(
-                        labelText: l10n.roomName,
-                        hintText: l10n.roomNameHint,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        prefixIcon: const Icon(Icons.meeting_room),
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return l10n.roomNameMissError;
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    DropdownButtonFormField<DepartmentDto>(
-                      initialValue: _selectedDepartment,
-                      decoration: InputDecoration(
-                        labelText: l10n.department,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        prefixIcon: const Icon(Icons.business),
-                      ),
-                      items: _departments.map((department) {
-                        return DropdownMenuItem(
-                          value: department,
-                          child: Text(
-                            department.name,
-                            style: GoogleFonts.notoSans(),
-                          ),
-                        );
-                      }).toList(),
-                      onChanged: (DepartmentDto? newValue) {
-                        setState(() {
-                          _selectedDepartment = newValue;
-                        });
-                      },
-                      validator: (value) {
-                        if (value == null) {
-                          return l10n.selectDepartment;
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    _isLoading
-                        ? const Center(child: CircularProgressIndicator())
-                        : ElevatedButton.icon(
-                            onPressed: _saveRoom,
-                            icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white),
-                            label: Text(
-                              isEditing ? l10n.saveChanges : l10n.addRoom,
-                              style: GoogleFonts.notoSans(fontSize: 16, color: Colors.white),
+      body: Column(
+        children: [
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+            ),
+          ),
+          Expanded(
+            child: _isLoading && _departments.isEmpty 
+                ? const Center(child: CircularProgressIndicator())
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(20.0).copyWith(bottom: 40),
+                    child: Column(
+                      children: [
+                        if (_errorMessage.isNotEmpty)
+                          Container(
+                            margin: const EdgeInsets.only(bottom: 20),
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade50,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: Colors.red.shade100),
                             ),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 173, 128, 245),
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
+                            child: Row(
+                              children: [
+                                Icon(Icons.error_outline_rounded, color: Colors.red.shade400),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    _errorMessage,
+                                    style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w500),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(24),
+                            boxShadow: [
+                              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8)),
+                            ],
+                          ),
+                          padding: const EdgeInsets.all(24),
+                          child: Form(
+                            key: _formKey,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildTextField(
+                                  controller: _nameController,
+                                  label: l10n.roomName,
+                                  hintText: l10n.roomNameHint,
+                                  icon: Icons.meeting_room_rounded,
+                                  validator: (value) {
+                                    if (value == null || value.trim().isEmpty) {
+                                      return l10n.roomNameMissError;
+                                    }
+                                    return null;
+                                  },
+                                ),
+                                const SizedBox(height: 20),
+                                
+                                _buildDropdown(l10n),
+                              ],
+                            ),
+                          ),
+                        ),
+                        
+                        const SizedBox(height: 32),
+                        
+                        Container(
+                          width: double.infinity,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color.fromARGB(255, 163, 108, 245), Color.fromARGB(255, 123, 68, 205)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.35),
+                                blurRadius: 15,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _isSaving ? null : _saveRoom,
+                              borderRadius: BorderRadius.circular(16),
+                              child: Center(
+                                child: _isSaving
+                                    ? const SizedBox(
+                                        height: 24,
+                                        width: 24,
+                                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                                      )
+                                    : Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(isEditing ? Icons.save_rounded : Icons.add_rounded, color: Colors.white, size: 22),
+                                          const SizedBox(width: 8),
+                                          Text(
+                                            isEditing ? l10n.saveChanges : l10n.addRoom,
+                                            style: GoogleFonts.notoSans(
+                                              fontSize: 16, 
+                                              color: Colors.white, 
+                                              fontWeight: FontWeight.bold,
+                                              letterSpacing: 1.1,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                               ),
                             ),
                           ),
-                  ],
-                ),
-              ),
+                        ),
+                      ],
+                    ),
+                  ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hintText,
+    required IconData icon,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+          child: Text(
+            label,
+            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+          ),
+        ),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+            prefixIcon: Icon(icon, color: Colors.grey.shade500),
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
             ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: Colors.redAccent, width: 1),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: Colors.redAccent, width: 1.5),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+          child: Text(
+            l10n.department,
+            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+          ),
+        ),
+        DropdownButtonFormField<DepartmentDto>(
+          value: _selectedDepartment,
+          icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
+          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          decoration: InputDecoration(
+            prefixIcon: Icon(Icons.business_rounded, color: Colors.grey.shade500),
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+            ),
+          ),
+          items: _departments.map((department) {
+            return DropdownMenuItem(
+              value: department,
+              child: Text(
+                department.name,
+                style: GoogleFonts.notoSans(),
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList(),
+          onChanged: (DepartmentDto? newValue) {
+            setState(() {
+              _selectedDepartment = newValue;
+            });
+          },
+          validator: (value) => value == null ? l10n.selectDepartment : null,
+        ),
+      ],
     );
   }
 }

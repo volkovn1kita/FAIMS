@@ -75,7 +75,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
       ),
     );
     if (result == true) {
-      _loadDepartmentDetails(); // Refresh list if room was added/edited
+      _loadDepartmentDetails();
     }
   }
 
@@ -85,12 +85,12 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
         builder: (context) => AddEditRoomScreen(
           roomId: room.id,
           initialName: room.name,
-          initialDepartmentId: widget.departmentId, // Pass current department ID for editing
+          initialDepartmentId: widget.departmentId,
         ),
       ),
     );
     if (result == true) {
-      _loadDepartmentDetails(); // Refresh list if room was added/edited
+      _loadDepartmentDetails();
     }
   }
 
@@ -131,7 +131,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
               backgroundColor: Colors.green,
             ),
           );
-          _loadDepartmentDetails(); // Refresh the list
+          _loadDepartmentDetails();
         }
       } catch (e) {
         if (mounted) {
@@ -161,119 +161,130 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           l10n.departmentRooms(widget.departmentName),
-          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
         ),
+        centerTitle: true,
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.add, color: Colors.black87),
-            onPressed: _addRoom,
-            tooltip: l10n.addNewRoom,
-          ),
-        ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : _errorMessage.isNotEmpty
-              ? Center(child: Text(_errorMessage, style: GoogleFonts.notoSans(color: Colors.red, fontSize: 16)))
+              ? Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(_errorMessage, textAlign: TextAlign.center, style: GoogleFonts.notoSans(color: Colors.red, fontSize: 16)),
+                  ),
+                )
               : _departmentDetail == null || _departmentDetail!.rooms.isEmpty
                   ? Center(
                       child: Text(
                         l10n.noRoomsFound,
-                        style: GoogleFonts.notoSans(fontSize: 16, color: Colors.grey),
+                        style: GoogleFonts.notoSans(fontSize: 15, color: Colors.grey.shade500),
                         textAlign: TextAlign.center,
                       ),
                     )
                   : ListView.builder(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.all(16.0).copyWith(bottom: 80),
                       itemCount: _departmentDetail!.rooms.length,
                       itemBuilder: (context, index) {
                         final room = _departmentDetail!.rooms[index];
-                        return Dismissible(
-                          key: Key(room.id), // Унікальний ключ для Dismissible
-                          direction: DismissDirection.horizontal,
-                          confirmDismiss: (direction) async {
-                            if (direction == DismissDirection.endToStart) {
-                              // Свайп вліво (видалення)
-                              await _deleteRoom(room.id);
-                              return false; // Запобігаємо автоматичному видаленню елемента
-                            } else if (direction == DismissDirection.startToEnd) {
-                              // Свайп вправо (редагування)
-                              await _editRoom(room);
-                              return false; // Запобігаємо автоматичному видаленню елемента
-                            }
-                            return false;
-                          },
-                          // --- Змінений background ---
-                          background: Card( // Обгортаємо в Card
-                            margin: const EdgeInsets.only(bottom: 12), // Те ж маргін
-                            elevation: 2, // Можете поставити 0
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Заокруглені кути
-                            color: Colors.blue.shade600, // Колір при свайпі вправо (редагування)
-                            child: Align(
-                              alignment: Alignment.centerLeft,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: Icon(Icons.edit, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                          // --- Змінений secondaryBackground ---
-                          secondaryBackground: Card( // Обгортаємо в Card
-                            margin: const EdgeInsets.only(bottom: 12), // Те ж маргін
-                            elevation: 2, // Можете поставити 0
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), // Заокруглені кути
-                            color: Colors.red, // Колір при свайпі вліво (видалення)
-                            child: Align(
-                              alignment: Alignment.centerRight,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
-                                child: const Icon(Icons.delete, color: Colors.white),
-                              ),
-                            ),
-                          ),
-                          child: Card(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            elevation: 2,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                              title: Text(
-                                room.name,
-                                style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.w600),
-                              ),
-                              leading: Icon(Icons.meeting_room, color: Colors.deepPurple.shade300),
-                              trailing: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  IconButton(
-                                    icon: Icon(Icons.edit, color: Colors.grey.shade600),
-                                    onPressed: () => _editRoom(room),
-                                    tooltip: l10n.editRoom,
-                                  ),
-                                  IconButton(
-                                    icon: const Icon(Icons.delete, color: Colors.red),
-                                    onPressed: () => _deleteRoom(room.id),
-                                    tooltip: l10n.deleteRoom,
-                                  ),
-                                ],
-                              ),
-                              onTap: () {
-                                _editRoom(room);
-                              },
-                            ),
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12.0),
+                          child: Dismissible(
+                            key: Key(room.id),
+                            direction: DismissDirection.horizontal,
+                            background: _buildSwipeBackground(Icons.edit_outlined, Colors.blue.shade400, Alignment.centerLeft),
+                            secondaryBackground: _buildSwipeBackground(Icons.delete_outline, Colors.redAccent, Alignment.centerRight),
+                            confirmDismiss: (direction) async {
+                              if (direction == DismissDirection.endToStart) {
+                                await _deleteRoom(room.id);
+                                return false;
+                              } else if (direction == DismissDirection.startToEnd) {
+                                await _editRoom(room);
+                                return false;
+                              }
+                              return false;
+                            },
+                            child: _buildRoomCard(room),
                           ),
                         );
                       },
                     ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _addRoom,
+        backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
+      ),
+    );
+  }
+
+  Widget _buildRoomCard(RoomListDto room) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 2)),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => _editRoom(room),
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(Icons.meeting_room_rounded, color: Colors.teal.shade400, size: 24),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Text(
+                    room.name,
+                    style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 28),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSwipeBackground(IconData icon, Color color, Alignment alignment) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Align(
+        alignment: alignment,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Icon(icon, color: Colors.white, size: 28),
+        ),
+      ),
     );
   }
 }

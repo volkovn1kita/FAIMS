@@ -44,198 +44,282 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
+      backgroundColor: Colors.grey.shade100, 
       appBar: AppBar(
-        title: Text(l10n.globalAnalytics, style: GoogleFonts.notoSans(color: Colors.black87, fontWeight: FontWeight.bold)),
+        title: Text(
+          l10n.globalAnalytics,
+          style: GoogleFonts.notoSans(
+            fontSize: 22, // Трохи збільшили для статусу головного заголовка
+            color: Colors.black87, 
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.3,
+          ),
+        ),
         backgroundColor: Colors.white,
-        elevation: 0.5,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        elevation: 0,
         centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage.isNotEmpty
-              ? Center(child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Text(_errorMessage, style: const TextStyle(color: Colors.red), textAlign: TextAlign.center),
-                ))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSectionHeader(l10n.mostUsedMedications, Icons.trending_up),
-                      const SizedBox(height: 16),
-                      _buildChartCard(
-                        _stats!.topUsedMedications,
-                        const Color.fromARGB(255, 173, 128, 245), // Твій фірмовий фіолетовий
+      body: Column(
+        children: [
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+            ),
+          ),
+          Expanded(
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _errorMessage.isNotEmpty
+                    ? Center(
+                        child: Container(
+                          margin: const EdgeInsets.all(20),
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            color: Colors.red.shade50,
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(color: Colors.red.shade100),
+                          ),
+                          child: Text(
+                            _errorMessage,
+                            style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w500),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    : SingleChildScrollView(
+                        padding: const EdgeInsets.all(20.0).copyWith(bottom: 40),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            _buildSectionHeader(
+                              title: l10n.mostUsedMedications,
+                              icon: Icons.trending_up_rounded,
+                              color: const Color.fromARGB(255, 143, 88, 225),
+                            ),
+                            const SizedBox(height: 16),
+                            _buildChartCard(
+                              data: _stats!.topUsedMedications,
+                              baseColor: const Color.fromARGB(255, 143, 88, 225),
+                              gradientColors: [
+                                const Color.fromARGB(255, 163, 108, 245),
+                                const Color.fromARGB(255, 123, 68, 205),
+                              ],
+                            ),
+                            
+                            const SizedBox(height: 32),
+                            
+                            _buildSectionHeader(
+                              title: l10n.mostExpiredORwrittenOff,
+                              icon: Icons.delete_outline_rounded,
+                              color: Colors.redAccent.shade400,
+                            ),
+                            const SizedBox(height: 16),
+                            _buildChartCard(
+                              data: _stats!.topExpiredMedications,
+                              baseColor: Colors.redAccent,
+                              gradientColors: [
+                                Colors.redAccent.shade200,
+                                Colors.redAccent.shade700,
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                      
-                      const SizedBox(height: 32),
-                      
-                      _buildSectionHeader(l10n.mostExpiredORwrittenOff, Icons.delete_outline),
-                      const SizedBox(height: 16),
-                      _buildChartCard(
-                        _stats!.topExpiredMedications,
-                        Colors.redAccent.shade200,
-                      ),
-                      const SizedBox(height: 32),
-                    ],
-                  ),
-                ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
+  Widget _buildSectionHeader({required String title, required IconData icon, required Color color}) {
     return Row(
       children: [
-        Icon(icon, color: Colors.grey.shade700),
-        const SizedBox(width: 8),
-        Text(
-          title,
-          style: GoogleFonts.notoSans(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+        Container(
+          padding: const EdgeInsets.all(8), // Трохи зменшили паддінг іконки
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(icon, color: color, size: 22),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Text(
+            title,
+            style: GoogleFonts.notoSans(
+              fontSize: 16, // Було 18, стало 16 - тепер це чіткий підзаголовок
+              fontWeight: FontWeight.w600, // Зробили трохи м'якшим
+              color: Colors.black87,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildChartCard(List<MedicationStatDto> data, Color barColor) {
+  Widget _buildChartCard({
+    required List<MedicationStatDto> data,
+    required Color baseColor,
+    required List<Color> gradientColors,
+  }) {
     final l10n = AppLocalizations.of(context)!;
+    
     if (data.isEmpty) {
       return Container(
-        height: 200,
+        height: 220,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade200),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: Colors.grey.shade200, width: 1.5),
         ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.bar_chart, size: 48, color: Colors.grey.shade300),
-              const SizedBox(height: 8),
-              Text(l10n.noDataAvailableYet, style: GoogleFonts.notoSans(color: Colors.grey)),
-            ],
-          ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(color: Colors.grey.shade50, shape: BoxShape.circle),
+              child: Icon(Icons.bar_chart_rounded, size: 40, color: Colors.grey.shade300),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.noDataAvailableYet,
+              style: GoogleFonts.notoSans(color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+            ),
+          ],
         ),
       );
     }
 
-    // Знаходимо максимальне значення для масштабування Y-осі
     double maxY = 0;
     for (var item in data) {
       if (item.totalQuantity > maxY) maxY = item.totalQuantity.toDouble();
     }
-    maxY = maxY == 0 ? 10 : maxY * 1.2; // Додаємо 20% простору зверху
+    maxY = maxY == 0 ? 10 : maxY * 1.3; 
 
-    return Card(
-      elevation: 3,
-      shadowColor: Colors.black12,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(16, 24, 16, 16),
-        child: SizedBox(
-          height: 250,
-          child: BarChart(
-            BarChartData(
-              alignment: BarChartAlignment.spaceAround,
-              maxY: maxY,
-              barTouchData: BarTouchData(
-                enabled: true,
-                touchTooltipData: BarTouchTooltipData(
-                  getTooltipColor: (group) => Colors.blueGrey.shade900,
-                  getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                    final item = data[group.x.toInt()];
-                    return BarTooltipItem(
-                      '${item.medicationName}\n',
-                      const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8)),
+        ],
+      ),
+      padding: const EdgeInsets.fromLTRB(16, 32, 24, 20),
+      child: SizedBox(
+        height: 220,
+        child: BarChart(
+          BarChartData(
+            alignment: BarChartAlignment.spaceAround,
+            maxY: maxY,
+            barTouchData: BarTouchData(
+              enabled: true,
+              touchTooltipData: BarTouchTooltipData(
+                tooltipPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                tooltipMargin: 8,
+                getTooltipItem: (group, groupIndex, rod, rodIndex) {
+                  final item = data[group.x.toInt()];
+                  return BarTooltipItem(
+                    '${item.medicationName}\n',
+                    GoogleFonts.notoSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    children: <TextSpan>[
+                      TextSpan(
+                        text: '${item.totalQuantity} ${item.unit}',
+                        style: GoogleFonts.notoSans(
+                          color: Colors.white70,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
+                        ),
                       ),
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: '${item.totalQuantity} ${item.unit}',
-                          style: TextStyle(
-                            color: barColor.withOpacity(0.8), // Світліший відтінок для тексту
-                            fontWeight: FontWeight.w500,
-                            fontSize: 12,
+                    ],
+                  );
+                },
+              ),
+            ),
+            titlesData: FlTitlesData(
+              show: true,
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 36,
+                  getTitlesWidget: (double value, TitleMeta meta) {
+                    int index = value.toInt();
+                    if (index >= 0 && index < data.length) {
+                      String name = data[index].medicationName;
+                      if (name.length > 8) name = '${name.substring(0, 6)}..';
+                      return SideTitleWidget(
+                        axisSide: meta.axisSide,
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: Text(
+                            name,
+                            style: GoogleFonts.notoSans(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
                           ),
                         ),
-                      ],
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                ),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 40,
+                  getTitlesWidget: (value, meta) {
+                    if (value == 0 || value == maxY) return const SizedBox.shrink();
+                    return SideTitleWidget(
+                      axisSide: meta.axisSide,
+                      child: Text(
+                        value.toInt().toString(),
+                        style: GoogleFonts.notoSans(fontSize: 11, color: Colors.grey.shade400, fontWeight: FontWeight.w600),
+                      ),
                     );
                   },
                 ),
               ),
-              titlesData: FlTitlesData(
-                show: true,
-                bottomTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 40,
-                    getTitlesWidget: (double value, TitleMeta meta) {
-                      int index = value.toInt();
-                      if (index >= 0 && index < data.length) {
-                        // Скорочуємо назву, якщо довга
-                        String name = data[index].medicationName;
-                        if (name.length > 8) name = '${name.substring(0, 6)}..';
-                        return SideTitleWidget(
-                          axisSide: meta.axisSide,
-                          child: Padding(
-                            padding: const EdgeInsets.only(top: 8.0),
-                            child: Text(name, style: GoogleFonts.notoSans(fontSize: 10, color: Colors.grey.shade700)),
-                          ),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    },
-                  ),
-                ),
-                leftTitles: AxisTitles(
-                  sideTitles: SideTitles(
-                    showTitles: true,
-                    reservedSize: 30,
-                    getTitlesWidget: (value, meta) {
-                       if (value == 0) return const SizedBox.shrink();
-                       return Text(value.toInt().toString(), 
-                         style: GoogleFonts.notoSans(fontSize: 10, color: Colors.grey.shade500));
-                    },
-                  ),
-                ),
-                topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-              ),
-              borderData: FlBorderData(show: false),
-              gridData: FlGridData(
-                show: true, 
-                drawVerticalLine: false,
-                getDrawingHorizontalLine: (value) => FlLine(color: Colors.grey.shade100, strokeWidth: 1),
-              ),
-              barGroups: data.asMap().entries.map((entry) {
-                return BarChartGroupData(
-                  x: entry.key,
-                  barRods: [
-                    BarChartRodData(
-                      toY: entry.value.totalQuantity.toDouble(),
-                      color: barColor,
-                      width: 18,
-                      borderRadius: const BorderRadius.vertical(top: Radius.circular(6)),
-                      backDrawRodData: BackgroundBarChartRodData(
-                        show: true,
-                        toY: maxY, // Фон на повну висоту
-                        color: Colors.grey.shade50,
-                      ),
-                    ),
-                  ],
-                );
-              }).toList(),
+              topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
+            borderData: FlBorderData(show: false),
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: false,
+              getDrawingHorizontalLine: (value) => FlLine(
+                color: Colors.grey.shade100,
+                strokeWidth: 1.5,
+                dashArray: [5, 5], 
+              ),
+            ),
+            barGroups: data.asMap().entries.map((entry) {
+              return BarChartGroupData(
+                x: entry.key,
+                barRods: [
+                  BarChartRodData(
+                    toY: entry.value.totalQuantity.toDouble(),
+                    gradient: LinearGradient(
+                      colors: gradientColors,
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                    ),
+                    width: 20,
+                    borderRadius: BorderRadius.circular(6),
+                    backDrawRodData: BackgroundBarChartRodData(
+                      show: true,
+                      toY: maxY,
+                      color: Colors.grey.shade50,
+                    ),
+                  ),
+                ],
+              );
+            }).toList(),
           ),
         ),
       ),

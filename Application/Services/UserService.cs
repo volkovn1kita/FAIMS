@@ -347,5 +347,32 @@ namespace Application.Services
             await _userRepository.RemoveAsync(userToDelete);
             await _userRepository.SaveChangesAsync();
         }
+
+        public async Task UpdateFcmTokenAsync(Guid userId, string token)
+        {
+            // Знаходимо користувача
+            var user = await _userRepository.GetByIdAsync(userId);
+
+            if (user == null)
+            {
+                throw new NotFoundException($"User with ID {userId} not found.");
+            }
+
+            // Оновлюємо токен
+            user.FcmToken = token;
+
+            // Зберігаємо
+            await _userRepository.SaveChangesAsync(); // або _unitOfWork.SaveAsync()
+        }
+        
+        public async Task<string?> GetUserFcmTokenAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId); 
+            
+            if (user == null) return null;
+            
+            return user.FcmToken;
+        }
+
     }
 }

@@ -153,4 +153,14 @@ public class FirstAidKitRepository : IFirstAidKitRepository
         _dbContext.Medications.Update(medication);
         return Task.CompletedTask;
     }
+
+    public async Task<IEnumerable<Medication>> GetMedicationsExpiringOnDateWithUsersAsync(DateTime date)
+        {
+            return await _dbContext.Medications
+                .Include(m => m.FirstAidKit)
+                    .ThenInclude(k => k.ResponsibleUser)
+                .Where(m => m.ExpirationDate.Date == date.Date)
+                .ToListAsync();
+        }
+
 }

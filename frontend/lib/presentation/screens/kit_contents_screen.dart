@@ -228,27 +228,29 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    
     return Scaffold(
+      backgroundColor: Colors.grey.shade100, // Світлий фон для контрасту карток
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0,
         title: Text(
           _kitDetails?.name ?? l10n.kitsContent,
-          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
           overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.of(context).pop(true), // Завжди повертаємо true
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          onPressed: () => Navigator.of(context).pop(true),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit, color: Colors.black87),
+            icon: const Icon(Icons.edit_outlined, color: Colors.black87),
             onPressed: _isLoading ? null : _navigateToEditKit,
           ),
           IconButton(
-            icon: const Icon(Icons.delete, color: Colors.black87),
+            icon: const Icon(Icons.delete_outline, color: Colors.redAccent),
             onPressed: _isLoading ? null : _confirmDeleteKit,
           ),
         ],
@@ -259,92 +261,152 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
               ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red, fontSize: 16)))
               : _kitDetails == null
                   ? Center(child: Text(l10n.kitDetailsNotFound, style: GoogleFonts.notoSans()))
-                  : SingleChildScrollView(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            _kitDetails!.name,
-                            style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                          Text(
-                            'ID: ${_kitDetails!.uniqueNumber}',
-                            style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade600),
-                          ),
-                          const SizedBox(height: 16),
-                          _buildDetailRow(
-                            '${l10n.department}:',
-                            _kitDetails!.departmentName,
-                            alignment: CrossAxisAlignment.start,
-                          ),
-                          _buildDetailRow(
-                            '${l10n.room}:',
-                            _kitDetails!.roomName,
-                            alignment: CrossAxisAlignment.start,
-                          ),
-                          _buildDetailRow(
-                            '${l10n.responsiblePerson}:',
-                            '${_kitDetails!.responsibleUserFirstName} ${_kitDetails!.responsibleUserLastName}',
-                            alignment: CrossAxisAlignment.center,
-                          ),
-                          const Divider(height: 32),
-                          Text(
-                            '${l10n.medication}:',
-                            style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-                          ),
-                          const SizedBox(height: 10),
-                          _medications.isEmpty
-                              ? Center(
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(16.0),
-                                    child: Text(
-                                      l10n.noMedicationsFoundInThisKit,
-                                      style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade700),
-                                      textAlign: TextAlign.center,
+                  : CustomScrollView(
+                      slivers: [
+                        SliverToBoxAdapter(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _buildKitInfoCard(l10n),
+                                const SizedBox(height: 24),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      l10n.medication,
+                                      style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                                     ),
-                                  ),
-                                )
-                              : ListView.builder(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: _medications.length,
-                                  itemBuilder: (context, index) {
-                                    final medication = _medications[index];
-                                    return _buildMedicationListItem(medication);
-                                  },
+                                    // Показуємо кількість ліків
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        '${_medications.length}',
+                                        style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, color: Colors.black54),
+                                      ),
+                                    )
+                                  ],
                                 ),
-                        ],
-                      ),
+                                const SizedBox(height: 12),
+                              ],
+                            ),
+                          ),
+                        ),
+                        if (_medications.isEmpty)
+                          SliverFillRemaining(
+                            hasScrollBody: false,
+                            child: Center(
+                              child: Text(
+                                l10n.noMedicationsFoundInThisKit,
+                                style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade500),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          )
+                        else
+                          SliverPadding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(bottom: 80),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) => _buildMedicationListItem(_medications[index]),
+                                childCount: _medications.length,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToAddEditMedication(),
-        backgroundColor: const Color.fromARGB(255, 173, 128, 245),
-        child: const Icon(Icons.add, color: Colors.white),
+        backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+        elevation: 4,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
     );
   }
 
-  Widget _buildDetailRow(String label, String value, {CrossAxisAlignment alignment = CrossAxisAlignment.start}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: alignment,
+  // --- ВІДЖЕТИ ДЛЯ СУЧАСНОГО UI ---
+
+  // Компактна і красива картка з інформацією про аптечку
+  Widget _buildKitInfoCard(AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(
-            width: 150,
-            child: Text('$label ', style: GoogleFonts.notoSans(fontWeight: FontWeight.w600, fontSize: 16)),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.medical_services_outlined, color: Colors.blue.shade400),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      _kitDetails!.name,
+                      style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    Text(
+                      'ID: ${_kitDetails!.uniqueNumber}',
+                      style: GoogleFonts.notoSans(fontSize: 13, color: Colors.grey.shade500),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Text(value, style: GoogleFonts.notoSans(fontSize: 16)),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Divider(height: 1, thickness: 1),
           ),
+          _buildInfoPill(Icons.domain, _kitDetails!.departmentName),
+          const SizedBox(height: 10),
+          _buildInfoPill(Icons.meeting_room_outlined, _kitDetails!.roomName),
+          const SizedBox(height: 10),
+          _buildInfoPill(Icons.person_outline, '${_kitDetails!.responsibleUserFirstName} ${_kitDetails!.responsibleUserLastName}'),
         ],
       ),
     );
   }
 
+  // Маленький рядок з іконкою для деталей аптечки
+  Widget _buildInfoPill(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 18, color: Colors.grey.shade600),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+            text,
+            style: GoogleFonts.notoSans(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Оновлена картка медикаменту
   Widget _buildMedicationListItem(MedicationDto medication) {
     final l10n = AppLocalizations.of(context)!;
     Color statusColor;
@@ -352,11 +414,11 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
 
     switch (medication.status) {
       case ExpirationStatus.expired:
-        statusColor = Colors.red.shade600;
+        statusColor = Colors.redAccent;
         statusText = l10n.expired;
         break;
       case ExpirationStatus.critical:
-        statusColor = Colors.deepOrange.shade600;
+        statusColor = Colors.orangeAccent;
         statusText = l10n.critical;
         break;
       case ExpirationStatus.warning:
@@ -364,121 +426,114 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         statusText = l10n.statusWarning;
         break;
       case ExpirationStatus.good:
-        statusColor = Colors.green.shade600;
+        statusColor = Colors.green;
         statusText = l10n.statusGood;
         break;
     }
 
     bool isLowQuantity = medication.quantity < medication.minimumQuantity;
-    Color quantityColor = isLowQuantity ? Colors.red.shade700 : Colors.black87;
-    String quantityWarning = isLowQuantity ? ' (${l10n.lowStock}!)' : '';
 
-    return Dismissible(
-      key: Key(medication.id),
-      direction: DismissDirection.horizontal, // Дозволяємо свайп в обидва боки
-      confirmDismiss: (direction) async {
-        if (direction == DismissDirection.endToStart) {
-          // Свайп вліво (видалення)
-          if (medication.quantity > 0) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(l10n.quantityIsGreaterThan0Erorr(medication.name), style: GoogleFonts.notoSans()),
-                backgroundColor: Colors.red,
-                duration: const Duration(seconds: 4),
-              ),
-            );
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Dismissible(
+        key: Key(medication.id),
+        direction: DismissDirection.horizontal,
+        confirmDismiss: (direction) async {
+          if (direction == DismissDirection.endToStart) {
+            if (medication.quantity > 0) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(l10n.quantityIsGreaterThan0Erorr(medication.name)),
+                  backgroundColor: Colors.red,
+                ),
+              );
+              return false;
+            }
+            await _confirmDeleteMedication(medication.id, medication.name);
+            return false;
+          } else if (direction == DismissDirection.startToEnd) {
+            await _navigateToAddEditMedication(medicationId: medication.id);
             return false;
           }
-          await _confirmDeleteMedication(medication.id, medication.name); // Викликаємо діалог підтвердження
-          return false; // Не дозволяємо Dismissible видаляти елемент
-        } else if (direction == DismissDirection.startToEnd) {
-          // Свайп вправо (редагування)
-          await _navigateToAddEditMedication(medicationId: medication.id);
-          return false; // Не дозволяємо Dismissible видаляти елемент
-        }
-        return false;
-      },
-      // Фон для свайпу вправо (редагування)
-      background: Card(
-        margin: const EdgeInsets.symmetric(vertical: 8.0), // Той самий маргін, що і у основного Card
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: Colors.blue.shade600, // Колір для редагування
-        child: const Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Icon(Icons.edit, color: Colors.white, size: 30),
+          return false;
+        },
+        background: _buildSwipeBackground(Icons.edit_outlined, Colors.blue.shade400, Alignment.centerLeft),
+        secondaryBackground: _buildSwipeBackground(Icons.delete_outline, Colors.redAccent, Alignment.centerRight),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 2)),
+            ],
+            // Тонка лінія зліва, яка показує статус
+            border: Border(left: BorderSide(color: statusColor, width: 4)),
           ),
-        ),
-      ),
-      // Фон для свайпу вліво (видалення)
-      secondaryBackground: Card(
-        margin: const EdgeInsets.symmetric(vertical: 8.0), // Той самий маргін
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        color: Colors.red.shade700, // Колір для видалення
-        child: const Align(
-          alignment: Alignment.centerRight,
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Icon(Icons.delete, color: Colors.white, size: 30),
-          ),
-        ),
-      ),
-      child: Card(
-        margin: const EdgeInsets.symmetric(vertical: 8.0),
-        elevation: 2,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        child: InkWell(
-          onTap: () {
-            _navigateToAddEditMedication(medicationId: medication.id);
-          },
-          borderRadius: BorderRadius.circular(12),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        medication.name,
-                        style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
-                        overflow: TextOverflow.ellipsis,
+          child: InkWell(
+            onTap: () => _navigateToAddEditMedication(medicationId: medication.id),
+            borderRadius: BorderRadius.circular(16),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          medication.name,
+                          style: GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                        ),
                       ),
-                    ),
-                    Chip(
-                      label: Text(
-                        statusText,
-                        style: GoogleFonts.notoSans(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold),
+                      const SizedBox(width: 8),
+                      // Сучасний Soft-Badge для статусу
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: statusColor.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          statusText,
+                          style: GoogleFonts.notoSans(fontSize: 12, color: statusColor, fontWeight: FontWeight.w700),
+                        ),
                       ),
-                      backgroundColor: statusColor,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                _buildMedicationInfoRow(
-                  Icons.inventory,
-                  l10n.quantity,
-                  '${medication.quantity} ${medication.unit.name.capitalize()}$quantityWarning', // Капіталізуємо одиницю
-                  valueColor: quantityColor,
-                ),
-                _buildMedicationInfoRow(
-                  Icons.calendar_today,
-                  '${l10n.expires}:',
-                  DateFormat('dd.MM.yyyy').format(medication.expirationDate),
-                ),
-                _buildMedicationInfoRow(
-                  Icons.warning_amber,
-                  '${l10n.minimumQuantity}:',
-                  '${medication.minimumQuantity} ${medication.unit.name.capitalize()}', // Капіталізуємо одиницю
-                ),
-              ],
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  // Інформація в один рядок
+                  Row(
+                    children: [
+                      // Кількість
+                      Icon(Icons.inventory_2_outlined, size: 16, color: isLowQuantity ? Colors.red : Colors.grey.shade500),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${medication.quantity} ${medication.unit.name.capitalize()}',
+                        style: GoogleFonts.notoSans(
+                          fontSize: 14, 
+                          fontWeight: FontWeight.w600, 
+                          color: isLowQuantity ? Colors.red : Colors.black87
+                        ),
+                      ),
+                      if (isLowQuantity) ...[
+                        const SizedBox(width: 4),
+                        Icon(Icons.error_outline, size: 14, color: Colors.red.shade400),
+                      ],
+                      
+                      const Spacer(),
+                      
+                      // Дата закінчення
+                      Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey.shade500),
+                      const SizedBox(width: 6),
+                      Text(
+                        DateFormat('dd.MM.yyyy').format(medication.expirationDate),
+                        style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
@@ -486,26 +541,19 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
     );
   }
 
-  Widget _buildMedicationInfoRow(IconData icon, String label, String value, {Color valueColor = Colors.grey}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Icon(icon, size: 18, color: Colors.grey.shade700),
-          const SizedBox(width: 8),
-          Text(
-            '$label ',
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: GoogleFonts.notoSans(fontSize: 14, color: valueColor),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
-        ],
+  // Фон для свайпу
+  Widget _buildSwipeBackground(IconData icon, Color color, Alignment alignment) {
+    return Container(
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Align(
+        alignment: alignment,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Icon(icon, color: Colors.white, size: 28),
+        ),
       ),
     );
   }

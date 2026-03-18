@@ -30,8 +30,6 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
 
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _uniqueNumberController = TextEditingController();
-  final TextEditingController _auditDateController = TextEditingController();
-  
 
   DepartmentDto? _selectedDepartment;
   RoomDto? _selectedRoom;
@@ -45,9 +43,6 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   bool _isSaving = false;
   bool _isRoomsLoading = false;
   String _errorMessage = '';
-  String _roomsErrorMessage = '';
-  DateTime? _lastAuditDate;
-  
 
   @override
   void initState() {
@@ -59,10 +54,9 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   void dispose() {
     _nameController.dispose();
     _uniqueNumberController.dispose();
-    _auditDateController.dispose();
     super.dispose();
   }
-  
+
   Future<void> _loadScreenData() async {
     if (!mounted) return;
     setState(() {
@@ -92,425 +86,326 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
         final kitToEdit = await _kitRepository.getFirstAidKitById(widget.kitId!);
         _nameController.text = kitToEdit.name;
         _uniqueNumberController.text = kitToEdit.uniqueNumber;
-        _selectedDepartment = _departments.firstWhere(
-          (dep) => dep.id == kitToEdit.departmentId,
-          orElse: () => throw Exception('Department not found for kit: ${kitToEdit.departmentId}'),
-        );
+        _selectedDepartment = _departments.firstWhere((dep) => dep.id == kitToEdit.departmentId);
         await _loadRoomsForDepartment(_selectedDepartment!.id);
-        _selectedRoom = _roomsInSelectedDepartment.firstWhere(
-          (room) => room.id == kitToEdit.roomId,
-          orElse: () => throw Exception('Room not found for kit: ${kitToEdit.roomId}'),
-        );
-        _selectedResponsibleUser = _responsibleUsers.firstWhere(
-          (user) => user.id == kitToEdit.responsibleUserId,
-          orElse: () => throw Exception('Responsible user not found for kit: ${kitToEdit.responsibleUserId}'),
-        );
-        _lastAuditDate = kitToEdit.lastAuditDate;
-        if (_lastAuditDate != null) {
-          _auditDateController.text = DateFormat('yyyy-MM-dd').format(_lastAuditDate!);
-        }
+        _selectedRoom = _roomsInSelectedDepartment.firstWhere((room) => room.id == kitToEdit.roomId);
+        _selectedResponsibleUser = _responsibleUsers.firstWhere((user) => user.id == kitToEdit.responsibleUserId);
       } else {
         _generateUniqueNumber();
-        _lastAuditDate = DateTime.now();
-        _auditDateController.text = DateFormat('yyyy-MM-dd').format(_lastAuditDate!);
       }
     } catch (e) {
       setState(() {
         _errorMessage = e.toString().contains('Exception:')
             ? e.toString().replaceAll('Exception: ', '')
-            : 'Failed to load initial data: ${e.toString()}';
-        print('Error loading initial data: $e');
+            : 'Failed to load data: ${e.toString()}';
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
   Future<void> _loadRoomsForDepartment(String departmentId) async {
     setState(() {
       _isRoomsLoading = true;
-      _roomsErrorMessage = '';
       _roomsInSelectedDepartment = [];
       _selectedRoom = null;
     });
     try {
-      final allRoomsInDepartment = await _firstAidKitApiService.getRoomsByDepartmentId(departmentId);
+      final allRooms = await _firstAidKitApiService.getRoomsByDepartmentId(departmentId);
       setState(() {
-        _roomsInSelectedDepartment = allRoomsInDepartment.where((room) {
+        _roomsInSelectedDepartment = allRooms.where((room) {
           if (widget.kitId == null) return !_occupiedRoomIds.contains(room.id);
           return !_occupiedRoomIds.contains(room.id) || room.id == _selectedRoom?.id;
         }).toList();
-
-        if (_selectedRoom != null && !_roomsInSelectedDepartment.any((room) => room.id == _selectedRoom!.id)) {
-          _selectedRoom = null;
-        }
       });
     } catch (e) {
-      setState(() {
-        _roomsErrorMessage = e.toString().contains('Exception:')
-            ? e.toString().replaceAll('Exception: ', '')
-            : 'Failed to load rooms for department: ${e.toString()}';
-        print('Error loading rooms: $e');
-      });
+      print('Error loading rooms: $e');
     } finally {
-      setState(() {
-        _isRoomsLoading = false;
-      });
+      if (mounted) setState(() => _isRoomsLoading = false);
     }
   }
 
   void _generateUniqueNumber() {
-    String newUniqueNumber = 'KIT-${_uuid.v4().substring(0, 7).toUpperCase()}';
-    _uniqueNumberController.text = newUniqueNumber;
+    setState(() {
+      _uniqueNumberController.text = 'KIT-${_uuid.v4().substring(0, 7).toUpperCase()}';
+    });
   }
 
   Future<void> _saveKit() async {
     final l10n = AppLocalizations.of(context)!;
     if (!_formKey.currentState!.validate()) return;
     if (_selectedDepartment == null || _selectedRoom == null || _selectedResponsibleUser == null) {
-      setState(() {
-        _errorMessage = l10n.fillAllFieldsError;
-      });
+      setState(() => _errorMessage = l10n.fillAllFieldsError);
       return;
     }
 
-    setState(() {
-      _isSaving = true;
-      _errorMessage = '';
-    });
+    setState(() => _isSaving = true);
 
     try {
       if (widget.kitId == null) {
-        final createKitData = CreateKitDto(
+        final dto = CreateKitDto(
           uniqueNumber: _uniqueNumberController.text,
           name: _nameController.text,
           roomId: _selectedRoom!.id,
           responsibleUserId: _selectedResponsibleUser!.id,
         );
-        await _firstAidKitApiService.createKit(createKitData);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(l10n.kitAddedSuccess)),
-        );
+        await _firstAidKitApiService.createKit(dto);
       } else {
-        final updateKitData = UpdateKitDto(
+        final dto = UpdateKitDto(
           id: widget.kitId!,
           name: _nameController.text,
           roomId: _selectedRoom!.id,
           responsibleUserId: _selectedResponsibleUser!.id,
         );
-        await _firstAidKitApiService.updateKit(widget.kitId!, updateKitData);
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('First aid kit successfully updated!'),
-            backgroundColor: Colors.green,
-          ),
-        );
+        await _firstAidKitApiService.updateKit(widget.kitId!, dto);
       }
-
-      Navigator.of(context).pop(true);
+      if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
-      setState(() {
-        _errorMessage = e.toString().contains('Exception:')
-            ? e.toString().replaceAll('Exception: ', '')
-            : 'Error saving first aid kit: ${e.toString()}';
-        print('Error saving kit: $e');
-      });
+      setState(() => _errorMessage = e.toString());
     } finally {
-      setState(() {
-        _isSaving = false;
-      });
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
   Future<void> _deleteKit() async {
-    final texts = AppLocalizations.of(context)!;
-    return showDialog<void>(
+    final l10n = AppLocalizations.of(context)!;
+    final confirm = await showDialog<bool>(
       context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Delete Kit'),
-          content: Text(texts.deleteKitConfirmation(_nameController.text,_uniqueNumberController.text)),
-          actions: <Widget>[
-            TextButton(
-              child: Text(texts.cancel),
-              onPressed: () => Navigator.of(context).pop(),
-            ),
-            TextButton(
-              style: TextButton.styleFrom(foregroundColor: Colors.red),
-              child: Text(texts.delete),
-              onPressed: () async {
-                Navigator.of(context).pop();
-                setState(() {
-                  _isSaving = true;
-                  _errorMessage = '';
-                });
-                try {
-                  await _firstAidKitApiService.deleteKit(widget.kitId!);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(texts.kitDeleteSuccess)),
-                  );
-                  Navigator.of(context).pop(true);
-                } catch (e) {
-                  setState(() {
-                    _errorMessage = e.toString().contains('Exception:')
-                        ? e.toString().replaceAll('Exception: ', '')
-                        : 'Error deleting kit: ${e.toString()}';
-                    print('Error deleting kit: $e');
-                  });
-                } finally {
-                  setState(() {
-                    _isSaving = false;
-                  });
-                }
-              },
-            ),
-          ],
-        );
-      },
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.delete, style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(l10n.deleteKitConfirmation(_nameController.text, _uniqueNumberController.text)),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(l10n.delete),
+          ),
+        ],
+      ),
     );
+
+    if (confirm == true) {
+      setState(() => _isSaving = true);
+      try {
+        await _firstAidKitApiService.deleteKit(widget.kitId!);
+        if (mounted) Navigator.of(context).pop(true);
+      } finally {
+        if (mounted) setState(() => _isSaving = false);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0.5,
         title: Text(
-          widget.kitId == null ?  l10n.addKitTitle : l10n.editKitTitle,
-          style: GoogleFonts. notoSans(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+          widget.kitId == null ? l10n.addKitTitle : l10n.editKitTitle,
+          style: GoogleFonts.notoSans(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
         ),
+        backgroundColor: Colors.white,
+        elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _errorMessage.isNotEmpty
-              ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red, fontSize: 16)))
-              : Form(
-                  key: _formKey,
+          : Column(
+              children: [
+                Container(height: 1, decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))])),
+                Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildSectionHeader(context, l10n.kitDetails),
-                        _buildRequiredLabel(context, l10n.kitName),
-                        _buildTextFormField(
-                          controller: _nameController,
-                          hintText: l10n.kitNameHint,
-                          maxLength: 50,
-                          validator: (value) {
-                            if (value == null || value.isEmpty) return l10n.kitNameRequired;
-                            if (value.length < 3) return l10n.kitNameMinChars;
-                            return null;
-                          },
-                        ),
-                        _buildHelperText(l10n.kitNameHelper),
-                        const SizedBox(height: 16),
-                        _buildTextWithRequiredLabel(context, l10n.uniqueNumber, isRequired: false),
-                        _buildUniqueNumberField(),
-                        _buildHelperText(l10n.uniqueNumberHelper),
-                        const SizedBox(height: 32),
-                        _buildSectionHeader(context, l10n.ownershipAndLocation),
-                        _buildRequiredLabel(context, l10n.department),
-                        _buildDropdownButtonFormField<DepartmentDto>(
-                          value: _selectedDepartment,
-                          hintText: l10n.selectDepartmentHint,
-                          items: _departments.map((dep) => DropdownMenuItem(value: dep, child: Text(dep.name))).toList(),
-                          onChanged: (newValue) async {
-                            setState(() {
-                              _selectedDepartment = newValue;
-                              _selectedRoom = null;
-                              _roomsInSelectedDepartment = [];
-                            });
-                            if (newValue != null) await _loadRoomsForDepartment(newValue.id);
-                          },
-                          validator: (value) => value == null ? l10n.departmentRequired : null,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildRequiredLabel(context, l10n.roomLocation),
-                        _buildDropdownButtonFormField<RoomDto>(
-                          value: _selectedRoom,
-                          hintText: _selectedDepartment == null ? l10n.roomHintPreselect : l10n.roomHintSelect,
-                          items: _roomsInSelectedDepartment.map((room) => DropdownMenuItem(value: room, child: Text(room.name))).toList(),
-                          onChanged: _selectedDepartment == null || _isRoomsLoading ? null : (newValue) => setState(() => _selectedRoom = newValue),
-                          validator: (value) => value == null && _selectedDepartment != null ? l10n.roomRequired : null,
-                        ),
-                        if (_isRoomsLoading) const Padding(padding: EdgeInsets.only(top: 8.0), child: Center(child: CircularProgressIndicator(strokeWidth: 2))),
-                        if (_roomsErrorMessage.isNotEmpty)
-                          Padding(padding: const EdgeInsets.only(top: 8.0), child: Text(_roomsErrorMessage, style: const TextStyle(color: Colors.red, fontSize: 14))),
-                        _buildHelperText(_selectedDepartment == null ? l10n.roomHelperPreselect : l10n.roomHelperOptions),
-                        const SizedBox(height: 16),
-                        _buildRequiredLabel(context, l10n.responsiblePerson),
-                        _buildDropdownButtonFormField<UserDto>(
-                          value: _selectedResponsibleUser,
-                          hintText: l10n.responsiblePersonHint,
-                          items: _responsibleUsers
-                              .where((user) => widget.kitId == null ? !_occupiedUserIds.contains(user.id) : !_occupiedUserIds.contains(user.id) || user.id == _selectedResponsibleUser?.id)
-                              .map((user) => DropdownMenuItem(value: user, child: Text(user.fullName)))
-                              .toList(),
-                          onChanged: (newValue) => setState(() => _selectedResponsibleUser = newValue),
-                          validator: (value) => value == null ? l10n.responsiblePersonRequired : null,
-                        ),
-                        const SizedBox(height: 16),
-                      ],
+                    padding: const EdgeInsets.all(20.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (_errorMessage.isNotEmpty) _buildErrorBanner(_errorMessage),
+                          _buildSectionTitle(l10n.kitDetails),
+                          _buildCard([
+                            _buildTextField(
+                              controller: _nameController,
+                              label: l10n.kitName,
+                              hint: l10n.kitNameHint,
+                              icon: Icons.medication_rounded,
+                              validator: (v) => (v == null || v.isEmpty) ? l10n.kitNameRequired : null,
+                            ),
+                            const SizedBox(height: 20),
+                            _buildUniqueField(l10n),
+                          ]),
+                          const SizedBox(height: 24),
+                          _buildSectionTitle(l10n.ownershipAndLocation),
+                          _buildCard([
+                            _buildDropdown<DepartmentDto>(
+                              label: l10n.department,
+                              value: _selectedDepartment,
+                              items: _departments.map((d) => DropdownMenuItem(value: d, child: Text(d.name))).toList(),
+                              icon: Icons.business_rounded,
+                              onChanged: (val) {
+                                setState(() => _selectedDepartment = val);
+                                if (val != null) _loadRoomsForDepartment(val.id);
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            _buildDropdown<RoomDto>(
+                              label: l10n.roomLocation,
+                              value: _selectedRoom,
+                              items: _roomsInSelectedDepartment.map((r) => DropdownMenuItem(value: r, child: Text(r.name))).toList(),
+                              icon: Icons.meeting_room_rounded,
+                              isLoading: _isRoomsLoading,
+                              onChanged: _selectedDepartment == null ? null : (val) => setState(() => _selectedRoom = val),
+                            ),
+                            const SizedBox(height: 20),
+                            _buildDropdown<UserDto>(
+                              label: l10n.responsiblePerson,
+                              value: _selectedResponsibleUser,
+                              items: _responsibleUsers
+                                  .where((u) => widget.kitId == null ? !_occupiedUserIds.contains(u.id) : !_occupiedUserIds.contains(u.id) || u.id == _selectedResponsibleUser?.id)
+                                  .map((u) => DropdownMenuItem(value: u, child: Text(u.fullName)))
+                                  .toList(),
+                              icon: Icons.person_search_rounded,
+                              onChanged: (val) => setState(() => _selectedResponsibleUser = val),
+                            ),
+                          ]),
+                          const SizedBox(height: 100), // Space for bottom buttons
+                        ],
+                      ),
                     ),
                   ),
                 ),
-      bottomNavigationBar: _isLoading || _isSaving
-          ? null
-          : BottomAppBar(
-              elevation: 8.0,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    if (widget.kitId != null)
-                      Expanded(
-                        child: SizedBox(
-                          height: 50,
-                          child: OutlinedButton.icon(
-                            onPressed: _isSaving ? null : _deleteKit,
-                            icon: const Icon(Icons.delete, color: Colors.red),
-                            label: FittedBox(fit: BoxFit.scaleDown, child: Text(l10n.delete, style: GoogleFonts. notoSans(color: Colors.red, fontWeight: FontWeight.bold))),
-                            style: OutlinedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(vertical: 0),
-                              side: const BorderSide(color: Colors.red),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            ),
-                          ),
-                        ),
-                      ),
-                    if (widget.kitId != null) const SizedBox(width: 16),
-                    Expanded(
-                      child: SizedBox(
-                        height: 50,
-                        child: ElevatedButton.icon(
-                          onPressed: _isSaving ? null : _saveKit,
-                          icon: _isSaving
-                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                              : const Icon(Icons.save, color: Colors.white),
-                          label: FittedBox(fit: BoxFit.scaleDown, child: Text(widget.kitId == null ? l10n.save : l10n.update, style: GoogleFonts. notoSans(fontSize: 15, color: Colors.white, fontWeight: FontWeight.bold))),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 173, 128, 245),
-                            padding: const EdgeInsets.symmetric(vertical: 0),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+              ],
+            ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        child: Row(
+          children: [
+            if (widget.kitId != null) ...[
+              IconButton.filled(
+                onPressed: _isSaving ? null : _deleteKit,
+                icon: const Icon(Icons.delete_outline_rounded),
+                style: IconButton.styleFrom(backgroundColor: Colors.red.shade50, foregroundColor: Colors.red, fixedSize: const Size(56, 56), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+              ),
+              const SizedBox(width: 12),
+            ],
+            Expanded(
+              child: Container(
+                height: 56,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(colors: [Color.fromARGB(255, 163, 108, 245), Color.fromARGB(255, 123, 68, 205)]),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [BoxShadow(color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.35), blurRadius: 15, offset: const Offset(0, 8))],
+                ),
+                child: ElevatedButton(
+                  onPressed: _isSaving ? null : _saveKit,
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
+                  child: _isSaving
+                      ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                      : Text(widget.kitId == null ? l10n.save : l10n.update, style: GoogleFonts.notoSans(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
                 ),
               ),
             ),
-    );
-  }
-
-  Widget _buildSectionHeader(BuildContext context, String title) {
-    return Padding(
-      padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
-      child: Text(title, style: GoogleFonts. notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-    );
-  }
-
-  Widget _buildRequiredLabel(BuildContext context, String label) {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Row(
-        children: [
-          Text(label, style: GoogleFonts. notoSans(fontSize: 14, color: Colors.black87)),
-          const SizedBox(width: 4),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-            decoration: BoxDecoration(color: Colors.red.shade100, borderRadius: BorderRadius.circular(4)),
-            child: Text(l10n.fieldRequired, style: GoogleFonts. notoSans(fontSize: 10, color: Colors.red.shade700, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextWithRequiredLabel(BuildContext context, String label, {bool isRequired = true}) {
-    final l10n = AppLocalizations.of(context)!;
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 4.0),
-      child: Row(
-        children: [
-          Text(label, style: GoogleFonts. notoSans(fontSize: 14, color: Colors.black87)),
-          if (isRequired) ...[
-            const SizedBox(width: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(color: Colors.red.shade100, borderRadius: BorderRadius.circular(4)),
-              child: Text(l10n.fieldRequired, style: GoogleFonts. notoSans(fontSize: 10, color: Colors.red.shade700, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextFormField({required TextEditingController controller, String? hintText, int? maxLength, FormFieldValidator<String>? validator}) {
-    return TextFormField(
-      controller: controller,
-      maxLength: maxLength,
-      decoration: InputDecoration(hintText: hintText, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16), counterText: ''),
-      validator: validator,
-    );
-  }
-
-  Widget _buildUniqueNumberField() {
-    final l10n = AppLocalizations.of(context)!;
-    return TextFormField(
-      controller: _uniqueNumberController,
-      readOnly: true,
-      decoration: InputDecoration(
-        hintText: 'KIT-000123',
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-        contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        suffixIcon: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(color: Colors.purple.shade100, borderRadius: BorderRadius.circular(8)),
-              child: Text(l10n.autoGenerated, style: GoogleFonts. notoSans(fontSize: 12, color: Colors.purple.shade700)),
-            ),
-            IconButton(icon: const Icon(Icons.refresh), onPressed: () {
-              _generateUniqueNumber();
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Unique Number regenerated!")));
-            }),
           ],
         ),
       ),
-      validator: (value) => (value == null || value.isEmpty) ? "Unique Number regenerated!" : null,
     );
   }
 
-  Widget _buildDropdownButtonFormField<T>({required T? value, required String hintText, required List<DropdownMenuItem<T>> items, required ValueChanged<T?>? onChanged, FormFieldValidator<T>? validator}) {
-    return DropdownButtonFormField<T>(
-      initialValue: value,
-      decoration: InputDecoration(hintText: hintText, border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)), contentPadding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16)),
-      items: items,
-      onChanged: onChanged,
-      validator: validator,
-      icon: const Icon(Icons.keyboard_arrow_down),
-      isExpanded: true,
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 4, bottom: 12),
+      child: Text(title, style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.grey.shade500, letterSpacing: 0.5)),
     );
   }
 
-  Widget _buildHelperText(String text) {
-    return Padding(padding: const EdgeInsets.only(top: 4.0, left: 12.0), child: Text(text, style: GoogleFonts. notoSans(fontSize: 12, color: Colors.grey.shade600)));
+  Widget _buildCard(List<Widget> children) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8))]),
+      child: Column(children: children),
+    );
+  }
+
+  Widget _buildTextField({required TextEditingController controller, required String label, required String hint, required IconData icon, String? Function(String?)? validator}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: GoogleFonts.notoSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          validator: validator,
+          decoration: InputDecoration(
+            hintText: hint,
+            prefixIcon: Icon(icon, color: Colors.grey.shade400, size: 22),
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5)),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUniqueField(AppLocalizations l10n) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(l10n.uniqueNumber, style: GoogleFonts.notoSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: _uniqueNumberController,
+          readOnly: true,
+          decoration: InputDecoration(
+            prefixIcon: Icon(Icons.fingerprint_rounded, color: Colors.grey.shade400, size: 22),
+            suffixIcon: widget.kitId == null ? IconButton(icon: const Icon(Icons.refresh_rounded, color: Color.fromARGB(255, 143, 88, 225)), onPressed: _generateUniqueNumber) : null,
+            filled: true,
+            fillColor: Colors.deepPurple.withOpacity(0.03),
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          ),
+          style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 143, 88, 225)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown<T>({required String label, required T? value, required List<DropdownMenuItem<T>> items, required IconData icon, required void Function(T?)? onChanged, bool isLoading = false}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: GoogleFonts.notoSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<T>(
+          value: value,
+          items: items,
+          onChanged: onChanged,
+          icon: isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.expand_more_rounded),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, color: Colors.grey.shade400, size: 22),
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorBanner(String message) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.red.shade100)),
+      child: Row(children: [const Icon(Icons.error_outline_rounded, color: Colors.red), const SizedBox(width: 8), Expanded(child: Text(message, style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w500)))]),
+    );
   }
 }

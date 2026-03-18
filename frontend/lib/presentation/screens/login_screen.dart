@@ -3,8 +3,8 @@ import 'package:frontend/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../data/dtos/login_dto.dart';
 import '../../domain/repositories/auth_repository.dart';
-import 'home_screen.dart'; // Адмін екран
-import 'user_home_screen.dart'; // Користувач екран
+import 'home_screen.dart';
+import 'user_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -44,11 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
       final dto = LoginDto(email: email, password: password);
       final authResult = await _authRepository.login(dto);
 
-      print('Login Successful! Role: ${authResult.role}, Token saved.');
-
-      // Перевіряємо роль та перенаправляємо на відповідний екран
       if (authResult.role == 'Administrator') {
-        // Адміністратор -> HomeScreen
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => HomeScreen(
             userName: authResult.name ?? authResult.email.split('@')[0],
@@ -56,7 +52,6 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
         ));
       } else {
-        // Звичайний користувач -> UserHomeScreen
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => UserHomeScreen(
             userName: authResult.name ?? authResult.email.split('@')[0],
@@ -79,125 +74,185 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: <Widget>[
-              Text(
-                'FAIMS',
-                style: GoogleFonts.anekTelugu(
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 64, 64, 64),
-                  letterSpacing: 5,
-                ),
-              ),
-              const SizedBox(height: 20),
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16.0),
-                child: Image.asset(
-                  'assets/10.jpg',
-                  width: 300,
-                  height: 300,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              const SizedBox(height: 30),
-              Text(l10n.welcomeBack, style: Theme.of(context).textTheme.headlineMedium),
-              const SizedBox(height: 8),
-              Text(l10n.signInLabel, textAlign: TextAlign.center),
-              const SizedBox(height: 32),
-              Container(
-                padding: const EdgeInsets.all(20.0),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(color: Colors.grey.shade300, width: 1.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey,
-                      spreadRadius: 1,
-                      blurRadius: 5,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _emailController,
-                      decoration: const InputDecoration(
-                        labelText: 'Email',
-                        hintText: 'name@hospital.org',
-                        border: UnderlineInputBorder(),
-                        prefixIcon: Icon(Icons.email_outlined),
-                      ),
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 16),
-                    TextField(
-                      controller: _passwordController,
-                      decoration: InputDecoration(
-                        labelText: l10n.password,
-                        border: const UnderlineInputBorder(),
-                        prefixIcon: const Icon(Icons.lock_outline),
-                        suffixIcon: IconButton(
-                          icon: Icon(
-                            _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
-                            color: Theme.of(context).primaryColor,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _isPasswordVisible = !_isPasswordVisible;
-                            });
-                          },
-                        ),
-                      ),
-                      obscureText: !_isPasswordVisible,
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: _isLoading ? null : _handleLogin,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(255, 173, 128, 245),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                        ),
-                        icon: _isLoading
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                              )
-                            : const Icon(Icons.login, color: Colors.white),
-                        label: Text(
-                          _isLoading ? '${l10n.processing}...' : l10n.login,
-                          style: const TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (_errorMessage.isNotEmpty)
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text(
-                    _errorMessage,
-                    style: const TextStyle(
-                        color: Color.fromARGB(255, 173, 128, 245), fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.medical_services_rounded,
+                    size: 56,
+                    color: Color.fromARGB(255, 143, 88, 225),
                   ),
                 ),
-            ],
+                const SizedBox(height: 24),
+                Text(
+                  'FAIMS',
+                  style: GoogleFonts.notoSans(
+                    fontSize: 32,
+                    fontWeight: FontWeight.w900,
+                    color: const Color.fromARGB(255, 143, 88, 225),
+                    letterSpacing: 2.5,
+                  ),
+                ),
+                const SizedBox(height: 40),
+                Text(
+                  l10n.welcomeBack,
+                  style: GoogleFonts.notoSans(
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  l10n.signInLabel,
+                  style: GoogleFonts.notoSans(
+                    fontSize: 15,
+                    color: Colors.grey.shade500,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 40),
+                _buildTextField(
+                  controller: _emailController,
+                  label: 'Email',
+                  hintText: 'name@hospital.org',
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                const SizedBox(height: 20),
+                _buildTextField(
+                  controller: _passwordController,
+                  label: l10n.password,
+                  hintText: '••••••••',
+                  icon: Icons.lock_outline_rounded,
+                  isPassword: true,
+                ),
+                const SizedBox(height: 32),
+                SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _handleLogin,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                          )
+                        : Text(
+                            l10n.login,
+                            style: GoogleFonts.notoSans(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                          ),
+                  ),
+                ),
+                if (_errorMessage.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 24),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.red.shade100),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.error_outline_rounded, color: Colors.red.shade400, size: 20),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: Text(
+                              _errorMessage,
+                              style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w600, fontSize: 13),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hintText,
+    required IconData icon,
+    bool isPassword = false,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
+          child: Text(
+            label,
+            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+          ),
+        ),
+        TextField(
+          controller: controller,
+          obscureText: isPassword && !_isPasswordVisible,
+          keyboardType: keyboardType,
+          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          decoration: InputDecoration(
+            hintText: hintText,
+            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
+            prefixIcon: Icon(icon, color: Colors.grey.shade500),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      _isPasswordVisible ? Icons.visibility_rounded : Icons.visibility_off_rounded,
+                      color: Colors.grey.shade500,
+                      size: 20,
+                    ),
+                    onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
+                  )
+                : null,
+            filled: true,
+            fillColor: Colors.grey.shade50,
+            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

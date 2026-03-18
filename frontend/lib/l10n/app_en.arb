@@ -57,7 +57,7 @@
   "medicationWrittenOffSuccess": "Medication written off successfully!",
   "addNewMedication": "Add New Medication",
   "medicationName": "Medication Name",
-  "minimumQuantity": "Minimum Quantity",
+  "minimumQuantity": "Min. Quantity",
   "unit": "Unit",
   "expirationDate": "Expiration Date",
   "enterMedicationName": "Please enter medication name",

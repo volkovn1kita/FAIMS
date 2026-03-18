@@ -50,11 +50,9 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
     try {
       if (isEditing) {
         await _departmentRepository.updateDepartment(widget.departmentId!, _nameController.text.trim());
-        if (mounted) Navigator.of(context).pop(true);
       } else {
         final createDto = DepartmentCreateDto(name: _nameController.text.trim());
         await _departmentRepository.addDepartment(createDto);
-        if (mounted) Navigator.of(context).pop(true);
       }
 
       if (mounted) {
@@ -62,19 +60,23 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
           SnackBar(
             content: Text(
               isEditing ? l10n.departmentUpdatedSuccess : l10n.departmentAddedSuccess,
-              style: GoogleFonts.notoSans(),
+              style: GoogleFonts.notoSans(fontWeight: FontWeight.w600),
             ),
-            backgroundColor: Colors.green,
+            backgroundColor: Colors.green.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
+        Navigator.of(context).pop(true);
       }
     } catch (e) {
       if (mounted) {
-        final errorMessage = l10n.failedToSaveDepartment(e.toString());
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(errorMessage, style: GoogleFonts.notoSans()),
-            backgroundColor: Colors.red,
+            content: Text(l10n.failedToSaveDepartment(e.toString())),
+            backgroundColor: Colors.red.shade600,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -88,63 +90,169 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           isEditing ? l10n.editDepartment : l10n.addDepartment,
-          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+          style: GoogleFonts.notoSans(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: Colors.black87,
+            letterSpacing: -0.3,
+          ),
         ),
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0,
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(
-                  labelText: l10n.departmentName,
-                  hintText: l10n.enterDepartmentNameHint,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixIcon: const Icon(Icons.business),
-                ),
-                validator: (value) {
-                  if (value == null || value.trim().isEmpty) {
-                    return l10n.departmentNameValidator;
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 20),
-              _isLoading
-                  ? const Center(child: CircularProgressIndicator())
-                  : ElevatedButton.icon(
-                      onPressed: _saveDepartment,
-                      icon: Icon(isEditing ? Icons.save : Icons.add, color: Colors.white),
-                      label: Text(
-                        isEditing ? l10n.saveChanges : l10n.addDepartment,
-                        style: GoogleFonts.notoSans(fontSize: 16, color: Colors.white),
+      body: Column(
+        children: [
+          Container(
+            height: 1,
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))
+              ],
+            ),
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 24.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 40),
+                    
+                    // Візуальний акцент замість тексту
+                    Container(
+                      height: 120,
+                      width: 120,
+                      decoration: BoxDecoration(
+                        color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.08),
+                        shape: BoxShape.circle,
                       ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color.fromARGB(255, 173, 128, 245),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
+                      child: Icon(
+                        Icons.business_rounded,
+                        size: 60,
+                        color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.5),
                       ),
                     ),
-            ],
+                    const SizedBox(height: 40),
+                    
+                    // Основна форма
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8)),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.departmentName,
+                            style: GoogleFonts.notoSans(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.grey.shade700,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          TextFormField(
+                            controller: _nameController,
+                            style: GoogleFonts.notoSans(fontSize: 16, color: Colors.black87),
+                            decoration: InputDecoration(
+                              hintText: l10n.enterDepartmentNameHint,
+                              hintStyle: TextStyle(color: Colors.grey.shade400),
+                              prefixIcon: const Icon(Icons.edit_note_rounded, color: Color.fromARGB(255, 143, 88, 225)),
+                              filled: true,
+                              fillColor: Colors.grey.shade50,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: BorderSide.none,
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide: const BorderSide(color: Colors.redAccent, width: 1),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return l10n.departmentNameValidator;
+                              }
+                              return null;
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 40),
+                    
+                    // Кнопка
+                    _isLoading 
+                      ? const CircularProgressIndicator()
+                      : Container(
+                          width: double.infinity,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color.fromARGB(255, 163, 108, 245), Color.fromARGB(255, 123, 68, 205)],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.35),
+                                blurRadius: 15,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: _isLoading ? null : _saveDepartment,
+                              borderRadius: BorderRadius.circular(16),
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(isEditing ? Icons.check_circle_outline : Icons.add_circle_outline, color: Colors.white, size: 20),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      isEditing ? l10n.saveChanges : l10n.addDepartment,
+                                      style: GoogleFonts.notoSans(
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1.1,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

@@ -1740,11 +1740,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "e:\\Diploma\\App\\Application\\Application.csproj",
+      "projectUniqueName": "E:\\Diploma\\App\\Application\\Application.csproj",
       "projectName": "Application",
-      "projectPath": "e:\\Diploma\\App\\Application\\Application.csproj",
+      "projectPath": "E:\\Diploma\\App\\Application\\Application.csproj",
       "packagesPath": "C:\\Users\\volch\\.nuget\\packages\\",
-      "outputPath": "e:\\Diploma\\App\\Application\\obj\\",
+      "outputPath": "E:\\Diploma\\App\\Application\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -1759,7 +1759,6 @@
       ],
       "sources": {
         "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
-        "C:\\Program Files\\dotnet\\library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -1809,7 +1808,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.312/PortableRuntimeIdentifierGraph.json"
       }
     }
   }

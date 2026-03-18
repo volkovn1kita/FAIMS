@@ -7,7 +7,7 @@ import 'package:frontend/presentation/screens/manage_departments_screen.dart';
 import 'package:frontend/presentation/screens/manage_users_screen.dart';
 import 'package:frontend/presentation/screens/manage_kits_screen.dart';
 import 'package:frontend/presentation/screens/my_profile_screen.dart';
-import 'package:frontend/presentation/screens/settings_screen.dart'; // 1. ІМПОРТ SETTINGS
+import 'package:frontend/presentation/screens/settings_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -38,11 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-      _loadOverviewData(); 
+    _loadOverviewData(); 
   }
 
   Future<void> _loadOverviewData() async {
-    // ... (без змін) ...
     if (!mounted) return;
     setState(() {
       _isOverviewLoading = true;
@@ -70,7 +69,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onItemTapped(int index) async {
-    // ... (без змін) ...
     if (index == _selectedIndex && index != 1) {
       return;
     }
@@ -102,18 +100,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // 3. ОТРИМУЄМО ДОСТУП ДО СЛОВНИКА
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      backgroundColor: Colors.grey.shade100, 
       appBar: AppBar(
-        // ... (без змін) ...
         backgroundColor: Colors.white,
-        elevation: 0.5,
+        elevation: 0, 
         leading: Builder(
           builder: (context) {
             return IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black87),
+              icon: const Icon(Icons.menu_rounded, color: Colors.black87),
               onPressed: () {
                 Scaffold.of(context).openDrawer();
               },
@@ -123,284 +120,357 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text(
           'FAIMS',
           style: GoogleFonts.notoSans(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            fontSize: 22,
+            fontWeight: FontWeight.w800,
+            color: const Color.fromARGB(255, 143, 88, 225), 
+            letterSpacing: 1.2,
           ),
         ),
         centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.notifications_none_outlined, color: Colors.black87),
+            icon: const Icon(Icons.notifications_none_rounded, color: Colors.black87),
             onPressed: () {
               // TODO: Додати логіку для переходу до сповіщень
             },
           ),
+          const SizedBox(width: 8),
         ],
       ),
+      
+      // === ОНОВЛЕНЕ БОКОВЕ МЕНЮ ===
       drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+        backgroundColor: Colors.white, // Чисто білий фон для меню
+        child: Column(
           children: <Widget>[
-            DrawerHeader(
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(top: 60, bottom: 30),
               decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 173, 128, 245),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: .0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.faimsMenu, // <--- ЗМІНЕНО
-                      style: GoogleFonts.notoSans(
-                        color: Colors.white,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Icon(
-                      Icons.medical_services_rounded,
-                      color: Colors.white.withOpacity(0.8),
-                      size: 36,
-                    ),
+                gradient: LinearGradient(
+                  colors: [
+                    Color.fromARGB(255, 163, 108, 245), 
+                    Color.fromARGB(255, 123, 68, 205)
                   ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
-            ),
-            if (widget.userRole == 'Administrator')
-              ListTile(
-                leading: const Icon(Icons.bar_chart_rounded),
-                title: Text(l10n.analytics, style: GoogleFonts.notoSans()), // <--- ЗМІНЕНО
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => const AnalyticsScreen()),
-                  );
-                },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.medical_services_rounded, color: Colors.white, size: 40),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    l10n.faimsMenu,
+                    style: GoogleFonts.notoSans(
+                      color: Colors.white, 
+                      fontSize: 22, 
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.5,
+                    ),
+                  ),
+                ],
               ),
-            ListTile(
-              leading: const Icon(Icons.settings_outlined),
-              title: Text(l10n.settings, style: GoogleFonts.notoSans()), // <--- ЗМІНЕНО
-              onTap: () {
-                Navigator.pop(context);
-                // 4. ДОДАЄМО НАВІГАЦІЮ
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (context) => const SettingsScreen()),
-                );
-              },
             ),
-            const Divider(thickness: 1, indent: 16, endIndent: 16),
-            ListTile(
-              leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: Text(l10n.logout, style: GoogleFonts.notoSans(color: Colors.redAccent)), // <--- ЗМІНЕНО
-              onTap: () {
-                Navigator.of(context).pushReplacementNamed('/login');
-              },
-            )
+            
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                children: [
+                  if (widget.userRole == 'Administrator')
+                    _buildDrawerItem(
+                      icon: Icons.bar_chart_rounded,
+                      title: l10n.analytics,
+                      onTap: () {
+                        Navigator.pop(context);
+                        Navigator.of(context).push(MaterialPageRoute(builder: (context) => const AnalyticsScreen()));
+                      },
+                    ),
+                  
+                  _buildDrawerItem(
+                    icon: Icons.settings_outlined,
+                    title: l10n.settings,
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) => const SettingsScreen()));
+                    },
+                  ),
+                  
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: Divider(color: Colors.grey.shade200, thickness: 1.5),
+                  ),
+                  
+                  _buildDrawerItem(
+                    icon: Icons.logout_rounded,
+                    title: l10n.logout,
+                    textColor: Colors.redAccent,
+                    iconColor: Colors.redAccent,
+                    onTap: () {
+                      Navigator.of(context).pushReplacementNamed('/login');
+                    },
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
+      // ============================
+      
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start, 
           children: [
-            Row(
-              // ... (без змін) ...
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.welcomeUser(_userName), // <--- ЗМІНЕНО (з параметром)
-                  style: GoogleFonts.notoSans(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                Flexible(
-                  child: Chip(
-                    label: Text(
-                      widget.userRole, // Роль можна теж перекласти, якщо додати в .arb
-                      style: GoogleFonts.notoSans(
-                        fontSize: 12,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    backgroundColor: const Color.fromARGB(150, 81, 0, 255),
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
             Text(
-              l10n.overview, // <--- ЗМІНЕНО
-              style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.bold),
+              l10n.welcomeUser(_userName),
+              style: GoogleFonts.notoSans(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87, letterSpacing: -0.5),
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min, 
+                children: [
+                  const Icon(Icons.verified_user_outlined, size: 16, color: Color.fromARGB(255, 143, 88, 225)),
+                  const SizedBox(width: 6),
+                  Text(
+                    widget.userRole,
+                    style: GoogleFonts.notoSans(
+                      fontSize: 13,
+                      color: const Color.fromARGB(255, 143, 88, 225),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            
+            const SizedBox(height: 40), 
+
+            Text(
+              l10n.overview,
+              style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
             ),
             const SizedBox(height: 16),
+
             _isOverviewLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? const Center(child: Padding(padding: EdgeInsets.all(40.0), child: CircularProgressIndicator()))
                 : _overviewError.isNotEmpty
-                    ? Center(
-                        child: Text(_overviewError, style: const TextStyle(color: Colors.red)),
-                      )
+                    ? Center(child: Text(_overviewError, style: const TextStyle(color: Colors.red)))
                     : GridView.count(
-                        // ... (без змін) ...
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
                         crossAxisCount: 2,
                         crossAxisSpacing: 16,
                         mainAxisSpacing: 16,
-                        childAspectRatio: 1.1,
+                        childAspectRatio: 0.85, 
                         children: [
-                          _buildOverviewCard(
-                              context, l10n.totalKits, _overviewData!.totalKits.toString(), Icons.inventory_2_outlined), // <--- ЗМІНЕНО
-                          _buildOverviewCard(context, l10n.kitsNeedingAttention,
-                              _overviewData!.kitsNeedingAttention.toString(), Icons.warning_amber_outlined), // <--- ЗМІНЕНО
-                          _buildOverviewCard(context, l10n.users, _overviewData!.totalUsers.toString(), Icons.people_outline), // <--- ЗМІНЕНО
-                          _buildOverviewCard(
-                              context, l10n.departments, _overviewData!.totalDepartments.toString(), Icons.business_outlined), // <--- ЗМІНЕНО
+                          _buildDashboardCard(
+                            title: l10n.manageKits, 
+                            value: _overviewData!.totalKits.toString(),
+                            icon: Icons.inventory_2_outlined,
+                            color: const Color.fromARGB(255, 143, 88, 225), 
+                            onTap: () async {
+                              await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageKitsScreen()));
+                              _loadOverviewData();
+                            },
+                          ),
+                          _buildDashboardCard(
+                            title: l10n.attention, 
+                            value: _overviewData!.kitsNeedingAttention.toString(),
+                            icon: Icons.warning_amber_rounded,
+                            color: Colors.orangeAccent, 
+                            onTap: () async {
+                              await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageKitsScreen(initialStatusFilter: 'Needs Attention')));
+                              _loadOverviewData();
+                            },
+                          ),
+                          _buildDashboardCard(
+                            title: l10n.manageUsers,
+                            value: _overviewData!.totalUsers.toString(),
+                            icon: Icons.group_outlined,
+                            color: Colors.blue.shade400,
+                            onTap: () async {
+                              await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageUsersScreen()));
+                              _loadOverviewData();
+                            },
+                          ),
+                          _buildDashboardCard(
+                            title: l10n.departments,
+                            value: _overviewData!.totalDepartments.toString(),
+                            icon: Icons.domain_rounded,
+                            color: Colors.teal.shade400,
+                            onTap: () async {
+                              await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageDepartmentsScreen()));
+                              _loadOverviewData();
+                            },
+                          ),
                         ],
                       ),
-            const SizedBox(height: 32),
-            Text(
-              l10n.shortcuts, // <--- ЗМІНЕНО
-              style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            GridView.count(
-              // ... (без змін) ...
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
-              childAspectRatio: 2.5,
-              children: [
-                _buildShortcutButton(context, l10n.manageKits, Icons.storage,
-                    const Color.fromARGB(135, 198, 157, 251), null), // <--- ЗМІНЕНО
-                _buildShortcutButton(context, l10n.attention, Icons.error_outline,
-                    const Color.fromARGB(135, 198, 157, 251), 'Needs Attention'), // <--- ЗМІНЕНО
-                _buildShortcutButton(context, l10n.manageUsers, Icons.group_outlined,
-                    const Color.fromARGB(135, 198, 157, 251), null), // <--- ЗМІНЕНО
-                _buildShortcutButton(context, l10n.departments, Icons.apartment,
-                    const Color.fromARGB(135, 198, 157, 251), null), // <--- ЗМІНЕНО
-              ],
-            ),
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home_outlined),
-            label: l10n.home, // <--- ЗМІНЕНО
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person_outline),
-            label: l10n.profile, // <--- ЗМІНЕНО
-          ),
-        ],
-        currentIndex: 0,
-        selectedItemColor: const Color.fromARGB(255, 173, 128, 245),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, -5),
+            ),
+          ],
+        ),
+        child: BottomNavigationBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          items: <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: const Padding(
+                padding: EdgeInsets.only(bottom: 4.0),
+                child: Icon(Icons.home_rounded, size: 26),
+              ),
+              label: l10n.home,
+            ),
+            BottomNavigationBarItem(
+              icon: const Padding(
+                padding: EdgeInsets.only(bottom: 4.0),
+                child: Icon(Icons.person_outline_rounded, size: 26),
+              ),
+              label: l10n.profile,
+            ),
+          ],
+          currentIndex: 0,
+          selectedItemColor: const Color.fromARGB(255, 143, 88, 225),
+          unselectedItemColor: Colors.grey.shade400,
+          selectedLabelStyle: GoogleFonts.notoSans(fontWeight: FontWeight.bold, fontSize: 12),
+          unselectedLabelStyle: GoogleFonts.notoSans(fontWeight: FontWeight.w600, fontSize: 12),
+          type: BottomNavigationBarType.fixed,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }
 
-  Widget _buildOverviewCard(BuildContext context, String title, String value, IconData icon) {
-    // ... (без змін, тут немає тексту для перекладу, крім title, який ми вже передаємо перекладеним)
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  // --- ВІДЖЕТ ПУНКТУ МЕНЮ ---
+  Widget _buildDrawerItem({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    Color textColor = Colors.black87,
+    Color iconColor = Colors.black54,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(16),
+          splashColor: Colors.grey.shade100,
+          highlightColor: Colors.grey.shade50,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
+            child: Row(
+              children: [
+                Icon(icon, color: iconColor, size: 24),
+                const SizedBox(width: 16),
+                Text(
+                  title,
+                  style: GoogleFonts.notoSans(
+                    color: textColor,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardCard({
+    required String title,
+    required String value,
+    required IconData icon,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24), 
+        boxShadow: [
+          BoxShadow(
+            color: color.withOpacity(0.08), 
+            blurRadius: 15,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(24),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center, 
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: color.withOpacity(0.12),
+                    shape: BoxShape.circle, 
+                  ),
+                  child: Icon(icon, color: color, size: 30),
+                ),
+                const SizedBox(height: 16),
                 Text(
                   value,
-                  style: GoogleFonts.notoSans(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.notoSans(
+                    fontSize: 34, 
+                    fontWeight: FontWeight.w800, 
+                    color: Colors.black87,
+                    height: 1.0,
+                  ),
                 ),
-                Icon(icon, color: Colors.grey.shade400, size: 28),
+                const SizedBox(height: 8),
+                Text(
+                  title,
+                  textAlign: TextAlign.center, 
+                  style: GoogleFonts.notoSans(
+                    fontSize: 14, 
+                    fontWeight: FontWeight.w600, 
+                    color: Colors.grey.shade600,
+                    height: 1.2,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              title,
-              style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade600),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
-
-  Widget _buildShortcutButton(
-    BuildContext context,
-    String label,
-    IconData icon,
-    Color bgColor,
-    String? statusFilter,
-  ) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return ElevatedButton(
-      onPressed: () async {
-        if (label == l10n.manageKits) {
-          await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const ManageKitsScreen()),
-          );
-          _loadOverviewData();
-        } else if (label == l10n.attention) {
-          await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => ManageKitsScreen(initialStatusFilter: statusFilter)),
-          );
-          _loadOverviewData();
-        } else if (label == l10n.manageUsers) {
-          await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const ManageUsersScreen()),
-          );
-          _loadOverviewData();
-        } else if (label == l10n.departments) {
-          await Navigator.of(context).push(
-            MaterialPageRoute(builder: (context) => const ManageDepartmentsScreen()),
-          );
-          _loadOverviewData();
-        }
-      },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: bgColor,
-        foregroundColor: Colors.black87,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center, // <-- Центруємо ВСЕ
-        mainAxisSize: MainAxisSize.min,              // <-- Не розтягуємо зайве
-        children: [
-          Icon(icon, size: 20),
-          const SizedBox(width: 8),
-          Flexible(
-            child: Text(
-              label,
-              textAlign: TextAlign.center, // <-- Центруємо ТЕКСТ
-              style: GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
 }

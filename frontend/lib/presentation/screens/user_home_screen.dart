@@ -1,4 +1,3 @@
-// lib/presentation/screens/user_home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:frontend/data/dtos/first_aid_kit_list_dto.dart';
 import 'package:frontend/data/dtos/medication_dto.dart';
@@ -13,10 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend/data/dtos/expiration_status.dart';
 import 'package:frontend/data/dtos/measurement_unit.dart';
-
-// === 1. ІМПОРТИ ЛОКАЛІЗАЦІЇ ===
-import 'package:frontend/presentation/screens/settings_screen.dart'; 
-// =============================
+import 'package:frontend/presentation/screens/settings_screen.dart';
 
 class UserHomeScreen extends StatefulWidget {
   final String userName;
@@ -32,28 +28,31 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   final _kitRepository = FirstAidKitRepository();
 
   FirstAidKitListDto? _myKit;
-  List<MedicationDto> _medications = []; // === Оригінальний список з сервера ===
+  List<MedicationDto> _medications = [];
   bool _isLoading = true;
   String _errorMessage = '';
   late String _userName;
 
-  // === НОВІ ЗМІННІ СТАНУ ДЛЯ ФІЛЬТРАЦІЇ ===
-  List<MedicationDto> _filteredMedications = []; // Список для відображення
+  List<MedicationDto> _filteredMedications = [];
   final _searchController = TextEditingController();
   String _searchQuery = '';
   final Set<ExpirationStatus> _statusFilters = {};
   bool _filterLowStock = false;
-  // ==========================================
+
+  // ─── КОЛЬОРИ ──────────────────────────────────────────────────
+  static const _purple = Color(0xFF8F58E1);
+  static const _purpleLight = Color(0xFFF5F3FF);
+  static const _purpleBorder = Color(0xFFE8E0FF);
+  static const _purpleLabel = Color(0xFF9E86C8);
 
   @override
   void initState() {
     super.initState();
     _userName = widget.userName;
-    _searchController.addListener(_onSearchChanged); // === НОВЕ ===
+    _searchController.addListener(_onSearchChanged);
     _loadMyKitAndMedications();
   }
 
-  // === НОВЕ ===
   @override
   void dispose() {
     _searchController.removeListener(_onSearchChanged);
@@ -61,7 +60,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     super.dispose();
   }
 
-  // === НОВЕ ===
   void _onSearchChanged() {
     setState(() {
       _searchQuery = _searchController.text;
@@ -69,30 +67,22 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     });
   }
 
-  // === НОВИЙ МЕТОД ДЛЯ ФІЛЬТРАЦІЇ ===
   void _applyFilters() {
     List<MedicationDto> filtered = List.from(_medications);
-
-    // 1. Фільтр за назвою
     if (_searchQuery.isNotEmpty) {
       filtered = filtered
           .where((m) =>
               m.name.toLowerCase().contains(_searchQuery.toLowerCase()))
           .toList();
     }
-
-    // 2. Фільтр за статусом (Expired, Critical)
     if (_statusFilters.isNotEmpty) {
       filtered =
           filtered.where((m) => _statusFilters.contains(m.status)).toList();
     }
-
-    // 3. Фільтр за низьким залишком
     if (_filterLowStock) {
       filtered =
           filtered.where((m) => m.quantity < m.minimumQuantity).toList();
     }
-
     setState(() {
       _filteredMedications = filtered;
     });
@@ -104,1026 +94,1006 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       _isLoading = true;
       _errorMessage = '';
     });
-
     try {
       final kit = await _kitRepository.getMyKit();
       final medications = await _kitRepository.getMedicationsForKit(kit.id);
-
       if (!mounted) return;
       setState(() {
         _myKit = kit;
         _medications = medications;
         _medications
             .sort((a, b) => a.expirationDate.compareTo(b.expirationDate));
-        _applyFilters(); // === ОНОВЛЕННЯ: Застосовуємо фільтри після завантаження
+        _applyFilters();
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = e.toString().contains('Exception:')
-            ? e.toString().replaceAll('Exception: ', '')
-            : 'Error loading your kit: ${e.toString()}';
+        _errorMessage = e.toString().replaceAll('Exception: ', '');
       });
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
+  // ─── НАВІГАЦІЯ ────────────────────────────────────────────────
   void _onItemTapped(int index) async {
     if (index == _selectedIndex && index != 1) return;
-
     if (index == 0) {
       setState(() => _selectedIndex = index);
-      // Не перезавантажуємо, якщо вже на екрані
     } else if (index == 1) {
       final updatedName = await Navigator.of(context).push<String>(
         MaterialPageRoute(builder: (context) => const MyProfileScreen()),
       );
-
       if (!mounted) return;
       if (updatedName != null) {
         setState(() => _userName = updatedName);
       }
-      // Залишаємось на головному екрані (індекс 0) після повернення з профілю
       setState(() => _selectedIndex = 0);
-      // Перезавантажуємо дані, оскільки користувач міг змінити ім'я
       await _loadMyKitAndMedications();
     }
   }
 
-  // ============ ОНОВЛЕНІ ДІАЛОГИ ============
+  // ─── ДОПОМІЖНІ ВІДЖЕТИ ────────────────────────────────────────
 
-  // === 2. ОНОВЛЕННЯ: Додаємо l10n як параметр ===
-  InputDecoration _buildDialogInputDecoration(AppLocalizations l10n, String label, {String? suffixText, String? hintText}) {
-    return InputDecoration(
-      labelText: label, // <--- label тепер буде перекладеним
-      hintText: hintText, // <--- hintText тепер буде перекладеним
-      suffixText: suffixText,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12.0),
-        borderSide: const BorderSide(color: Color.fromARGB(255, 173, 128, 245), width: 2),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    );
-  }
-
-  // === 2. ОНОВЛЕННЯ: Додаємо l10n як параметр ===
-  Future<void> _showUseMedicationDialog(MedicationDto medication, AppLocalizations l10n) async {
-    final quantityController = TextEditingController(text: '1');
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            const Icon(Icons.medication, color: Color.fromARGB(255, 173, 128, 245)),
-            const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                l10n.useMedicationTitle(medication.name), // <--- ЗМІНЕНО
-                style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
-            ),
-          ],
+  InputDecoration _inputStyle(String label, String? suffix) =>
+      InputDecoration(
+        labelText: label,
+        suffixText: suffix,
+        filled: true,
+        fillColor: _purpleLight,
+        labelStyle: const TextStyle(color: _purpleLabel, fontSize: 14),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}', // <--- ЗМІНЕНО
-              style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade700),
-            ),
-            const SizedBox(height: 20),
-            TextField(
-              controller: quantityController,
-              keyboardType: TextInputType.number,
-              decoration: _buildDialogInputDecoration(
-                l10n,
-                l10n.quantityToUse, // <--- ЗМІНЕНО
-                suffixText: medication.unit.name.capitalize(),
-              ),
-            ),
-          ],
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: _purpleBorder, width: 1.5),
         ),
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel, style: GoogleFonts.notoSans(color: Colors.grey.shade700)), // <--- ЗМІНЕНО
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: const BorderSide(color: _purple, width: 2),
+        ),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      );
+
+  Widget _sheetHandle() => Center(
+        child: Container(
+          width: 44,
+          height: 4,
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade300,
+            borderRadius: BorderRadius.circular(10),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromARGB(255, 173, 128, 245),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ),
+      );
+
+  Widget _sheetTitle(String text, IconData icon, Color color) => Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(12),
             ),
-            child: Text(l10n.use, style: GoogleFonts.notoSans()), // <--- ЗМІНЕНО
+            child: Icon(icon, color: color, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Text(
+              text,
+              style: GoogleFonts.notoSans(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: Colors.black87,
+              ),
+            ),
           ),
         ],
-      ),
-    );
+      );
 
-    if (result == true) {
-      final quantity = int.tryParse(quantityController.text) ?? 0;
-      if (quantity <= 0) {
-        _showErrorSnackBar(l10n.enterValidQuantity); // <--- ЗМІНЕНО
-        return;
-      }
-      if (quantity > medication.quantity) {
-        _showErrorSnackBar(l10n.notEnoughAvailable); // <--- ЗМІНЕНО
-        return;
-      }
-      await _performUseMedication(medication.id, quantity, l10n); // <--- ЗМІНЕНО
-    }
-  }
-
-  Future<void> _performUseMedication(String medicationId, int quantity, AppLocalizations l10n) async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
-
-    try {
-      final dto = MedicationQuantityUpdateDto(quantity: quantity);
-      await _kitRepository.useMedication(medicationId, dto);
-      
-      if (!mounted) return;
-      _showSuccessSnackBar(l10n.medicationUsedSuccess); // <--- ЗМІНЕНО
-      await _loadMyKitAndMedications();
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _errorMessage = e.toString().contains('Exception:')
-            ? e.toString().replaceAll('Exception: ', '')
-            : 'Error using medication: ${e.toString()}';
-      });
-      _showErrorSnackBar(_errorMessage);
-    } finally {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-    }
-  }
-
-  // === 2. ОНОВЛЕННЯ: Додаємо l10n як параметр ===
-  Future<void> _showWriteOffDialog(MedicationDto medication, AppLocalizations l10n) async {
-    final quantityController = TextEditingController();
-    final reasonController = TextEditingController();
-
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
+  Widget _infoRow(IconData icon, String text, Color color) => Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.08),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color.withOpacity(0.18)),
+        ),
+        child: Row(
           children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.red),
+            Icon(icon, size: 16, color: color),
             const SizedBox(width: 10),
-            Expanded(
-              child: Text(
-                l10n.writeOffMedicationTitle(medication.name), // <--- ЗМІНЕНО
-                style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, fontSize: 18),
-              ),
+            Text(
+              text,
+              style: TextStyle(
+                  fontSize: 13,
+                  color: color,
+                  fontWeight: FontWeight.w600),
             ),
           ],
         ),
-        content: SingleChildScrollView(
+      );
+
+  Widget _buildActionBtn(
+          String label, Color color, VoidCallback onPressed) =>
+      SizedBox(
+        width: double.infinity,
+        height: 54,
+        child: DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [color, color.withOpacity(0.78)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+            borderRadius: BorderRadius.circular(14),
+            boxShadow: [
+              BoxShadow(
+                color: color.withOpacity(0.35),
+                blurRadius: 14,
+                offset: const Offset(0, 6),
+              ),
+            ],
+          ),
+          child: ElevatedButton(
+            onPressed: onPressed,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.transparent,
+              shadowColor: Colors.transparent,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14)),
+            ),
+            child: Text(
+              label,
+              style: GoogleFonts.notoSans(
+                fontSize: 15,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+      );
+
+  Widget _cancelBtn(BuildContext ctx, String label) => SizedBox(
+        width: double.infinity,
+        height: 48,
+        child: TextButton(
+          onPressed: () => Navigator.pop(ctx),
+          child: Text(
+            label,
+            style: const TextStyle(color: Colors.grey, fontSize: 15),
+          ),
+        ),
+      );
+
+  // ─── ДІАЛОГ: ВИКОРИСТАТИ ЛІКИ ─────────────────────────────────
+
+  Future<void> _showUseMedicationDialog(
+      MedicationDto medication, AppLocalizations l10n) async {
+    final quantityController = TextEditingController(text: '1');
+    bool confirmed = false;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius:
+                BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}', // <--- ЗМІНЕНО
-                style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade700),
+              _sheetHandle(),
+              const SizedBox(height: 8),
+              _sheetTitle(
+                l10n.useMedicationTitle(medication.name),
+                Icons.medication_liquid_rounded,
+                _purple,
+              ),
+              const SizedBox(height: 20),
+              _infoRow(
+                Icons.inventory_2_outlined,
+                '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
+                _purple,
               ),
               const SizedBox(height: 20),
               TextField(
                 controller: quantityController,
                 keyboardType: TextInputType.number,
-                decoration: _buildDialogInputDecoration(
-                  l10n,
-                  l10n.quantityToWriteOff, // <--- ЗМІНЕНО
-                  suffixText: medication.unit.name.capitalize(),
+                style: GoogleFonts.notoSans(
+                    fontWeight: FontWeight.w600, fontSize: 15),
+                decoration: _inputStyle(
+                  l10n.quantityToUse,
+                  medication.unit.name.capitalize(),
                 ),
               ),
-              const SizedBox(height: 16),
-              TextField(
-                controller: reasonController,
-                maxLines: 3,
-                decoration: _buildDialogInputDecoration(
-                  l10n,
-                  l10n.reasonRequired, // <--- ЗМІНЕНО
-                  hintText: l10n.reasonHint, // <--- ЗМІНЕНО
-                ),
-              ),
+              const SizedBox(height: 28),
+              _buildActionBtn(l10n.use, _purple, () {
+                confirmed = true;
+                Navigator.pop(ctx);
+              }),
+              const SizedBox(height: 4),
+              _cancelBtn(ctx, l10n.cancel),
             ],
           ),
         ),
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel, style: GoogleFonts.notoSans(color: Colors.grey.shade700)), // <--- ЗМІНЕНО
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            child: Text(l10n.writeOff, style: GoogleFonts.notoSans()), // <--- ЗМІНЕНО
-          ),
-        ],
       ),
     );
 
-    if (result == true) {
-      final quantity = int.tryParse(quantityController.text) ?? 0;
-      final reason = reasonController.text.trim();
-
-      if (quantity <= 0) {
-        _showErrorSnackBar(l10n.enterValidQuantity); // <--- ЗМІНЕНО
-        return;
+    if (confirmed) {
+      final q = int.tryParse(quantityController.text) ?? 0;
+      if (q > 0 && q <= medication.quantity) {
+        await _performAction(
+          () => _kitRepository.useMedication(
+              medication.id, MedicationQuantityUpdateDto(quantity: q)),
+          l10n.medicationUsedSuccess,
+        );
       }
-      if (reason.isEmpty) {
-        _showErrorSnackBar(l10n.reasonIsRequired); // <--- ЗМІНЕНО
-        return;
-      }
-      if (quantity > medication.quantity) {
-        _showErrorSnackBar(l10n.notEnoughAvailable); // <--- ЗМІНЕНО
-        return;
-      }
-      await _performWriteOff(medication.id, quantity, reason, l10n); // <--- ЗМІНЕНО
     }
   }
 
-  Future<void> _performWriteOff(
-      String medicationId, int quantity, String reason, AppLocalizations l10n) async {
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
+  // ─── ДІАЛОГ: СПИСАТИ ЛІКИ ────────────────────────────────────
 
-    try {
-      final dto = MedicationWriteOffDto(quantity: quantity, reason: reason);
-      await _kitRepository.writeOffMedication(medicationId, dto);
-      
-      if (!mounted) return;
-      _showSuccessSnackBar(l10n.medicationWrittenOffSuccess); // <--- ЗМІНЕНО
-      await _loadMyKitAndMedications();
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _errorMessage = e.toString().contains('Exception:')
-            ? e.toString().replaceAll('Exception: ', '')
-            : 'Error writing off medication: ${e.toString()}';
-      });
-      _showErrorSnackBar(_errorMessage);
-    } finally {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-    }
-  }
+  Future<void> _showWriteOffDialog(
+      MedicationDto medication, AppLocalizations l10n) async {
+    final qController = TextEditingController();
+    final rController = TextEditingController();
+    bool confirmed = false;
 
-  // === 2. ОНОВЛЕННЯ: Додаємо l10n як параметр ===
-  Future<void> _showAddMedicationDialog(AppLocalizations l10n) async {
-    final nameController = TextEditingController();
-    final quantityController = TextEditingController();
-    final minQuantityController = TextEditingController();
-    DateTime selectedDate = DateTime.now().add(const Duration(days: 365));
-    MeasurementUnit selectedUnit = MeasurementUnit.pieces;
-
-    final result = await showDialog<Map<String, dynamic>?>(
+    await showModalBottomSheet(
       context: context,
-      builder: (context) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: Row(
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => Padding(
+        padding:
+            EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius:
+                BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.add_circle, color: Color.fromARGB(255, 173, 128, 245)),
-              const SizedBox(width: 10),
-              Text(
-                l10n.addNewMedication, // <--- ЗМІНЕНО
-                style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, fontSize: 18),
+              _sheetHandle(),
+              const SizedBox(height: 8),
+              _sheetTitle(
+                l10n.writeOffMedicationTitle(medication.name),
+                Icons.delete_sweep_rounded,
+                Colors.redAccent,
               ),
+              const SizedBox(height: 20),
+              _infoRow(
+                Icons.warning_amber_rounded,
+                '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
+                Colors.red.shade700,
+              ),
+              const SizedBox(height: 20),
+              TextField(
+                controller: qController,
+                keyboardType: TextInputType.number,
+                style: GoogleFonts.notoSans(
+                    fontWeight: FontWeight.w600, fontSize: 15),
+                decoration: _inputStyle(
+                  l10n.quantityToWriteOff,
+                  medication.unit.name.capitalize(),
+                ),
+              ),
+              const SizedBox(height: 14),
+              TextField(
+                controller: rController,
+                maxLines: 3,
+                style: GoogleFonts.notoSans(fontSize: 14),
+                decoration:
+                    _inputStyle(l10n.reasonRequired, null).copyWith(
+                  hintText: l10n.reasonHint,
+                  alignLabelWithHint: true,
+                ),
+              ),
+              const SizedBox(height: 28),
+              _buildActionBtn(l10n.writeOff, Colors.redAccent, () {
+                confirmed = true;
+                Navigator.pop(ctx);
+              }),
+              const SizedBox(height: 4),
+              _cancelBtn(ctx, l10n.cancel),
             ],
           ),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextField(
-                  controller: nameController,
-                  decoration: _buildDialogInputDecoration(l10n, l10n.medicationName), // <--- ЗМІНЕНО
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: quantityController,
-                  keyboardType: TextInputType.number,
-                  decoration: _buildDialogInputDecoration(l10n, l10n.quantity), // <--- ЗМІНЕНО
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: minQuantityController,
-                  keyboardType: TextInputType.number,
-                  decoration: _buildDialogInputDecoration(l10n, l10n.minimumQuantity), // <--- ЗМІНЕНО
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<MeasurementUnit>(
-                  initialValue: selectedUnit,
-                  decoration: _buildDialogInputDecoration(l10n, l10n.unit), // <--- ЗМІНЕНО
-                  items: MeasurementUnit.values.map((unit) {
-                    return DropdownMenuItem(
-                      value: unit,
-                      child: Text(unit.name.capitalize()),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) {
-                      setDialogState(() => selectedUnit = value);
-                    }
-                  },
-                ),
-                const SizedBox(height: 16),
-                ListTile(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.grey.shade300)
-                  ),
-                  title: Text(l10n.expirationDate, style: GoogleFonts.notoSans(fontSize: 14)), // <--- ЗМІНЕНО
-                  subtitle: Text(DateFormat('dd.MM.yyyy').format(selectedDate)),
-                  trailing: const Icon(Icons.calendar_today),
-                  onTap: () async {
-                    final picked = await showDatePicker(
-                      context: context,
-                      initialDate: selectedDate,
-                      firstDate: DateTime.now(),
-                      lastDate: DateTime.now().add(const Duration(days: 3650)),
-                    );
-                    if (picked != null) {
-                      setDialogState(() => selectedDate = picked);
-                    }
-                  },
-                ),
-              ],
-            ),
-          ),
-          actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(null),
-              child: Text(l10n.cancel, style: GoogleFonts.notoSans(color: Colors.grey.shade700)), // <--- ЗМІНЕНО
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop({
-                  'name': nameController.text,
-                  'quantity': quantityController.text,
-                  'minQuantity': minQuantityController.text,
-                  'unit': selectedUnit,
-                  'expirationDate': selectedDate,
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 173, 128, 245),
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              child: Text(l10n.add, style: GoogleFonts.notoSans()), // <--- ЗМІНЕНО
-            ),
-          ],
         ),
       ),
     );
 
-    if (result != null) {
-      final name = result['name'] as String;
-      final quantity = int.tryParse(result['quantity'] as String) ?? 0;
-      final minQuantity = int.tryParse(result['minQuantity'] as String) ?? 0;
-      final unit = result['unit'] as MeasurementUnit;
-      final expirationDate = result['expirationDate'] as DateTime;
-
-      if (name.trim().isEmpty) {
-        _showErrorSnackBar(l10n.enterMedicationName); // <--- ЗМІНЕНО
-        return;
+    if (confirmed) {
+      final q = int.tryParse(qController.text) ?? 0;
+      final r = rController.text.trim();
+      if (q > 0 && r.isNotEmpty) {
+        await _performAction(
+          () => _kitRepository.writeOffMedication(medication.id,
+              MedicationWriteOffDto(quantity: q, reason: r)),
+          l10n.medicationWrittenOffSuccess,
+        );
       }
-      if (quantity <= 0) {
-        _showErrorSnackBar(l10n.enterValidQuantity); // <--- ЗМІНЕНО
-        return;
-      }
-
-      await _performAddMedication(
-          name, quantity, minQuantity, unit, expirationDate, l10n); // <--- ЗМІНЕНО
     }
   }
 
-  Future<void> _performAddMedication(
-      String name,
-      int quantity,
-      int minQuantity,
-      MeasurementUnit unit,
-      DateTime expirationDate,
-      AppLocalizations l10n) async { // <--- ЗМІНЕНО
-    if (_myKit == null) return;
+  // ─── ДІАЛОГ: ДОДАТИ ЛІКИ ─────────────────────────────────────
 
-    setState(() {
-      _isLoading = true;
-      _errorMessage = '';
-    });
+  Future<void> _showAddMedicationDialog(AppLocalizations l10n) async {
+    final nameC = TextEditingController();
+    final qC = TextEditingController();
+    final minC = TextEditingController();
+    DateTime date = DateTime.now().add(const Duration(days: 365));
+    MeasurementUnit unit = MeasurementUnit.pieces;
+    bool confirmed = false;
 
-    try {
-      final utcExpirationDate = DateTime.utc(
-        expirationDate.year,
-        expirationDate.month,
-        expirationDate.day,
-        23,
-        59,
-        59,
-      );
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setS) => Padding(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius:
+                  BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sheetHandle(),
+                  const SizedBox(height: 8),
+                  _sheetTitle(
+                    l10n.addNewMedication,
+                    Icons.add_circle_outline_rounded,
+                    _purple,
+                  ),
+                  const SizedBox(height: 24),
 
+                  // Назва
+                  TextField(
+                    controller: nameC,
+                    textCapitalization: TextCapitalization.sentences,
+                    style: GoogleFonts.notoSans(
+                        fontWeight: FontWeight.w600, fontSize: 15),
+                    decoration: _inputStyle(l10n.medicationName, null),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Кількість + мінімум
+                  Row(children: [
+                    Expanded(
+                      child: TextField(
+                        controller: qC,
+                        keyboardType: TextInputType.number,
+                        style: GoogleFonts.notoSans(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                        decoration: _inputStyle(l10n.quantity, null),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: TextField(
+                        controller: minC,
+                        keyboardType: TextInputType.number,
+                        style: GoogleFonts.notoSans(
+                            fontWeight: FontWeight.w600, fontSize: 15),
+                        decoration: _inputStyle(l10n.minRequired, null),
+                      ),
+                    ),
+                  ]),
+                  const SizedBox(height: 14),
+
+                  // Одиниця виміру
+                  DropdownButtonFormField<MeasurementUnit>(
+                    value: unit,
+                    decoration: _inputStyle(l10n.unit, null),
+                    borderRadius: BorderRadius.circular(16),
+                    items: MeasurementUnit.values
+                        .map((u) => DropdownMenuItem(
+                              value: u,
+                              child: Text(
+                                u.name.capitalize(),
+                                style: GoogleFonts.notoSans(
+                                    fontWeight: FontWeight.w500),
+                              ),
+                            ))
+                        .toList(),
+                    onChanged: (v) => setS(() => unit = v!),
+                  ),
+                  const SizedBox(height: 14),
+
+                  // Дата придатності
+                  GestureDetector(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: ctx,
+                        initialDate: date,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now()
+                            .add(const Duration(days: 3650)),
+                        builder: (context, child) => Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: const ColorScheme.light(
+                              primary: _purple,
+                              onSurface: Colors.black87,
+                            ),
+                          ),
+                          child: child!,
+                        ),
+                      );
+                      if (picked != null) setS(() => date = picked);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: _purpleLight,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                            color: _purpleBorder, width: 1.5),
+                      ),
+                      child: Row(children: [
+                        const Icon(Icons.calendar_today_rounded,
+                            size: 18, color: _purple),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.expirationDate,
+                                style: const TextStyle(
+                                    fontSize: 11,
+                                    color: _purpleLabel,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                DateFormat('dd.MM.yyyy').format(date),
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right_rounded,
+                            color: _purpleLabel),
+                      ]),
+                    ),
+                  ),
+
+                  const SizedBox(height: 28),
+                  _buildActionBtn(l10n.add, _purple, () {
+                    confirmed = true;
+                    Navigator.pop(ctx);
+                  }),
+                  const SizedBox(height: 4),
+                  _cancelBtn(ctx, l10n.cancel),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (confirmed && nameC.text.trim().isNotEmpty) {
       final dto = MedicationCreateDto(
         firstAidKitId: _myKit!.id,
-        name: name,
-        quantity: quantity,
-        minimumQuantity: minQuantity,
+        name: nameC.text.trim(),
+        quantity: int.tryParse(qC.text) ?? 0,
+        minimumQuantity: int.tryParse(minC.text) ?? 0,
         unit: unit,
-        expirationDate: utcExpirationDate,
+        expirationDate: date,
       );
-      await _kitRepository.addMedication(dto);
-      
-      if (!mounted) return;
-      _showSuccessSnackBar(l10n.medicationAddedSuccess); // <--- ЗМІНЕНО
-      await _loadMyKitAndMedications();
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        _errorMessage = e.toString().contains('Exception:')
-            ? e.toString().replaceAll('Exception: ', '')
-            : 'Error adding medication: ${e.toString()}';
-      });
-      _showErrorSnackBar(_errorMessage);
-    } finally {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
+      await _performAction(
+        () => _kitRepository.addMedication(dto),
+        l10n.medicationAddedSuccess,
+      );
     }
   }
 
-  void _showSuccessSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message, style: GoogleFonts.notoSans()), backgroundColor: Colors.green),
-    );
+  // ─── ЗАГАЛЬНА ДІЯ ─────────────────────────────────────────────
+
+  Future<void> _performAction(
+      Future<void> Function() action, String successMsg) async {
+    setState(() => _isLoading = true);
+    try {
+      await action();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(successMsg), backgroundColor: Colors.green));
+      await _loadMyKitAndMedications();
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(e.toString()), backgroundColor: Colors.red));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
-  void _showErrorSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message, style: GoogleFonts.notoSans()), backgroundColor: Colors.red),
-    );
-  }
+  // ─── UI ───────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
-    // === 3. ОТРИМУЄМО ДОСТУП ДО СЛОВНИКА ===
     final l10n = AppLocalizations.of(context)!;
-    
     return Scaffold(
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         backgroundColor: Colors.white,
-        elevation: 0.5,
-        leading: IconButton(
-          icon: const Icon(Icons.logout, color: Colors.redAccent),
-          tooltip: l10n.logout, // <--- ЗМІНЕНО
-          onPressed: () {
-            Navigator.of(context)
-                .pushNamedAndRemoveUntil('/login', (route) => false);
-          },
-        ),
-        title: Text(
-          l10n.myFirstAidKit, // <--- ЗМІНЕНО
-          style: GoogleFonts.notoSans(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
+        elevation: 0,
         centerTitle: true,
+        title: Text('FAIMS',
+            style: GoogleFonts.notoSans(
+                fontSize: 22,
+                fontWeight: FontWeight.w800,
+                color: _purple,
+                letterSpacing: 1.2)),
+        leading: IconButton(
+            icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
+            onPressed: () => Navigator.of(context)
+                .pushNamedAndRemoveUntil('/login', (r) => false)),
         actions: [
           IconButton(
-            icon: const Icon(Icons.refresh, color: Colors.black87),
-            onPressed: _isLoading ? null : _loadMyKitAndMedications,
-          ),
-          // === 4. НОВА КНОПКА НАЛАШТУВАНЬ ===
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Colors.black87),
-            tooltip: l10n.settings,
-            onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-          ),
+              icon: const Icon(Icons.settings_outlined,
+                  color: Colors.black87),
+              onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                      builder: (c) => const SettingsScreen()))),
+          const SizedBox(width: 8),
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _errorMessage.isNotEmpty
-              ? Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.error_outline, size: 64, color: Colors.red),
-                        const SizedBox(height: 16),
-                        Text(_errorMessage, textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.red, fontSize: 16)),
-                        const SizedBox(height: 16),
-                        ElevatedButton.icon(
-                          onPressed: _loadMyKitAndMedications,
-                          icon: const Icon(Icons.refresh),
-                          label: Text(l10n.retry), // <--- ЗМІНЕНО
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color.fromARGB(255, 173, 128, 245)),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              : _myKit == null
-                  ? Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text(
-                          l10n.notAssignedToKit, // <--- ЗМІНЕНО
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.notoSans(fontSize: 16, color: Colors.grey.shade700)
-                        ),
-                      ))
-                  : RefreshIndicator(
-                      onRefresh: _loadMyKitAndMedications,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(bottom: 16.0),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      l10n.welcomeUser(_userName), // <--- ЗМІНЕНО (з параметром)
-                                      style: GoogleFonts.notoSans(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                      ),
-                                    ),
-                                  ),
-                                  Chip(
-                                    avatar: Icon(
-                                      Icons.person,
-                                      size: 18,
-                                      color: Colors.grey.shade700,
-                                    ),
-                                    label: Text(
-                                      l10n.userRoleUser, // <--- ЗМІНЕНО
-                                      style: GoogleFonts.notoSans(
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.grey.shade700,
-                                      ),
-                                    ),
-                                    backgroundColor: Colors.grey.shade200,
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            
-                            _buildKitInfoCard(),
-                            const SizedBox(height: 24),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text(l10n.medications, // <--- ЗМІНЕНО
-                                    style: GoogleFonts.notoSans(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87)),
-                                Row(
-                                  children: [
-                                    Text('${_filteredMedications.length} ${l10n.items}', // <--- ЗМІНЕНО
-                                        style: GoogleFonts.notoSans(
-                                            fontSize: 14,
-                                            color: Colors.grey.shade600)),
-                                    const SizedBox(width: 8),
-                                    // 5. ОНОВЛЕННЯ: Кнопка "Додати" переїхала сюди, щоб не перекривати FAB
-                                    ElevatedButton.icon(
-                                      onPressed: () => _showAddMedicationDialog(l10n), // <--- ЗМІНЕНО
-                                      icon: const Icon(Icons.add, size: 18),
-                                      label: Text(l10n.add, style: GoogleFonts.notoSans(fontSize: 13)), // <--- ЗМІНЕНО
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: const Color.fromARGB(255, 173, 128, 245),
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
+          ? const Center(
+              child: CircularProgressIndicator(color: _purple))
+          : RefreshIndicator(
+              onRefresh: _loadMyKitAndMedications,
+              color: _purple,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 20, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildWelcomeHeader(l10n),
+                    const SizedBox(height: 24),
+                    if (_myKit != null)
+                      _buildKitInfoCard(l10n)
+                    else
+                      Center(
+                          child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Text(l10n.notAssignedToKit,
+                            textAlign: TextAlign.center),
+                      )),
+                    const SizedBox(height: 32),
+                    _buildSectionHeader(l10n),
+                    const SizedBox(height: 16),
+                    _buildFilterSection(l10n),
+                    _buildMedicationList(l10n),
+                  ],
+                ),
+              ),
+            ),
+      bottomNavigationBar: _buildBottomNav(l10n),
+    );
+  }
 
-                            const SizedBox(height: 16),
-                            _buildFilterSection(),
-                            _buildMedicationList(),
-                          ],
-                        ),
-                      ),
-                    ),
-      // FAB видалено, щоб не перекривати навігацію
-      bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
-          BottomNavigationBarItem(icon: const Icon(Icons.home_outlined), label: l10n.home), // <--- ЗМІНЕНО
-          BottomNavigationBarItem(icon: const Icon(Icons.person_outline), label: l10n.profile), // <--- ЗМІНЕНО
+  Widget _buildWelcomeHeader(AppLocalizations l10n) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.welcomeUser(_userName),
+              style: GoogleFonts.notoSans(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                  letterSpacing: -0.5)),
+          const SizedBox(height: 8),
+          Container(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+            decoration: BoxDecoration(
+                color: Colors.blue.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(20)),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.medical_information_rounded,
+                  size: 14, color: Colors.blue),
+              const SizedBox(width: 6),
+              Text(l10n.userRoleUser,
+                  style: GoogleFonts.notoSans(
+                      fontSize: 12,
+                      color: Colors.blue,
+                      fontWeight: FontWeight.bold)),
+            ]),
+          ),
         ],
-        currentIndex: _selectedIndex,
-        selectedItemColor: const Color.fromARGB(255, 173, 128, 245),
-        unselectedItemColor: Colors.grey,
-        onTap: _onItemTapped,
-      ),
-    );
-  }
-
-  Widget _buildFilterSection() {
-    final l10n = AppLocalizations.of(context)!; // Отримуємо l10n тут
-    return Column(
-      children: [
-        TextField(
-          controller: _searchController,
-          decoration: InputDecoration(
-            hintText: l10n.searchMedicationHint, // <--- ЗМІНЕНО
-            prefixIcon: const Icon(Icons.search),
-            suffixIcon: _searchQuery.isNotEmpty
-                ? IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () => _searchController.clear(),
-                  )
-                : null,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.0),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.0),
-              borderSide: BorderSide(color: Colors.grey.shade300),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12.0),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 173, 128, 245), width: 2),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
-          ),
-        ),
-        const SizedBox(height: 12),
-        SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          child: Row(
-            children: [
-              FilterChip(
-                label: Text(l10n.expired, style: GoogleFonts.notoSans()),
-                selected: _statusFilters.contains(ExpirationStatus.expired),
-                onSelected: (selected) {
-                  setState(() {
-                    if (selected) {
-                      _statusFilters.add(ExpirationStatus.expired);
-                    } else {
-                      _statusFilters.remove(ExpirationStatus.expired);
-                    }
-                    _applyFilters();
-                  });
-                },
-                selectedColor: Colors.red.shade100,
-                checkmarkColor: Colors.red,
-              ),
-              const SizedBox(width: 8), // Відступ між чіпами
-              FilterChip(
-                label: Text(l10n.critical, style: GoogleFonts.notoSans()),
-                selected: _statusFilters.contains(ExpirationStatus.critical),
-                onSelected: (selected) {
-                   setState(() {
-                    if (selected) {
-                      _statusFilters.add(ExpirationStatus.critical);
-                    } else {
-                      _statusFilters.remove(ExpirationStatus.critical);
-                    }
-                    _applyFilters();
-                  });
-                },
-                selectedColor: Colors.deepOrange.shade100,
-                checkmarkColor: Colors.deepOrange,
-              ),
-              const SizedBox(width: 8), // Відступ між чіпами
-              FilterChip(
-                label: Text(l10n.lowStock, style: GoogleFonts.notoSans()),
-                selected: _filterLowStock,
-                onSelected: (selected) {
-                  setState(() {
-                    _filterLowStock = selected;
-                    _applyFilters();
-                  });
-                },
-                selectedColor: Colors.amber.shade100,
-                checkmarkColor: Colors.amber.shade800,
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-      ],
-    );
-  }
-
-  Widget _buildMedicationList() {
-    final l10n = AppLocalizations.of(context)!; // Отримуємо l10n тут
-    if (_medications.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            children: [
-              Icon(Icons.medication_outlined, size: 64, color: Colors.grey.shade400),
-              const SizedBox(height: 16),
-              Text(l10n.noMedicationsYet, // <--- ЗМІНЕНО
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.notoSans(fontSize: 16, color: Colors.grey.shade600)),
-              const SizedBox(height: 8),
-              Text(l10n.tapToAddMedication, // <--- ЗМІНЕНО
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade500)),
-            ],
-          ),
-        ),
       );
-    }
 
-    if (_filteredMedications.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(32.0),
-          child: Column(
-            children: [
-              Icon(Icons.search_off, size: 64, color: Colors.grey.shade400),
-              const SizedBox(height: 16),
-              Text(l10n.noMedicationsFound, // <--- ЗМІНЕНО
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.notoSans(fontSize: 16, color: Colors.grey.shade600)),
-              const SizedBox(height: 8),
-              Text(l10n.adjustSearchFilters, // <--- ЗМІНЕНО
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade500)),
-            ],
-          ),
+  Widget _buildKitInfoCard(AppLocalizations l10n) => Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+              colors: [
+                Color.fromARGB(255, 163, 108, 245),
+                Color.fromARGB(255, 123, 68, 205)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight),
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+                color: _purple.withOpacity(0.3),
+                blurRadius: 15,
+                offset: const Offset(0, 8))
+          ],
         ),
-      );
-    }
-    
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: _filteredMedications.length,
-      itemBuilder: (context, index) {
-        return _buildMedicationCard(_filteredMedications[index]);
-      },
-    );
-  }
-
-
-  Widget _buildKitInfoCard() {
-    final l10n = AppLocalizations.of(context)!; // Отримуємо l10n тут
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Icon(Icons.inventory_2, color: Colors.grey.shade700, size: 28),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
+        padding: const EdgeInsets.all(24),
+        child: Column(children: [
+          Row(children: [
+            Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle),
+                child: const Icon(Icons.inventory_2_rounded,
+                    color: Colors.white, size: 28)),
+            const SizedBox(width: 16),
+            Expanded(
+                child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_myKit!.name, style: GoogleFonts.notoSans(
-                          fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-                      Text('ID: ${_myKit!.uniqueNumber}',
-                          style: GoogleFonts.notoSans(fontSize: 12, color: Colors.grey.shade600)),
-                    ],
-                  ),
-                ),
-                _buildStatusChip(_myKit!.statusBadge),
-              ],
-            ),
-            const Divider(height: 24),
-            _buildInfoRow(Icons.business, l10n.department, _myKit!.departmentName), // <--- ЗМІНЕНО
-            const SizedBox(height: 8),
-            _buildInfoRow(Icons.meeting_room, l10n.room, _myKit!.roomName), // <--- ЗМІНЕНО
-            if (_myKit!.expiredItemsCount > 0 || _myKit!.criticalItemsCount > 0 || _myKit!.lowQuantityItemsCount > 0)
-              ...[
-                const Divider(height: 24),
-                _buildWarningRow(),
-              ],
+                  Text(_myKit!.name,
+                      style: GoogleFonts.notoSans(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
+                  Text('ID: ${_myKit!.uniqueNumber}',
+                      style: GoogleFonts.notoSans(
+                          fontSize: 12, color: Colors.white70)),
+                ])),
+            _buildKitStatusBadge(l10n, _myKit!.statusBadge),
+          ]),
+          const SizedBox(height: 20),
+          Container(height: 1, color: Colors.white.withOpacity(0.15)),
+          const SizedBox(height: 20),
+          _buildKitDetailRow(
+              Icons.business_rounded, l10n.department, _myKit!.departmentName),
+          const SizedBox(height: 12),
+          _buildKitDetailRow(
+              Icons.meeting_room_rounded, l10n.room, _myKit!.roomName),
+          if (_myKit!.expiredItemsCount > 0 ||
+              _myKit!.criticalItemsCount > 0) ...[
+            const SizedBox(height: 20),
+            _buildKitWarningBox(l10n),
           ],
-        ),
-      ),
-    );
-  }
+        ]),
+      );
 
-  Widget _buildInfoRow(IconData icon, String label, String value) {
-    return Row(
-      children: [
-        Icon(icon, size: 18, color: Colors.grey.shade600),
-        const SizedBox(width: 8),
-        Text('$label: ', style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600)), // Label вже перекладений
-        Expanded(child: Text(value, style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade700))),
-      ],
-    );
-  }
-
-  Widget _buildWarningRow() {
-    final l10n = AppLocalizations.of(context)!; // Отримуємо l10n тут
-    final warnings = <String>[];
-    if (_myKit!.expiredItemsCount > 0) warnings.add('${_myKit!.expiredItemsCount} ${l10n.expired}'); // <--- ЗМІНЕНО
-    if (_myKit!.criticalItemsCount > 0) warnings.add('${_myKit!.criticalItemsCount} ${l10n.critical}'); // <--- ЗМІНЕНО
-    if (_myKit!.lowQuantityItemsCount > 0) warnings.add('${_myKit!.lowQuantityItemsCount} ${l10n.lowStock}'); // <--- ЗМІНЕНО
-
+  Widget _buildKitStatusBadge(AppLocalizations l10n, String status) {
+    bool isG = status == 'Good';
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
-        color: Colors.orange.shade50,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.orange.shade300),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.warning_amber, color: Colors.orange.shade700, size: 20),
-          const SizedBox(width: 8),
+          color: isG ? Colors.green.shade400 : Colors.orange.shade400,
+          borderRadius: BorderRadius.circular(12)),
+      child: Text(isG ? l10n.statusGood : l10n.statusWarning,
+          style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+              color: Colors.white)),
+    );
+  }
+
+  Widget _buildKitDetailRow(IconData i, String l, String v) =>
+      Row(children: [
+        Icon(i, size: 18, color: Colors.white70),
+        const SizedBox(width: 12),
+        Text('$l:', style: const TextStyle(fontSize: 14, color: Colors.white70)),
+        const SizedBox(width: 8),
+        Expanded(
+            child: Text(v,
+                style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white))),
+      ]);
+
+  Widget _buildKitWarningBox(AppLocalizations l10n) => Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(16)),
+        child: Row(children: [
+          const Icon(Icons.warning_amber_rounded,
+              color: Colors.orangeAccent, size: 20),
+          const SizedBox(width: 12),
           Expanded(
-            child: Text(warnings.join(', '),
-                style: GoogleFonts.notoSans(fontSize: 13, color: Colors.orange.shade900, fontWeight: FontWeight.w600)),
+              child: Text(
+                  '${_myKit!.expiredItemsCount} ${l10n.expired}, ${_myKit!.criticalItemsCount} ${l10n.critical}',
+                  style: const TextStyle(
+                      fontSize: 13,
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600))),
+        ]),
+      );
+
+  Widget _buildSectionHeader(AppLocalizations l10n) =>
+      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+        Text(l10n.medications,
+            style: GoogleFonts.notoSans(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87)),
+        TextButton.icon(
+          onPressed: () => _showAddMedicationDialog(l10n),
+          icon: const Icon(Icons.add_rounded, size: 20),
+          label: Text(l10n.add),
+          style: TextButton.styleFrom(
+            foregroundColor: _purple,
+            textStyle:
+                GoogleFonts.notoSans(fontWeight: FontWeight.bold),
           ),
-        ],
-      ),
+        ),
+      ]);
+
+  Widget _buildFilterSection(AppLocalizations l10n) => Column(children: [
+        Container(
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4))
+              ]),
+          child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                  hintText: l10n.searchMedicationHint,
+                  prefixIcon:
+                      const Icon(Icons.search_rounded, color: Colors.grey),
+                  border: InputBorder.none,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 15))),
+        ),
+        const SizedBox(height: 16),
+        SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(children: [
+              _buildFilterChip(
+                  l10n.expired, ExpirationStatus.expired, Colors.red),
+              const SizedBox(width: 8),
+              _buildFilterChip(l10n.critical, ExpirationStatus.critical,
+                  Colors.deepOrange),
+              const SizedBox(width: 8),
+              FilterChip(
+                  label: Text(l10n.lowStock),
+                  selected: _filterLowStock,
+                  onSelected: (v) => setState(() {
+                        _filterLowStock = v;
+                        _applyFilters();
+                      }),
+                  selectedColor: Colors.amber.shade100,
+                  checkmarkColor: Colors.amber.shade900,
+                  backgroundColor: Colors.white,
+                  shape: const StadiumBorder(
+                      side: BorderSide(color: Color(0xFFEEEEEE)))),
+            ])),
+        const SizedBox(height: 16),
+      ]);
+
+  Widget _buildFilterChip(
+      String label, ExpirationStatus status, Color color) {
+    bool isS = _statusFilters.contains(status);
+    return FilterChip(
+        label: Text(label),
+        selected: isS,
+        onSelected: (v) => setState(() {
+              v
+                  ? _statusFilters.add(status)
+                  : _statusFilters.remove(status);
+              _applyFilters();
+            }),
+        selectedColor: color.withOpacity(0.1),
+        checkmarkColor: color,
+        backgroundColor: Colors.white,
+        shape: const StadiumBorder(
+            side: BorderSide(color: Color(0xFFEEEEEE))));
+  }
+
+  Widget _buildMedicationList(AppLocalizations l10n) {
+    if (_filteredMedications.isEmpty)
+      return Center(
+          child: Padding(
+              padding: const EdgeInsets.all(40),
+              child: Text(l10n.noMedicationsFound,
+                  style: const TextStyle(color: Colors.grey))));
+    return ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: _filteredMedications.length,
+        itemBuilder: (c, i) =>
+            _buildMedicationCard(_filteredMedications[i], l10n));
+  }
+
+  Widget _buildMedicationCard(MedicationDto med, AppLocalizations l10n) {
+    Color sColor = _getStatusColor(med.status);
+    bool isLow = med.quantity < med.minimumQuantity;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.black.withOpacity(0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4))
+          ]),
+      padding: const EdgeInsets.all(16),
+      child: Column(children: [
+        Row(children: [
+          Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                  color: sColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12)),
+              child: Icon(Icons.vaccines_rounded, color: sColor, size: 24)),
+          const SizedBox(width: 16),
+          Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                Text(med.name,
+                    style: GoogleFonts.notoSans(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(
+                    '${l10n.expires}: ${DateFormat('dd.MM.yyyy').format(med.expirationDate)}',
+                    style:
+                        const TextStyle(fontSize: 12, color: Colors.grey)),
+              ])),
+          _buildStatusTag(med.status, l10n),
+        ]),
+        const SizedBox(height: 16),
+        Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+          _buildStatItem(l10n.quantity,
+              '${med.quantity} ${med.unit.name.capitalize()}',
+              isLow ? Colors.red : Colors.black87),
+          _buildStatItem(l10n.minRequired,
+              '${med.minimumQuantity} ${med.unit.name.capitalize()}',
+              Colors.grey),
+        ]),
+        const SizedBox(height: 16),
+        Row(children: [
+          Expanded(
+              child: OutlinedButton(
+                  onPressed: () => _showWriteOffDialog(med, l10n),
+                  style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.red,
+                      side: BorderSide(color: Colors.red.shade100),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12))),
+                  child: Text(l10n.writeOff))),
+          const SizedBox(width: 12),
+          Expanded(
+              child: ElevatedButton(
+                  onPressed: () => _showUseMedicationDialog(med, l10n),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor:
+                          const Color.fromARGB(255, 173, 128, 245),
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      elevation: 0),
+                  child: Text(l10n.use))),
+        ]),
+      ]),
     );
   }
 
-  Widget _buildStatusChip(String status) {
-    // 6. ОНОВЛЕННЯ: Теж локалізуємо
-    final l10n = AppLocalizations.of(context)!;
-    final String statusText;
-    final Color color;
+  Widget _buildStatItem(String label, String value, Color valueColor) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label,
+            style: const TextStyle(
+                fontSize: 11,
+                color: Colors.grey,
+                fontWeight: FontWeight.w600)),
+        Text(value,
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: valueColor)),
+      ]);
 
-    if (status == 'Good') {
-      statusText = l10n.statusGood;
-      color = Colors.green;
-    } else {
-      // Припускаємо, що все інше це "Needs Attention"
-      statusText = l10n.statusWarning;
-      color = Colors.orange;
-    }
-
-    return Chip(
-      label: Text(statusText, style: GoogleFonts.notoSans(fontSize: 12, color: Colors.white, fontWeight: FontWeight.bold)),
-      backgroundColor: color,
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    );
-  }
-
-  Widget _buildMedicationCard(MedicationDto medication) {
-    final l10n = AppLocalizations.of(context)!; // Отримуємо l10n тут
-    Color statusColor;
-    String statusText;
-
-    switch (medication.status) {
+  Widget _buildStatusTag(ExpirationStatus status, AppLocalizations l10n) {
+    String text = '';
+    Color color = _getStatusColor(status);
+    switch (status) {
       case ExpirationStatus.expired:
-        statusColor = Colors.red.shade600;
-        statusText = l10n.expired; // <--- ЗМІНЕНО
+        text = l10n.expired;
         break;
       case ExpirationStatus.critical:
-        statusColor = Colors.deepOrange.shade600;
-        statusText = l10n.critical; // <--- ЗМІНЕНО
+        text = l10n.critical;
         break;
       case ExpirationStatus.warning:
-        statusColor = Colors.amber.shade600;
-        statusText = l10n.statusWarning; // <--- ЗМІНЕНО
+        text = l10n.statusWarning;
         break;
       case ExpirationStatus.good:
-        statusColor = Colors.green.shade600;
-        statusText = l10n.statusGood; // <--- ЗМІНЕНО
+        text = l10n.statusGood;
         break;
     }
-
-    bool isLowQuantity = medication.quantity < medication.minimumQuantity;
-
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(medication.name, style: GoogleFonts.notoSans(
-                      fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87)),
-                ),
-                Chip(
-                  label: Text(statusText, style: GoogleFonts.notoSans( // <--- statusText вже перекладено
-                      fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold)),
-                  backgroundColor: statusColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Icon(Icons.inventory, size: 16, color: Colors.grey.shade600),
-                const SizedBox(width: 6),
-                Text('${l10n.quantity}: ', style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600)), // <--- ЗМІНЕНО
-                Text('${medication.quantity} ${medication.unit.name.capitalize()}',
-                    style: GoogleFonts.notoSans(fontSize: 14, color: isLowQuantity ? Colors.red : Colors.grey.shade700)),
-                if (isLowQuantity)
-                  Text(' ${l10n.lowStockWarning}', style: GoogleFonts.notoSans(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold)), // <--- ЗМІНЕНО
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Icon(Icons.arrow_downward, size: 16, color: Colors.grey.shade600),
-                const SizedBox(width: 6),
-                Text('${l10n.minRequired}: ', style: GoogleFonts.notoSans(fontSize: 13, fontWeight: FontWeight.w600)), // <--- ЗМІНЕНО
-                Text('${medication.minimumQuantity} ${medication.unit.name.capitalize()}',
-                    style: GoogleFonts.notoSans(fontSize: 13, color: Colors.grey.shade700)),
-              ],
-            ),
-            const SizedBox(height: 6),
-            Row(
-              children: [
-                Icon(Icons.calendar_today, size: 16, color: Colors.grey.shade600),
-                const SizedBox(width: 6),
-                Text('${l10n.expires}: ', style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600)), // <--- ЗМІНЕНО
-                Text(DateFormat('dd.MM.yyyy').format(medication.expirationDate),
-                    style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade700)),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                OutlinedButton.icon(
-                  onPressed: () => _showWriteOffDialog(medication, l10n), // <--- ЗМІНЕНО
-                  icon: const Icon(Icons.remove_circle_outline, size: 18),
-                  label: Text(l10n.writeOff, style: GoogleFonts.notoSans(fontSize: 13)), // <--- ЗМІНЕНО
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: BorderSide(color: Colors.red.shade300),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                ElevatedButton.icon(
-                  onPressed: () => _showUseMedicationDialog(medication, l10n), // <--- ЗМІНЕНО
-                  icon: const Icon(Icons.medication, size: 18),
-                  label: Text(l10n.use, style: GoogleFonts.notoSans(fontSize: 13)), // <--- ЗМІНЕНО
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 173, 128, 245),
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(8)),
+      child: Text(text,
+          style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.bold,
+              color: color)),
     );
   }
+
+  Color _getStatusColor(ExpirationStatus s) {
+    switch (s) {
+      case ExpirationStatus.expired:
+        return Colors.red;
+      case ExpirationStatus.critical:
+        return Colors.deepOrange;
+      case ExpirationStatus.warning:
+        return Colors.orange;
+      case ExpirationStatus.good:
+        return Colors.green;
+    }
+  }
+
+  Widget _buildBottomNav(AppLocalizations l10n) => Container(
+        decoration: BoxDecoration(boxShadow: [
+          BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 20,
+              offset: const Offset(0, -5))
+        ]),
+        child: BottomNavigationBar(
+          elevation: 0,
+          backgroundColor: Colors.white,
+          currentIndex: _selectedIndex,
+          selectedItemColor: _purple,
+          onTap: _onItemTapped,
+          items: [
+            BottomNavigationBarItem(
+                icon: const Icon(Icons.home_rounded), label: l10n.home),
+            BottomNavigationBarItem(
+                icon: const Icon(Icons.person_rounded),
+                label: l10n.profile),
+          ],
+        ),
+      );
 }
