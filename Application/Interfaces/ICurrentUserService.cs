@@ -3,5 +3,6 @@ using System;
 public interface ICurrentUserService
 {
     Guid GetUserId();
-    string? GetUserRole(); 
+    string? GetUserRole();
+    Guid GetOrganizationId();
 }

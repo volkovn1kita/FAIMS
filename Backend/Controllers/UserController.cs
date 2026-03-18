@@ -1,4 +1,3 @@
-// Backend/Controllers/UserController.cs - ОНОВЛЕНА ВЕРСІЯ
 using Application.DTOs;
 using Application.Interfaces;
 using Domain;
@@ -27,7 +26,6 @@ namespace Backend.Controllers
             _currentUserService = currentUserService;
         }
 
-        // POST: api/users/login - Дозволяє неавторизований доступ
         [HttpPost("login")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] UserLoginDto dto)
@@ -40,16 +38,29 @@ namespace Backend.Controllers
             return Ok(authResult);
         }
 
-        // GET: api/users - Тільки для адміністраторів, тепер з фільтрацією, пошуком та сортуванням
+        [HttpPost("register-organization")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterOrganization([FromBody] RegisterOrganizationDto dto)
+        {
+            try
+            {
+                var result = await _userService.RegisterOrganizationAsync(dto);
+                return Ok(result);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+        }
+
         [HttpGet]
         [Authorize(Roles = nameof(UserRole.Administrator))]
-        public async Task<IActionResult> GetAllUsers([FromQuery] UserFilterAndPaginationDto filterDto) // <--- ЗМІНЕНО
+        public async Task<IActionResult> GetAllUsers([FromQuery] UserFilterAndPaginationDto filterDto)
         {
             var users = await _userService.GetAllUsersAsync(filterDto);
             return Ok(users);
         }
 
-        // GET: api/users/{id} - Тільки для адміністраторів
         [HttpGet("{id}")]
         [Authorize(Roles = nameof(UserRole.Administrator))]
         public async Task<IActionResult> GetUserById(Guid id)
@@ -65,7 +76,6 @@ namespace Backend.Controllers
             }
         }
 
-        // GET: api/users/me - Для будь-якого авторизованого користувача
         [HttpGet("me")]
         public async Task<IActionResult> GetCurrentUserProfile()
         {
@@ -85,10 +95,9 @@ namespace Backend.Controllers
             }
         }
 
-        // POST: api/users/admin-create - Тільки для адміністраторів
         [HttpPost("admin-create")]
         [Authorize(Roles = nameof(UserRole.Administrator))]
-        public async Task<IActionResult> AdminCreateUser ([FromBody] AdminCreateUserDto dto)
+        public async Task<IActionResult> AdminCreateUser([FromBody] AdminCreateUserDto dto)
         {
             try
             {
@@ -101,7 +110,6 @@ namespace Backend.Controllers
             }
         }
 
-        // PUT: api/users/{id} - Оновлення користувача адміністратором
         [HttpPut("{id}")]
         [Authorize(Roles = nameof(UserRole.Administrator))]
         public async Task<IActionResult> UpdateUser(Guid id, [FromBody] UpdateUserDto dto)
@@ -121,7 +129,6 @@ namespace Backend.Controllers
             }
         }
 
-        // PUT: api/users/me - Оновлення власного профілю користувачем
         [HttpPut("me")]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateProfileDto dto)
         {
@@ -145,7 +152,6 @@ namespace Backend.Controllers
             }
         }
 
-        // DELETE: api/users/{id} - Тільки для адміністраторів
         [HttpDelete("{id}")]
         [Authorize(Roles = nameof(UserRole.Administrator))]
         public async Task<IActionResult> DeleteUser(Guid id)
@@ -184,7 +190,6 @@ namespace Backend.Controllers
             }
         }
 
-        // POST: api/users/me/avatar - Завантаження аватара для поточного користувача
         [HttpPost("me/avatar")]
         public async Task<IActionResult> UploadMyAvatar(IFormFile avatarFile)
         {
@@ -208,7 +213,6 @@ namespace Backend.Controllers
             }
         }
 
-        // DELETE: api/users/{id}/avatar - Видалення аватара для конкретного користувача (адмін)
         [HttpDelete("{id}/avatar")]
         [Authorize(Roles = nameof(UserRole.Administrator))]
         public async Task<IActionResult> DeleteUserAvatar(Guid id)
@@ -228,7 +232,6 @@ namespace Backend.Controllers
             }
         }
 
-        // DELETE: api/users/me/avatar - Видалення аватара для поточного користувача
         [HttpDelete("me/avatar")]
         public async Task<IActionResult> DeleteMyAvatar()
         {
@@ -261,11 +264,9 @@ namespace Backend.Controllers
                 return Unauthorized(new { Message = "User not authenticated." });
             }
 
-            // Передаємо виконання у сервіс
             await _userService.UpdateFcmTokenAsync(userId, request.Token);
             
             return Ok(new { Message = "FCM token updated successfully." });
         }
-
     }
 }

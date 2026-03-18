@@ -14,9 +14,9 @@ namespace Application.Interfaces
         Task UpdateUserAsync(Guid userId, UpdateUserDto dto);
         Task UpdateUserProfileAsync(Guid userId, UpdateProfileDto dto);
         Task DeleteUserAsync(Guid userId);
-        Task<string> UploadUserAvatarAsync(Guid userId, IFormFile avatarFile); // <--- НОВИЙ МЕТОД
+        Task<string> UploadUserAvatarAsync(Guid userId, IFormFile avatarFile);
         Task DeleteUserAvatarAsync(Guid userId);
-
+        Task<AuthResultDto> RegisterOrganizationAsync(RegisterOrganizationDto dto);
         Task UpdateFcmTokenAsync(Guid userId, string token);
         Task<string?> GetUserFcmTokenAsync(Guid userId);
     }

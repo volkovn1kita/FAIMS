@@ -1,4 +1,3 @@
-// Application/Services/UserService.cs - ОНОВЛЕНА ВЕРСІЯ
 using Application.DTOs;
 using Application.Interfaces;
 using Domain;
@@ -6,11 +5,6 @@ using Domain.Exceptions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions; // Для PredicateBuilder
-using System.Threading.Tasks;
 
 namespace Application.Services
 {
@@ -22,11 +16,13 @@ namespace Application.Services
         private readonly ICurrentUserService _currentUserService;
         private readonly IFirstAidKitRepository _kitRepository;
         private readonly IHostEnvironment _hostEnvironment;
+        private readonly IOrganizationRepository _organizationRepository;
 
         public UserService(
             IUserRepository userRepository,
             IPasswordHasher<User> passwordHasher,
             ITokenService tokenService,
+            IOrganizationRepository organizationRepository,
             ICurrentUserService currentUserService,
             IFirstAidKitRepository kitRepository,
             IHostEnvironment hostEnvironment)
@@ -37,14 +33,13 @@ namespace Application.Services
             _currentUserService = currentUserService;
             _kitRepository = kitRepository;
             _hostEnvironment = hostEnvironment;
+            _organizationRepository = organizationRepository;
         }
 
-        public async Task<IEnumerable<UserDto>> GetAllUsersAsync(UserFilterAndPaginationDto filterDto) // <--- ЗМІНЕНО
+        public async Task<IEnumerable<UserDto>> GetAllUsersAsync(UserFilterAndPaginationDto filterDto)
         {
-            // Передаємо фільтри в репозиторій
             var users = await _userRepository.GetAllFilteredAndSortedAsync(filterDto);
 
-            // Перетворюємо Domain.User на Application.DTOs.UserDto
             return users.Select(u => new UserDto
             {
                 Id = u.Id,
@@ -57,8 +52,6 @@ namespace Application.Services
                 AvatarUrl = u.AvatarUrl
             }).ToList();
         }
-
-        // ... (інші методи залишились без змін)
 
         public async Task<UserDto> GetUserByIdAsync(Guid id)
         {
@@ -108,13 +101,11 @@ namespace Application.Services
                 throw new NotFoundException($"User with Id: {userId} not found.");
             }
 
-            // Перевірка файлу
             if (avatarFile == null || avatarFile.Length == 0)
             {
                 throw new ValidationException("No file uploaded or file is empty.");
             }
 
-            // Перевірка типу файлу (наприклад, дозволяємо лише зображення)
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif" };
             var fileExtension = Path.GetExtension(avatarFile.FileName).ToLower();
             if (!allowedExtensions.Contains(fileExtension))
@@ -122,28 +113,22 @@ namespace Application.Services
                 throw new ValidationException("Only .jpg, .jpeg, .png, .gif files are allowed.");
             }
 
-            // Перевірка розміру файлу (наприклад, до 5 MB)
-            const long maxFileSize = 5 * 1024 * 1024; // 5 MB
+            const long maxFileSize = 5 * 1024 * 1024;
             if (avatarFile.Length > maxFileSize)
             {
                 throw new ValidationException("File size exceeds 5 MB limit.");
             }
 
-            // Визначаємо шлях до папки wwwroot/avatars
             string uploadsFolder = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot", "avatars");
 
-            // Створюємо папку, якщо вона не існує
             if (!Directory.Exists(uploadsFolder))
             {
                 Directory.CreateDirectory(uploadsFolder);
             }
 
-            // Генеруємо унікальне ім'я файлу на основі UserId, щоб уникнути конфліктів
-            // і легко замінювати старий аватар на новий
             string uniqueFileName = $"{userId}{fileExtension}";
             string filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
-            // Видаляємо старий аватар, якщо він існує
             if (!string.IsNullOrEmpty(user.AvatarUrl))
             {
                 string oldFilePath = Path.Combine(_hostEnvironment.ContentRootPath, user.AvatarUrl.TrimStart('/'));
@@ -153,20 +138,17 @@ namespace Application.Services
                 }
             }
 
-            // Зберігаємо новий файл
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
                 await avatarFile.CopyToAsync(fileStream);
             }
 
-            // Оновлюємо AvatarUrl в моделі User
-            // Ми зберігаємо відносний шлях, який буде доступний через Static Files Middleware
             user.AvatarUrl = $"/avatars/{uniqueFileName}";
             user.UpdatedDate = DateTime.UtcNow;
 
             await _userRepository.SaveChangesAsync();
 
-            return user.AvatarUrl; // Повертаємо URL аватара
+            return user.AvatarUrl;
         }
 
         public async Task DeleteUserAvatarAsync(Guid userId)
@@ -182,16 +164,13 @@ namespace Application.Services
                 throw new ValidationException("User does not have an avatar to delete.");
             }
 
-            // Визначаємо шлях до файлу аватара
             string filePath = Path.Combine(_hostEnvironment.ContentRootPath, user.AvatarUrl.TrimStart('/'));
 
-            // Видаляємо файл, якщо він існує
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
             }
 
-            // Оновлюємо AvatarUrl в моделі User
             user.AvatarUrl = null;
             user.UpdatedDate = DateTime.UtcNow;
 
@@ -210,7 +189,7 @@ namespace Application.Services
             {
                 return null;
             }
-            var token = await _tokenService.GenerateTokenAsync(user.Id, user.Email, user.Role);
+            var token = await _tokenService.GenerateTokenAsync(user.Id, user.Email, user.Role, user.OrganizationId);
 
             return new AuthResultDto(
                 Token: token,
@@ -233,13 +212,19 @@ namespace Application.Services
                 throw new ValidationException($"User with email '{dto.Email}' already exists.");
             }
 
+            var currentOrgId = _currentUserService.GetOrganizationId();
+            if (currentOrgId == Guid.Empty)
+            {
+                throw new ValidationException("Could not determine the organization of the current administrator.");
+            }
+
             var newUser = new User
             {
                 Email = dto.Email,
                 FirstName = dto.FirstName,
                 LastName = dto.LastName,
                 Role = dto.Role,
-                // CreatedDate та UpdatedDate встановлюються в BaseEntity або через механізми EF Core
+                OrganizationId = currentOrgId 
             };
 
             var hashedPassword = _passwordHasher.HashPassword(newUser, dto.Password);
@@ -350,7 +335,6 @@ namespace Application.Services
 
         public async Task UpdateFcmTokenAsync(Guid userId, string token)
         {
-            // Знаходимо користувача
             var user = await _userRepository.GetByIdAsync(userId);
 
             if (user == null)
@@ -358,20 +342,62 @@ namespace Application.Services
                 throw new NotFoundException($"User with ID {userId} not found.");
             }
 
-            // Оновлюємо токен
             user.FcmToken = token;
 
-            // Зберігаємо
-            await _userRepository.SaveChangesAsync(); // або _unitOfWork.SaveAsync()
+            await _userRepository.SaveChangesAsync(); 
         }
-        
+
         public async Task<string?> GetUserFcmTokenAsync(Guid userId)
         {
-            var user = await _userRepository.GetByIdAsync(userId); 
-            
+            var user = await _userRepository.GetByIdAsync(userId);
+
             if (user == null) return null;
-            
+
             return user.FcmToken;
+        }
+        
+        public async Task<AuthResultDto> RegisterOrganizationAsync(RegisterOrganizationDto dto)
+        {
+            var existingUser = await _userRepository.GetByEmailAsync(dto.AdminEmail);
+            if (existingUser != null)
+            {
+                throw new ValidationException($"User with email '{dto.AdminEmail}' already exists.");
+            }
+
+            var organization = new Organization
+            {
+                Id = Guid.NewGuid(),
+                Name = dto.OrganizationName,
+                Address = dto.OrganizationAddress,
+                CreatedDate = DateTime.UtcNow
+            };
+
+            var adminUser = new User
+            {
+                Id = Guid.NewGuid(),
+                OrganizationId = organization.Id,
+                FirstName = dto.AdminFirstName,
+                LastName = dto.AdminLastName,
+                Email = dto.AdminEmail,
+                Role = UserRole.Administrator,
+                CreatedDate = DateTime.UtcNow
+            };
+
+            adminUser.PasswordHash = _passwordHasher.HashPassword(adminUser, dto.AdminPassword);
+
+            await _organizationRepository.AddAsync(organization);
+            await _userRepository.AddAsync(adminUser);
+
+            await _userRepository.SaveChangesAsync();
+
+            var token = await _tokenService.GenerateTokenAsync(adminUser.Id, adminUser.Email, adminUser.Role, adminUser.OrganizationId);
+
+            return new AuthResultDto(
+                Token: token,
+                Email: adminUser.Email,
+                Role: adminUser.Role.ToString(),
+                Name: adminUser.FirstName ?? adminUser.Email.Split('@')[0]
+            );
         }
 
     }

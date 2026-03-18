@@ -10,12 +10,16 @@ public class DepartmentService : IDepartmentService
 {
     private readonly IDepartmentRepository _departmentRepository;
     private readonly IFirstAidKitRepository _kitRepository;
+    private readonly ICurrentUserService _currentUserService;
 
-    public DepartmentService(IDepartmentRepository departmentRepository,
-                             IFirstAidKitRepository kitRepository)
+    public DepartmentService(
+        IDepartmentRepository departmentRepository,
+        IFirstAidKitRepository kitRepository,
+        ICurrentUserService currentUserService)
     {
         _departmentRepository = departmentRepository;
         _kitRepository = kitRepository;
+        _currentUserService = currentUserService;
     }
 
     public async Task<IEnumerable<RoomListAllDto>> GetAllRoomsAsync()
@@ -44,15 +48,26 @@ public class DepartmentService : IDepartmentService
             roomDtos.ToList()
         );
     }
+
     public async Task<Guid> AddDepartmentAsync(DepartmentCreateDto dto)
     {
+        var currentOrgId = _currentUserService.GetOrganizationId();
+        if (currentOrgId == Guid.Empty)
+        {
+            throw new ValidationException("Organization ID not found in token.");
+        }
+
         var existingDepartments = await _departmentRepository.GetAllDepartmentsAsync();
         if (existingDepartments.Any(d => d.Name.Equals(dto.Name, StringComparison.OrdinalIgnoreCase)))
         {
             throw new ValidationException($"A department named ‘{dto.Name}’ already exists.");
         }
 
-        var newDepartment = new Department { Name = dto.Name };
+        var newDepartment = new Department 
+        { 
+            Name = dto.Name,
+            OrganizationId = currentOrgId 
+        };
         
         await _departmentRepository.AddDepartmentAsync(newDepartment);
         await _departmentRepository.SaveChangesAsync();
@@ -62,6 +77,12 @@ public class DepartmentService : IDepartmentService
 
     public async Task<Guid> AddRoomAsync(RoomCreateDto dto)
     {
+        var currentOrgId = _currentUserService.GetOrganizationId();
+        if (currentOrgId == Guid.Empty)
+        {
+            throw new ValidationException("Organization ID not found in token.");
+        }
+
         var department = await _departmentRepository.GetDepartmentByIdAsync(dto.DepartmentId);
         if (department == null)
         {
@@ -79,7 +100,8 @@ public class DepartmentService : IDepartmentService
         var newRoom = new Room
         {
             DepartmentId = dto.DepartmentId,
-            Name = dto.Name
+            Name = dto.Name,
+            OrganizationId = currentOrgId
         };
 
         await _departmentRepository.AddRoomToDepartmentAsync(newRoom);
@@ -92,7 +114,6 @@ public class DepartmentService : IDepartmentService
     {
         var departmentToDelete = await _departmentRepository.GetDepartmentByIdAsync(id);
         if (departmentToDelete == null) return;
-        
         
         if (departmentToDelete.Rooms != null && departmentToDelete.Rooms.Any())
         {
@@ -108,7 +129,6 @@ public class DepartmentService : IDepartmentService
         var roomToDelete = await _departmentRepository.GetRoomByIdAsync(id);
     
         if (roomToDelete == null) return;
-        
         
         var existingKit = await _kitRepository.GetKitByRoomIdAsync(id);
         

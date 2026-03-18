@@ -1,6 +1,8 @@
-﻿namespace Domain;
+﻿using Domain.Interfaces;
 
-public class Journal : BaseEntity
+namespace Domain;
+
+public class Journal : BaseEntity, IMustHaveTenant
 {
     public JournalAction ActionType { get; set; }
     public string? Reason { get; set; }
@@ -14,6 +16,9 @@ public class Journal : BaseEntity
 
     public Guid UserId { get; set; }
     public User User { get; set; } = null!;
+
+    public Guid OrganizationId { get; set; }
+    public Organization Organization { get; set; } = null!;
 
     public Guid? BatchId { get; set; }
     

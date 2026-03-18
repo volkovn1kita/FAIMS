@@ -1,6 +1,8 @@
-﻿namespace Domain;
+﻿using Domain.Interfaces;
 
-public class User : BaseEntity
+namespace Domain;
+
+public class User : BaseEntity, IMustHaveTenant
 {
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
@@ -9,6 +11,9 @@ public class User : BaseEntity
     public UserRole Role { get; set; }
 
     public string? FcmToken { get; set; } 
+
+    public Guid OrganizationId { get; set; }
+    public Organization Organization { get; set; } = null!;
 
     public FirstAidKit? ResponsibleKit { get; set; }
     public ICollection<Journal> Journals { get; set; } = new List<Journal>();

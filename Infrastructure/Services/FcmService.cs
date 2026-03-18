@@ -20,7 +20,6 @@ namespace Infrastructure.Services
             {
                 var pathToKey = Path.Combine(Directory.GetCurrentDirectory(), "faims-baaab-firebase-adminsdk-fbsvc-4a8578170b.json");
                 
-                // Перевіряємо, чи файл дійсно лежить там, де ми очікуємо
                 if (!File.Exists(pathToKey))
                 {
                     throw new FileNotFoundException($"❌ УВАГА! Файл ключів Firebase не знайдено за адресою: {pathToKey}");

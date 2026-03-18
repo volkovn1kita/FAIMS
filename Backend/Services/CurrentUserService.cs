@@ -1,4 +1,3 @@
-using System;
 using System.Security.Claims;
 
 namespace Backend.Services;
@@ -11,10 +10,10 @@ public class CurrentUserService : ICurrentUserService
     {
         _httpContextAccessor = httpContextAccessor;
     }
+
     public Guid GetUserId()
     {
         var user = _httpContextAccessor.HttpContext?.User;
-        
         var userIdClaim = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
         if (Guid.TryParse(userIdClaim, out var userId))
@@ -28,5 +27,18 @@ public class CurrentUserService : ICurrentUserService
     public string? GetUserRole()
     {
         return _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
+    }
+
+    public Guid GetOrganizationId()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        var orgIdClaim = user?.FindFirst("OrganizationId")?.Value;
+
+        if (Guid.TryParse(orgIdClaim, out var orgId))
+        {
+            return orgId;
+        }
+
+        return Guid.Empty;
     }
 }

@@ -2,8 +2,8 @@ using Application.DTOs;
 using Application.Interfaces;
 using Domain;
 using Domain.Exceptions;
-using System.Linq; // Add this for LINQ extensions
-using System.Collections.Generic; // Add this for List
+using System.Linq; 
+using System.Collections.Generic; 
 
 namespace Application.Services;
 
@@ -30,6 +30,12 @@ public class FirstAidKitService : IFirstAidKitService
 
     public async Task<Guid> AddKitAsync(FirstAidKitCreateDto dto)
     {
+        var currentOrgId = _currentUserService.GetOrganizationId();
+        if (currentOrgId == Guid.Empty)
+        {
+            throw new ValidationException("Organization ID not found in token.");
+        }
+
         var existedKit = await _kitRepository.GetKitByUniqueNumberAsync(dto.UniqueNumber);
         if (existedKit != null)
         {
@@ -54,6 +60,7 @@ public class FirstAidKitService : IFirstAidKitService
             Name = dto.Name,
             RoomId = dto.RoomId,
             ResponsibleUserId = dto.ResponsibleUserId,
+            OrganizationId = currentOrgId 
         };
 
         await _kitRepository.AddKitAsync(newKit);
@@ -113,24 +120,11 @@ public class FirstAidKitService : IFirstAidKitService
             int lowQuantityCount = kit.Medications.Count(m => m.Quantity < m.MinimumQuantity);
 
             string currentStatusBadge;
-            // if (expiredCount > 0 || criticalCount > 0)
-            // {
-            //     currentStatusBadge = "Needs Attention";
-            // }
-            // else if (lowQuantityCount > 0)
-            // {
-            //     currentStatusBadge = "Low Stock";
-            // }
-            // else
-            // {
-            //     currentStatusBadge = "Good";
-            // }
             
             if (expiredCount > 0 || criticalCount > 0 || lowQuantityCount > 0)
                 currentStatusBadge = "Needs Attention";
             else
                 currentStatusBadge = "Good";
-
 
             if (!string.IsNullOrWhiteSpace(statusFilter))
             {
@@ -262,7 +256,6 @@ public class FirstAidKitService : IFirstAidKitService
         await _kitRepository.SaveChangesAsync();
     }
 
-    // MEDICATIONS - UPDATED IMPLEMENTATION
     public async Task<MedicationResponseDto> GetMedicationByIdAsync(Guid id)
     {
         var medication = await _kitRepository.GetMedicationByIdAsync(id);
@@ -271,7 +264,7 @@ public class FirstAidKitService : IFirstAidKitService
             throw new NotFoundException($"The medication with Id: {id} was not found.");
         }
 
-        var kit = await _kitRepository.GetKitByIdAsync(medication.FirstAidKitId); // Needs kit details for auth
+        var kit = await _kitRepository.GetKitByIdAsync(medication.FirstAidKitId); 
         if (kit == null)
         {
             throw new NotFoundException($"The kit of medication was not found.");
@@ -285,7 +278,6 @@ public class FirstAidKitService : IFirstAidKitService
             throw new ForbiddenException("You cannot get medication to this first aid kit.");
         }
 
-        // Manual mapping to DTO
         return new MedicationResponseDto(
             Id: medication.Id,
             Name: medication.Name,
@@ -300,7 +292,7 @@ public class FirstAidKitService : IFirstAidKitService
 
     public async Task<IEnumerable<MedicationResponseDto>> GetMedicationsByKitIdAsync(Guid kitId)
     {
-        var kit = await _kitRepository.GetKitByIdAsync(kitId); // Needs kit details for auth
+        var kit = await _kitRepository.GetKitByIdAsync(kitId); 
         if (kit == null)
         {
             throw new NotFoundException($"First aid kit with Id: {kitId} not found.");
@@ -330,6 +322,12 @@ public class FirstAidKitService : IFirstAidKitService
 
     public async Task<Guid> AddMedicationAsync(MedicationCreateDto dto)
     {
+        var currentOrgId = _currentUserService.GetOrganizationId();
+        if (currentOrgId == Guid.Empty)
+        {
+            throw new ValidationException("Organization ID not found in token.");
+        }
+
         dto = dto with { ExpirationDate = DateTime.SpecifyKind(dto.ExpirationDate, DateTimeKind.Utc) };
 
         var kit = await _kitRepository.GetKitByIdAsync(dto.FirstAidKitId);
@@ -371,10 +369,11 @@ public class FirstAidKitService : IFirstAidKitService
                 Reason = $"Medication '{existingBatch.Name}' replenished. Quantity changed from {oldQuantity} to {existingBatch.Quantity}.",
                 FirstAidKitId = dto.FirstAidKitId,
                 MedicationName = dto.Name,
-                UserId = _currentUserService.GetUserId(),
+                UserId = currentUserId,
                 BatchId = existingBatch.Id,
                 Quantity = dto.Quantity,
-                Unit = existingBatch.Unit
+                Unit = existingBatch.Unit,
+                OrganizationId = currentOrgId 
             });
 
             return existingBatch.Id;
@@ -387,7 +386,8 @@ public class FirstAidKitService : IFirstAidKitService
             Quantity = dto.Quantity,
             MinimumQuantity = dto.MinimumQuantity,
             Unit = dto.Unit,
-            ExpirationDate = dto.ExpirationDate
+            ExpirationDate = dto.ExpirationDate,
+            OrganizationId = currentOrgId 
         };
 
         await _kitRepository.AddMedicationToKitAsync(newMedication, dto.FirstAidKitId);
@@ -398,16 +398,16 @@ public class FirstAidKitService : IFirstAidKitService
             Reason = $"New medication '{newMedication.Name}' added with quantity {newMedication.Quantity} {newMedication.Unit}.",
             FirstAidKitId = dto.FirstAidKitId,
             MedicationName = newMedication.Name,
-            UserId = _currentUserService.GetUserId(),
+            UserId = currentUserId,
             BatchId = newMedication.Id,
             Quantity = dto.Quantity,
-            Unit = newMedication.Unit
+            Unit = newMedication.Unit,
+            OrganizationId = currentOrgId 
         });
 
         await _kitRepository.SaveChangesAsync();
 
         return newMedication.Id;
-
     }
 
     public async Task UpdateMedicationAsync(MedicationUpdateDto dto)
@@ -418,7 +418,6 @@ public class FirstAidKitService : IFirstAidKitService
             throw new NotFoundException($"The medication with Id: {dto.Id} was not found.");
         }
 
-        // Перевірка, чи належить медикамент до вказаної аптечки (додаткова безпека)
         if (medToUpdate.FirstAidKitId != dto.FirstAidKitId)
         {
             throw new ValidationException("It is impossible to update the medication: the first aid kit is not compliant.");
@@ -426,10 +425,9 @@ public class FirstAidKitService : IFirstAidKitService
 
         var currentUserId = _currentUserService.GetUserId();
         var currentUserRoleString = _currentUserService.GetUserRole();
-        // Перетворюємо рядок ролі в enum UserRole для зручного порівняння
+        
         if (!Enum.TryParse<UserRole>(currentUserRoleString, out var currentUserRole))
         {
-            // Обробка випадку, якщо роль не може бути розпізнана
             throw new ForbiddenException("User role could not be determined.");
         }
 
@@ -440,76 +438,46 @@ public class FirstAidKitService : IFirstAidKitService
             throw new NotFoundException($"The kit for update medication was not found.");
         }
 
-        // Авторизація:
-        // Якщо тільки адмін може робити повне редагування через цей ендпоінт,
-        // а звичайний користувач може змінювати лише minimumQuantity та expirationDate.
-        // Зауваження: В контролері (як ми домовлялися), ендпоінт PUT /medications має бути
-        // авторизований лише для [Authorize(Roles = nameof(UserRole.Administrator))].
-        // Це додаткова перевірка, якщо раптом дозволи в контролері зміняться.
-        // Або, якщо ми дозволяємо звичайному юзеру цей ендпоінт,
-        // тоді логіка розмежування нижче працює.
         if (currentUserRole != UserRole.Administrator && kit.ResponsibleUserId != currentUserId)
         {
             throw new ForbiddenException("You cannot update medications in this first aid kit.");
         }
 
-        // Зберігаємо старі значення для перевірок (не для журналювання, згідно з вашою вимогою)
         var oldName = medToUpdate.Name;
         var oldUnit = medToUpdate.Unit;
         var oldMinQuantity = medToUpdate.MinimumQuantity;
         var oldExpirationDate = medToUpdate.ExpirationDate;
         var oldQuantity = medToUpdate.Quantity;
 
-        // Логіка оновлення полів залежно від ролі
         if (currentUserRole == UserRole.Administrator)
         {
-            // Адміністратор може змінювати всі поля.
-            // Дії адміністратора через цей ендпоінт НЕ ЖУРНАЛУЮТЬСЯ.
             medToUpdate.Name = dto.Name;
             medToUpdate.Quantity = dto.Quantity;
             medToUpdate.MinimumQuantity = dto.MinimumQuantity;
             medToUpdate.Unit = dto.Unit;
             medToUpdate.ExpirationDate = dto.ExpirationDate;
         }
-        else // Звичайний користувач (відповідальна особа)
+        else 
         {
-            // Звичайний користувач НЕ може змінювати назву, одиниці виміру або кількість через UpdateMedicationAsync
             if (oldName != dto.Name || oldUnit != dto.Unit || oldQuantity != dto.Quantity)
             {
                 throw new ForbiddenException("Only administrators can change medication name, unit, or quantity directly. Use specific actions for quantity changes for regular users.");
             }
 
-            // Звичайний користувач може змінювати лише MinimumQuantity та ExpirationDate
             medToUpdate.MinimumQuantity = dto.MinimumQuantity;
             medToUpdate.ExpirationDate = dto.ExpirationDate;
-
-            // *** Журналювання для дій звичайного користувача через цей ендпоінт
-            // Згідно з вашою логікою, звичайний користувач через UpdateMedicationAsync
-            // може змінити лише MinimumQuantity та ExpirationDate. Ці зміни МОЖУТЬ бути залоговані.
-            // Якщо і ці зміни не потрібно логувати, видаліть блок if (changes.Any()) нижче
-            // або зробіть його більш специфічним.
-            var changesForUser = new List<string>();
-            if (oldMinQuantity != dto.MinimumQuantity)
-            {
-                changesForUser.Add($"Minimum quantity from {oldMinQuantity} to {dto.MinimumQuantity}");
-            }
-            if (oldExpirationDate != dto.ExpirationDate)
-            {
-                changesForUser.Add($"Expiration date from {oldExpirationDate.ToShortDateString()} to {dto.ExpirationDate.ToShortDateString()}");
-            }
-
         }
 
         medToUpdate.UpdatedDate = DateTime.UtcNow;
 
         await _kitRepository.UpdateMedicationInKit(medToUpdate);
         await _kitRepository.SaveChangesAsync();
-
     }
 
-    // НОВИЙ МЕТОД: Використання медикаменту
     public async Task UseMedicationAsync(Guid medicationId, int quantityUsed)
     {
+        var currentOrgId = _currentUserService.GetOrganizationId();
+        
         if (quantityUsed <= 0)
         {
             throw new ValidationException("Quantity used must be greater than zero.");
@@ -555,15 +523,17 @@ public class FirstAidKitService : IFirstAidKitService
             UserId = currentUserId,
             BatchId = medication.Id,
             Quantity = quantityUsed,
-            Unit = medication.Unit
+            Unit = medication.Unit,
+            OrganizationId = currentOrgId 
         });
 
         await _kitRepository.SaveChangesAsync();
     }
 
-    // НОВИЙ МЕТОД: Списання медикаменту
     public async Task WriteOffMedicationAsync(Guid medicationId, int quantityWrittenOff, string reason)
     {
+        var currentOrgId = _currentUserService.GetOrganizationId();
+        
         if (quantityWrittenOff <= 0)
         {
             throw new ValidationException("Quantity to write off must be greater than zero.");
@@ -606,25 +576,26 @@ public class FirstAidKitService : IFirstAidKitService
 
         await _journalRepository.AddEntryAsync(new Journal
         {
-            ActionType = JournalAction.WrittenOff, // Використовуємо новий тип дії
+            ActionType = JournalAction.WrittenOff, 
             Reason = $"Medication '{medication.Name}' written off. Quantity changed from {oldQuantity} to {medication.Quantity}. Written off {quantityWrittenOff} {medication.Unit}. Reason: {reason}",
             FirstAidKitId = medication.FirstAidKitId,
             MedicationName = medication.Name,
             UserId = currentUserId,
             BatchId = medication.Id,
             Quantity = quantityWrittenOff,
-            Unit = medication.Unit
+            Unit = medication.Unit,
+            OrganizationId = currentOrgId 
         });
 
         await _kitRepository.SaveChangesAsync();
     }
 
-
     public async Task RemoveMedicationAsync(Guid medicationId, Guid kitId)
     {
+        var currentOrgId = _currentUserService.GetOrganizationId();
         var medToDelete = await _kitRepository.GetMedicationByIdAsync(medicationId);
 
-        if (medToDelete == null) return; // If medication not found, gracefully exit or throw specific error
+        if (medToDelete == null) return; 
 
         if (medToDelete.FirstAidKitId != kitId)
         {
@@ -657,10 +628,11 @@ public class FirstAidKitService : IFirstAidKitService
             Reason = $"The record for {medToDelete.Name} (batch {medToDelete.Id}) has been fully deleted from the system (quantity was 0).",
             FirstAidKitId = kitId,
             MedicationName = medToDelete.Name,
-            UserId = _currentUserService.GetUserId(),
+            UserId = currentUserId,
             BatchId = medToDelete.Id,
             Quantity = 0,
-            Unit = medToDelete.Unit
+            Unit = medToDelete.Unit,
+            OrganizationId = currentOrgId 
         });
 
         await _kitRepository.SaveChangesAsync();

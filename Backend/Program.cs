@@ -72,6 +72,7 @@ builder.Services.AddScoped<IReportingService, ReportingService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 
 builder.Services.AddHostedService<ExpirationCheckHostedService>();
 

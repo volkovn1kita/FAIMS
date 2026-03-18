@@ -1,4 +1,3 @@
-// Infrastructure/Repositories/UserRepository.cs - ОНОВЛЕНА ВЕРСІЯ
 using Application.Interfaces;
 using Domain;
 using Infrastructure.Data;
@@ -8,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Application.DTOs;
-using System.Linq.Expressions; // Для UserFilterAndPaginationDto
+using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories
 {
@@ -21,7 +20,6 @@ namespace Infrastructure.Repositories
             _dbContext = dbContext;
         }
 
-        // Реалізація нового методу для фільтрації, пошуку та сортування
         public async Task<IEnumerable<User>> GetAllFilteredAndSortedAsync(UserFilterAndPaginationDto filterDto)
         {
             IQueryable<User> query = _dbContext.Users;
@@ -32,7 +30,6 @@ namespace Infrastructure.Repositories
                 query = query.Where(u => u.Role == filterDto.Role.Value);
             }
 
-            // 2. Пошук за SearchQuery
             if (!string.IsNullOrWhiteSpace(filterDto.SearchQuery))
             {
                 string searchLower = filterDto.SearchQuery.ToLower();
@@ -42,17 +39,13 @@ namespace Infrastructure.Repositories
                     u.Email.ToLower().Contains(searchLower));
             }
 
-            // 3. Сортування
-            // Використовуємо Expression Trees для динамічного сортування
-            // Важливо: EF Core може коректно перетворити ці вирази
             Expression<Func<User, object>> orderByExpression = filterDto.SortBy?.ToLower() switch
             {
                 "firstname" => u => u.FirstName,
                 "lastname" => u => u.LastName,
                 "email" => u => u.Email,
                 "createddate" => u => u.CreatedDate,
-                // Додайте інші поля для сортування за потребою
-                _ => u => u.CreatedDate // Сортування за замовчуванням
+                _ => u => u.CreatedDate
             };
 
             if (filterDto.SortOrder?.ToLower() == "desc")
@@ -83,7 +76,9 @@ namespace Infrastructure.Repositories
 
         public async Task<User?> GetByEmailAsync(string email)
         {
-            return await _dbContext.Users.FirstOrDefaultAsync(u => u.Email == email);
+            return await _dbContext.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Email == email);
         }
 
         public async Task<User?> GetByFirstAndLastNameAsync(string firstName, string lastName)

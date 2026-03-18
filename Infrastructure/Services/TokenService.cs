@@ -12,24 +12,26 @@ namespace Infrastructure.Services;
 public class TokenService : ITokenService
 {
     private readonly JwtSettings _jwtSettings;
+
     public TokenService(IOptions<JwtSettings> jwtSettings)
     {
         _jwtSettings = jwtSettings.Value;
     }
-    public Task<string> GenerateTokenAsync(Guid userId, string email, UserRole role)
+
+    public Task<string> GenerateTokenAsync(Guid userId, string email, UserRole role, Guid organizationId)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.SecurityKey));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
         
         var claims = new List<Claim>
         {
             new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.Email, email),
-            new Claim(ClaimTypes.Role, role.ToString())
+            new Claim(ClaimTypes.Role, role.ToString()),
+            new Claim("OrganizationId", organizationId.ToString())
         };
 
         var tokenDescriptor = new SecurityTokenDescriptor

@@ -9,10 +9,8 @@ namespace Application.Interfaces
 {
     public interface IUserRepository
     {
-        // Змінено: Тепер приймає DTO для фільтрації та сортування
         Task<IEnumerable<User>> GetAllFilteredAndSortedAsync(UserFilterAndPaginationDto filterDto); // <--- НОВИЙ МЕТОД
         
-        // Старий GetAllAsync можна залишити або видалити, якщо він більше не потрібен
         Task<IEnumerable<User>> GetAllAsync();
 
         Task<User?> GetByIdAsync(Guid id);
