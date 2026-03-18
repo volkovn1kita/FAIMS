@@ -447,7 +447,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           ),
         ),
         DropdownButtonFormField<UserRoleDto>(
-          value: _selectedRole,
+          initialValue: _selectedRole,
           icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
           style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(

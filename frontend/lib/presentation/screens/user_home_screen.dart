@@ -506,7 +506,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
                   // Одиниця виміру
                   DropdownButtonFormField<MeasurementUnit>(
-                    value: unit,
+                    initialValue: unit,
                     decoration: _inputStyle(l10n.unit, null),
                     borderRadius: BorderRadius.circular(16),
                     items: MeasurementUnit.values
@@ -928,12 +928,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   Widget _buildMedicationList(AppLocalizations l10n) {
-    if (_filteredMedications.isEmpty)
+    if (_filteredMedications.isEmpty) {
       return Center(
           child: Padding(
               padding: const EdgeInsets.all(40),
               child: Text(l10n.noMedicationsFound,
                   style: const TextStyle(color: Colors.grey))));
+    }
     return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),

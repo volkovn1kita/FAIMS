@@ -3,7 +3,6 @@ import 'package:frontend/data/dtos/create_kit_dto.dart';
 import 'package:frontend/data/services/first_aid_kit_api_service.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
 import 'package:frontend/data/dtos/user_dto.dart';
 import 'package:frontend/data/dtos/department_dto.dart';
@@ -385,7 +384,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
         Text(label, style: GoogleFonts.notoSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
         const SizedBox(height: 8),
         DropdownButtonFormField<T>(
-          value: value,
+          initialValue: value,
           items: items,
           onChanged: onChanged,
           icon: isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.expand_more_rounded),

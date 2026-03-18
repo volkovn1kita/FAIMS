@@ -380,7 +380,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           ),
         ),
         DropdownButtonFormField<DepartmentDto>(
-          value: _selectedDepartment,
+          initialValue: _selectedDepartment,
           icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
           style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(

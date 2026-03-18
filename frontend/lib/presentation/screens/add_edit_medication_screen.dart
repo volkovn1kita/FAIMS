@@ -479,7 +479,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           ),
         ),
         DropdownButtonFormField<MeasurementUnit>(
-          value: _selectedUnit,
+          initialValue: _selectedUnit,
           icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
           style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
