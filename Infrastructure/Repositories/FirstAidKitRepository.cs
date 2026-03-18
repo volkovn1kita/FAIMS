@@ -157,6 +157,7 @@ public class FirstAidKitRepository : IFirstAidKitRepository
     public async Task<IEnumerable<Medication>> GetMedicationsExpiringOnDateWithUsersAsync(DateTime date)
         {
             return await _dbContext.Medications
+                .IgnoreQueryFilters()
                 .Include(m => m.FirstAidKit)
                     .ThenInclude(k => k.ResponsibleUser)
                 .Where(m => m.ExpirationDate.Date == date.Date)

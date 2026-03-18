@@ -196,6 +196,78 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterMedicationName => 'Please enter medication name';
 
   @override
+  String get register => 'Register';
+
+  @override
+  String get fillAllRequiredFields => 'Please fill in all required fields.';
+
+  @override
+  String get passwordMinLength =>
+      'Password must contain at least 6 characters.';
+
+  @override
+  String get registrationError =>
+      'Registration error. Please check your connection.';
+
+  @override
+  String get registerClinicTitle => 'Clinic Registration';
+
+  @override
+  String get registerClinicSubtitle =>
+      'Create a workspace for your organization';
+
+  @override
+  String get organizationDataLabel => 'ORGANIZATION DATA';
+
+  @override
+  String get clinicNameLabel => 'Clinic / Hospital Name *';
+
+  @override
+  String get clinicNameHint => 'First City Hospital';
+
+  @override
+  String get addressOptionalLabel => 'Address (optional)';
+
+  @override
+  String get addressHint => '1 Main St, Kyiv';
+
+  @override
+  String get adminDataLabel => 'ADMINISTRATOR DATA';
+
+  @override
+  String get firstNameLabel => 'First Name *';
+
+  @override
+  String get firstNameHint => 'John';
+
+  @override
+  String get lastNameLabel => 'Last Name *';
+
+  @override
+  String get lastNameHint => 'Doe';
+
+  @override
+  String get emailLoginLabel => 'Email (Login) *';
+
+  @override
+  String get emailAdminHint => 'admin@hospital.org';
+
+  @override
+  String get passwordRequiredLabel => 'Password *';
+
+  @override
+  String get passwordHint => '••••••••';
+
+  @override
+  String get createClinicButton => 'Create Clinic';
+
+  @override
+  String get newClinicQuestion => 'New clinic?';
+
+  @override
+  String get registerButtonText => 'Register';
+
+  @override
   String get medicationAddedSuccess => 'Medication added successfully!';
 
   @override
@@ -206,6 +278,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get departmentName => 'Department Name';
+
+  @override
+  String get newOrg => 'New organization?';
 
   @override
   String get enterDepartmentNameHint => 'Enter department name';

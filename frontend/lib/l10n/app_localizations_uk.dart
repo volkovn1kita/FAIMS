@@ -196,6 +196,77 @@ class AppLocalizationsUk extends AppLocalizations {
   String get enterMedicationName => 'Будь ласка, введіть назву медикаменту';
 
   @override
+  String get register => 'Register';
+
+  @override
+  String get fillAllRequiredFields =>
+      'Будь ласка, заповніть всі необхідні поля.';
+
+  @override
+  String get passwordMinLength => 'Пароль має містити щонайменше 6 символів.';
+
+  @override
+  String get registrationError => 'Помилка реєстрації. Перевірте з\'єднання.';
+
+  @override
+  String get registerClinicTitle => 'Реєстрація клініки';
+
+  @override
+  String get registerClinicSubtitle =>
+      'Створіть робочий простір для вашої організації';
+
+  @override
+  String get organizationDataLabel => 'ДАНІ ОРГАНІЗАЦІЇ';
+
+  @override
+  String get clinicNameLabel => 'Назва клініки / лікарні *';
+
+  @override
+  String get clinicNameHint => 'First City Hospital';
+
+  @override
+  String get addressOptionalLabel => 'Адреса (необов\'язково)';
+
+  @override
+  String get addressHint => 'м. Київ, вул. Головна 1';
+
+  @override
+  String get adminDataLabel => 'ДАНІ АДМІНІСТРАТОРА';
+
+  @override
+  String get firstNameLabel => 'Ім\'я *';
+
+  @override
+  String get firstNameHint => 'Іван';
+
+  @override
+  String get lastNameLabel => 'Прізвище *';
+
+  @override
+  String get lastNameHint => 'Коваленко';
+
+  @override
+  String get emailLoginLabel => 'Email (Логін) *';
+
+  @override
+  String get emailAdminHint => 'admin@hospital.org';
+
+  @override
+  String get passwordRequiredLabel => 'Пароль *';
+
+  @override
+  String get passwordHint => '••••••••';
+
+  @override
+  String get createClinicButton => 'Створити клініку';
+
+  @override
+  String get newClinicQuestion => 'Нова клініка?';
+
+  @override
+  String get registerButtonText => 'Зареєструвати';
+
+  @override
   String get medicationAddedSuccess => 'Медикамент успішно додано!';
 
   @override
@@ -206,6 +277,9 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get departmentName => 'Назва підрозділу';
+
+  @override
+  String get newOrg => 'New organization?';
 
   @override
   String get enterDepartmentNameHint => 'Введіть назву підрозділу';

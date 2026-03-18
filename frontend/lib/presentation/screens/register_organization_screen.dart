@@ -1,153 +1,213 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/presentation/screens/register_organization_screen.dart';
+import 'package:frontend/l10n/app_localizations.dart'; // <--- ДОДАНО ІМПОРТ
 import 'package:google_fonts/google_fonts.dart';
-import '../../data/dtos/login_dto.dart';
+import '../../data/dtos/register_organization_dto.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'home_screen.dart';
-import 'user_home_screen.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterOrganizationScreen extends StatefulWidget {
+  const RegisterOrganizationScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterOrganizationScreen> createState() => _RegisterOrganizationScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen> {
+  final TextEditingController _orgNameController = TextEditingController();
+  final TextEditingController _orgAddressController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  
   final AuthRepository _authRepository = AuthRepository();
 
   bool _isLoading = false;
   String _errorMessage = '';
   bool _isPasswordVisible = false;
 
-  Future<void> _handleLogin() async {
+  Future<void> _handleRegistration() async {
+    // Отримуємо l10n для використання в повідомленнях про помилки
     final l10n = AppLocalizations.of(context)!;
+
     setState(() {
       _isLoading = true;
       _errorMessage = '';
     });
 
-    final email = _emailController.text;
+    final orgName = _orgNameController.text.trim();
+    final firstName = _firstNameController.text.trim();
+    final lastName = _lastNameController.text.trim();
+    final email = _emailController.text.trim();
     final password = _passwordController.text;
+    final address = _orgAddressController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
+    if (orgName.isEmpty || firstName.isEmpty || lastName.isEmpty || email.isEmpty || password.isEmpty) {
       setState(() {
-        _errorMessage = l10n.enterEmailAndPassword;
+        _errorMessage = l10n.fillAllRequiredFields;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      setState(() {
+        _errorMessage = l10n.passwordMinLength;
         _isLoading = false;
       });
       return;
     }
 
     try {
-      final dto = LoginDto(email: email, password: password);
-      final authResult = await _authRepository.login(dto);
+      final dto = RegisterOrganizationDto(
+        organizationName: orgName,
+        organizationAddress: address.isEmpty ? null : address,
+        adminFirstName: firstName,
+        adminLastName: lastName,
+        adminEmail: email,
+        adminPassword: password,
+      );
 
-      if (authResult.role == 'Administrator') {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => HomeScreen(
-            userName: authResult.name ?? authResult.email.split('@')[0],
-            userRole: authResult.role,
+      final authResult = await _authRepository.registerOrganization(dto);
+
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (context) => HomeScreen(
+              userName: authResult.name ?? authResult.email.split('@')[0],
+              userRole: authResult.role,
+            ),
           ),
-        ));
-      } else {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => UserHomeScreen(
-            userName: authResult.name ?? authResult.email.split('@')[0],
-          ),
-        ));
+          (Route<dynamic> route) => false,
+        );
       }
     } catch (e) {
       setState(() {
         _errorMessage = e.toString().contains('Exception:')
             ? e.toString().replaceAll('Exception: ', '')
-            : 'Login error: check API.';
+            : l10n.registrationError;
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Отримуємо l10n для UI
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
+            padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 8.0),
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(
-                    Icons.medical_services_rounded,
-                    size: 56,
-                    color: Color.fromARGB(255, 143, 88, 225),
-                  ),
-                ),
-                const SizedBox(height: 24),
                 Text(
-                  'FAIMS',
-                  style: GoogleFonts.notoSans(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w900,
-                    color: const Color.fromARGB(255, 143, 88, 225),
-                    letterSpacing: 2.5,
-                  ),
-                ),
-                const SizedBox(height: 40),
-                Text(
-                  l10n.welcomeBack,
+                  l10n.registerClinicTitle,
                   style: GoogleFonts.notoSans(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
+                  textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  l10n.signInLabel,
+                  l10n.registerClinicSubtitle,
                   style: GoogleFonts.notoSans(
                     fontSize: 15,
                     color: Colors.grey.shade500,
                   ),
                   textAlign: TextAlign.center,
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 32),
+                
+                Text(
+                  l10n.organizationDataLabel,
+                  style: GoogleFonts.notoSans(fontSize: 12, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 143, 88, 225)),
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _orgNameController,
+                  label: l10n.clinicNameLabel,
+                  hintText: l10n.clinicNameHint,
+                  icon: Icons.local_hospital_outlined,
+                ),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _orgAddressController,
+                  label: l10n.addressOptionalLabel,
+                  hintText: l10n.addressHint,
+                  icon: Icons.location_on_outlined,
+                ),
+                
+                const SizedBox(height: 32),
+                
+                Text(
+                  l10n.adminDataLabel,
+                  style: GoogleFonts.notoSans(fontSize: 12, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 143, 88, 225)),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _firstNameController,
+                        label: l10n.firstNameLabel,
+                        hintText: l10n.firstNameHint,
+                        icon: Icons.person_outline,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: _buildTextField(
+                        controller: _lastNameController,
+                        label: l10n.lastNameLabel,
+                        hintText: l10n.lastNameHint,
+                        icon: Icons.person_outline,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
                 _buildTextField(
                   controller: _emailController,
-                  label: 'Email',
-                  hintText: 'name@hospital.org',
+                  label: l10n.emailLoginLabel,
+                  hintText: l10n.emailAdminHint,
                   icon: Icons.email_outlined,
                   keyboardType: TextInputType.emailAddress,
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 16),
                 _buildTextField(
                   controller: _passwordController,
-                  label: l10n.password,
-                  hintText: '••••••••',
+                  label: l10n.passwordRequiredLabel,
+                  hintText: l10n.passwordHint,
                   icon: Icons.lock_outline_rounded,
                   isPassword: true,
                 ),
-                const SizedBox(height: 32),
+                
+                const SizedBox(height: 40),
+                
                 SizedBox(
-                  width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: _isLoading ? null : _handleLogin,
+                    onPressed: _isLoading ? null : _handleRegistration,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 143, 88, 225),
                       elevation: 0,
@@ -160,11 +220,12 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                           )
                         : Text(
-                            l10n.login,
+                            l10n.createClinicButton,
                             style: GoogleFonts.notoSans(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),
+                
                 if (_errorMessage.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 24),
@@ -191,43 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                const SizedBox(height: 32),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      l10n.newClinicQuestion,
-                      style: GoogleFonts.notoSans(
-                        color: Colors.grey.shade600,
-                        fontSize: 14,
-                      ),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const RegisterOrganizationScreen(),
-                          ),
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(horizontal: 8),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                      child: Text(
-                        l10n.registerButtonText,
-                        style: GoogleFonts.notoSans(
-                          color: const Color.fromARGB(255, 143, 88, 225),
-                          fontWeight: FontWeight.bold,
-                          fontSize: 14,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                // --------------------------------------------------------
+                const SizedBox(height: 40),
               ],
             ),
           ),

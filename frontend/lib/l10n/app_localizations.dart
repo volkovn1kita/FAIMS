@@ -458,6 +458,144 @@ abstract class AppLocalizations {
   /// **'Please enter medication name'**
   String get enterMedicationName;
 
+  /// No description provided for @register.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get register;
+
+  /// No description provided for @fillAllRequiredFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Please fill in all required fields.'**
+  String get fillAllRequiredFields;
+
+  /// No description provided for @passwordMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must contain at least 6 characters.'**
+  String get passwordMinLength;
+
+  /// No description provided for @registrationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration error. Please check your connection.'**
+  String get registrationError;
+
+  /// No description provided for @registerClinicTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinic Registration'**
+  String get registerClinicTitle;
+
+  /// No description provided for @registerClinicSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a workspace for your organization'**
+  String get registerClinicSubtitle;
+
+  /// No description provided for @organizationDataLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ORGANIZATION DATA'**
+  String get organizationDataLabel;
+
+  /// No description provided for @clinicNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Clinic / Hospital Name *'**
+  String get clinicNameLabel;
+
+  /// No description provided for @clinicNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'First City Hospital'**
+  String get clinicNameHint;
+
+  /// No description provided for @addressOptionalLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address (optional)'**
+  String get addressOptionalLabel;
+
+  /// No description provided for @addressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'1 Main St, Kyiv'**
+  String get addressHint;
+
+  /// No description provided for @adminDataLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'ADMINISTRATOR DATA'**
+  String get adminDataLabel;
+
+  /// No description provided for @firstNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'First Name *'**
+  String get firstNameLabel;
+
+  /// No description provided for @firstNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'John'**
+  String get firstNameHint;
+
+  /// No description provided for @lastNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last Name *'**
+  String get lastNameLabel;
+
+  /// No description provided for @lastNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Doe'**
+  String get lastNameHint;
+
+  /// No description provided for @emailLoginLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Email (Login) *'**
+  String get emailLoginLabel;
+
+  /// No description provided for @emailAdminHint.
+  ///
+  /// In en, this message translates to:
+  /// **'admin@hospital.org'**
+  String get emailAdminHint;
+
+  /// No description provided for @passwordRequiredLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Password *'**
+  String get passwordRequiredLabel;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'••••••••'**
+  String get passwordHint;
+
+  /// No description provided for @createClinicButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Clinic'**
+  String get createClinicButton;
+
+  /// No description provided for @newClinicQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'New clinic?'**
+  String get newClinicQuestion;
+
+  /// No description provided for @registerButtonText.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get registerButtonText;
+
   /// No description provided for @medicationAddedSuccess.
   ///
   /// In en, this message translates to:
@@ -481,6 +619,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Department Name'**
   String get departmentName;
+
+  /// No description provided for @newOrg.
+  ///
+  /// In en, this message translates to:
+  /// **'New organization?'**
+  String get newOrg;
 
   /// No description provided for @enterDepartmentNameHint.
   ///
