@@ -7,10 +7,10 @@ services:
     restart: always
     environment:
       POSTGRES_USER: faims_admin
-      POSTGRES_PASSWORD: faims_secure_password_123
+      POSTGRES_PASSWORD: faims_password
       POSTGRES_DB: faims_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 

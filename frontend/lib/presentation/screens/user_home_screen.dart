@@ -39,7 +39,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   final Set<ExpirationStatus> _statusFilters = {};
   bool _filterLowStock = false;
 
-  // ─── КОЛЬОРИ ──────────────────────────────────────────────────
   static const _purple = Color(0xFF8F58E1);
   static const _purpleLight = Color(0xFFF5F3FF);
   static const _purpleBorder = Color(0xFFE8E0FF);
@@ -115,7 +114,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
-  // ─── НАВІГАЦІЯ ────────────────────────────────────────────────
   void _onItemTapped(int index) async {
     if (index == _selectedIndex && index != 1) return;
     if (index == 0) {
@@ -132,8 +130,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       await _loadMyKitAndMedications();
     }
   }
-
-  // ─── ДОПОМІЖНІ ВІДЖЕТИ ────────────────────────────────────────
 
   InputDecoration _inputStyle(String label, String? suffix) =>
       InputDecoration(
@@ -270,8 +266,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         ),
       );
 
-  // ─── ДІАЛОГ: ВИКОРИСТАТИ ЛІКИ ─────────────────────────────────
-
   Future<void> _showUseMedicationDialog(
       MedicationDto medication, AppLocalizations l10n) async {
     final quantityController = TextEditingController(text: '1');
@@ -343,8 +337,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       }
     }
   }
-
-  // ─── ДІАЛОГ: СПИСАТИ ЛІКИ ────────────────────────────────────
 
   Future<void> _showWriteOffDialog(
       MedicationDto medication, AppLocalizations l10n) async {
@@ -431,8 +423,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
-  // ─── ДІАЛОГ: ДОДАТИ ЛІКИ ─────────────────────────────────────
-
   Future<void> _showAddMedicationDialog(AppLocalizations l10n) async {
     final nameC = TextEditingController();
     final qC = TextEditingController();
@@ -469,8 +459,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     _purple,
                   ),
                   const SizedBox(height: 24),
-
-                  // Назва
                   TextField(
                     controller: nameC,
                     textCapitalization: TextCapitalization.sentences,
@@ -479,8 +467,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     decoration: _inputStyle(l10n.medicationName, null),
                   ),
                   const SizedBox(height: 14),
-
-                  // Кількість + мінімум
                   Row(children: [
                     Expanded(
                       child: TextField(
@@ -503,8 +489,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     ),
                   ]),
                   const SizedBox(height: 14),
-
-                  // Одиниця виміру
                   DropdownButtonFormField<MeasurementUnit>(
                     initialValue: unit,
                     decoration: _inputStyle(l10n.unit, null),
@@ -522,8 +506,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     onChanged: (v) => setS(() => unit = v!),
                   ),
                   const SizedBox(height: 14),
-
-                  // Дата придатності
                   GestureDetector(
                     onTap: () async {
                       final picked = await showDatePicker(
@@ -585,7 +567,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       ]),
                     ),
                   ),
-
                   const SizedBox(height: 28),
                   _buildActionBtn(l10n.add, _purple, () {
                     confirmed = true;
@@ -617,8 +598,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
-  // ─── ЗАГАЛЬНА ДІЯ ─────────────────────────────────────────────
-
   Future<void> _performAction(
       Future<void> Function() action, String successMsg) async {
     setState(() => _isLoading = true);
@@ -636,8 +615,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       if (mounted) setState(() => _isLoading = false);
     }
   }
-
-  // ─── UI ───────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -683,20 +660,36 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   children: [
                     _buildWelcomeHeader(l10n),
                     const SizedBox(height: 24),
-                    if (_myKit != null)
-                      _buildKitInfoCard(l10n)
-                    else
+                    if (_myKit != null) ...[
+                      _buildKitInfoCard(l10n),
+                      const SizedBox(height: 32),
+                      _buildSectionHeader(l10n),
+                      const SizedBox(height: 16),
+                      _buildFilterSection(l10n),
+                      _buildMedicationList(l10n),
+                    ] else
                       Center(
-                          child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Text(l10n.notAssignedToKit,
-                            textAlign: TextAlign.center),
-                      )),
-                    const SizedBox(height: 32),
-                    _buildSectionHeader(l10n),
-                    const SizedBox(height: 16),
-                    _buildFilterSection(l10n),
-                    _buildMedicationList(l10n),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 60.0, horizontal: 20.0),
+                          child: Column(
+                            children: [
+                              Icon(Icons.inventory_2_outlined,
+                                  size: 64, color: Colors.grey.shade300),
+                              const SizedBox(height: 16),
+                              Text(
+                                l10n.notAssignedToKit,
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 16,
+                                  color: Colors.grey.shade600,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
                   ],
                 ),
               ),
