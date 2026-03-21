@@ -9,7 +9,6 @@ class AnalyticsApiService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
 
   Future<DashboardStatsDto> getGlobalStats() async {
-    // URL відповідає нашому новому контролеру
     final Uri uri = Uri.parse('$_baseUrl/analytics/global');
 
     final token = await _storage.read(key: 'jwt_token');

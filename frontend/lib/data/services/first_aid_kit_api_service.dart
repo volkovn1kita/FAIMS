@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:frontend/data/dtos/create_kit_dto.dart';
 import 'package:frontend/data/dtos/department_dto.dart';
 import 'package:frontend/data/dtos/medication_quantity_update_dto.dart';
+import 'package:frontend/data/dtos/medication_refill_dto.dart';
 import 'package:frontend/data/dtos/medication_write_off_dto.dart';
 import 'package:frontend/data/dtos/room_dto.dart';
 import 'package:frontend/data/dtos/user_dto.dart';
@@ -525,4 +526,21 @@ class FirstAidKitApiService {
       rethrow;
     }
   }
+
+  Future<void> refillMedication(String medicationId, MedicationRefillDto dto) async {
+    final token = await _storage.read(key: 'jwt_token');
+    final response = await http.post(
+      Uri.parse('$_baseUrl/kits/medications/$medicationId/refill'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+      body: json.encode(dto.toJson()),
+    );
+
+    if (response.statusCode != 204) {
+      throw Exception('Failed to refill medication: ${response.body}');
+    }
+  }
+
 }

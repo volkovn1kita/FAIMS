@@ -626,6 +626,72 @@ abstract class AppLocalizations {
   /// **'New organization?'**
   String get newOrg;
 
+  /// No description provided for @reportsAndLists.
+  ///
+  /// In en, this message translates to:
+  /// **'Reports & Lists'**
+  String get reportsAndLists;
+
+  /// No description provided for @forPurchase.
+  ///
+  /// In en, this message translates to:
+  /// **'For Purchase'**
+  String get forPurchase;
+
+  /// No description provided for @forDisposal.
+  ///
+  /// In en, this message translates to:
+  /// **'For Disposal'**
+  String get forDisposal;
+
+  /// No description provided for @export.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get export;
+
+  /// No description provided for @listIsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'The list is empty'**
+  String get listIsEmpty;
+
+  /// No description provided for @pdfGenerationInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF Generation in progress...'**
+  String get pdfGenerationInProgress;
+
+  /// No description provided for @refill.
+  ///
+  /// In en, this message translates to:
+  /// **'Refill'**
+  String get refill;
+
+  /// No description provided for @refillMedicationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Refill: {name}'**
+  String refillMedicationTitle(String name);
+
+  /// No description provided for @newExpirationDate.
+  ///
+  /// In en, this message translates to:
+  /// **'New expiration date'**
+  String get newExpirationDate;
+
+  /// No description provided for @medicationRefilledSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Medication successfully refilled!'**
+  String get medicationRefilledSuccess;
+
+  /// No description provided for @forSelectedPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'For selected period'**
+  String get forSelectedPeriod;
+
   /// No description provided for @enterDepartmentNameHint.
   ///
   /// In en, this message translates to:

@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/screens/register_organization_screen.dart';
@@ -19,9 +20,72 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final AuthRepository _authRepository = AuthRepository();
 
-  bool _isLoading = false;
+  bool _isLoading = true;
   String _errorMessage = '';
   bool _isPasswordVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAutoLogin();
+  }
+
+  Map<String, dynamic> _decodeJwt(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return {};
+      final payload = parts[1];
+      final String normalized = base64Url.normalize(payload);
+      final String resp = utf8.decode(base64Url.decode(normalized));
+      return json.decode(resp);
+    } catch (e) {
+      return {};
+    }
+  }
+
+  Future<void> _checkAutoLogin() async {
+    try {
+      final token = await _authRepository.getToken();
+      if (token != null && token.isNotEmpty) {
+        final payload = _decodeJwt(token);
+        
+        final role = payload['role'] ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+        
+        final savedName = await _authRepository.getName();
+        
+        String name = savedName ?? '';
+
+        if (name.isEmpty) {
+          final email = payload['email'] ?? payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ?? '';
+          if (email.isNotEmpty) {
+            name = email.split('@')[0];
+          } else {
+            name = 'User';
+          }
+        }
+
+        if (role != null) {
+          if (!mounted) return;
+          if (role == 'Administrator') {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => HomeScreen(userName: name, userRole: role),
+            ));
+          } else {
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+              builder: (context) => UserHomeScreen(userName: name),
+            ));
+          }
+          return;
+        }
+      }
+    } catch (_) {}
+
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 
   Future<void> _handleLogin() async {
     final l10n = AppLocalizations.of(context)!;
@@ -30,7 +94,7 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = '';
     });
 
-    final email = _emailController.text;
+    final email = _emailController.text.trim();
     final password = _passwordController.text;
 
     if (email.isEmpty || password.isEmpty) {
@@ -75,6 +139,15 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    if (_isLoading && _errorMessage.isEmpty) {
+      return const Scaffold(
+        backgroundColor: Colors.white,
+        body: Center(
+          child: CircularProgressIndicator(color: Color.fromARGB(255, 143, 88, 225)),
+        ),
+      );
+    }
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -227,7 +300,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ],
                 ),
-                // --------------------------------------------------------
               ],
             ),
           ),

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:frontend/data/dtos/first_aid_kit_list_dto.dart';
 import 'package:frontend/data/dtos/department_dto.dart';
@@ -10,12 +11,11 @@ import 'package:frontend/data/services/first_aid_kit_api_service.dart';
 import 'package:frontend/presentation/screens/kit_contents_screen.dart';
 
 class ManageKitsScreen extends StatefulWidget {
-  // НОВЕ: Додаємо необов'язковий параметр initialStatusFilter
   final String? initialStatusFilter;
 
   const ManageKitsScreen({
     super.key,
-    this.initialStatusFilter, // Додаємо до конструктора
+    this.initialStatusFilter,
   });
 
   @override
@@ -26,6 +26,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FirstAidKitRepository _kitRepository = FirstAidKitRepository();
   final FirstAidKitApiService _apiService = FirstAidKitApiService();
+  Timer? _debounce;
 
   List<FirstAidKitListDto> _kits = [];
   bool _isLoading = true;
@@ -42,7 +43,6 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
   @override
   void initState() {
     super.initState();
-    // НОВЕ: Встановлюємо initialStatusFilter, якщо він переданий
     _selectedStatusFilter = widget.initialStatusFilter;
 
     _loadFilterData().then((_) {
@@ -54,6 +54,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
 
   @override
   void dispose() {
+    _debounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
@@ -69,32 +70,26 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
       final loadedUsers = await _kitRepository.getResponsibleUsers();
       final loadedDepartments = await _kitRepository.getDepartments();
 
-      if (!mounted) return; // <--- Додати тут
+      if (!mounted) return;
       setState(() {
         _responsibleUsers = loadedUsers;
         _departments = loadedDepartments;
       });
     } catch (e) {
-      if (!mounted) return; // <--- І тут
+      if (!mounted) return;
       setState(() {
         _errorMessage = e.toString().contains('Exception:')
             ? e.toString().replaceAll('Exception: ', '')
             : 'Failed to load filter data: ${e.toString()}';
       });
-    } finally {
-      if (!mounted) return; // <--- І ще тут
-      setState(() {
-        // _isLoading = false; <-- якщо потрібно
-      });
     }
   }
-
 
   Future<void> _loadKits() async {
     setState(() {
       _isLoading = true;
       if (_errorMessage.isNotEmpty && !(_errorMessage.contains('Failed to load filter data'))) {
-        _errorMessage = ''; // Clear error if it's not related to filters
+        _errorMessage = '';
       }
     });
     try {
@@ -112,7 +107,6 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
         _errorMessage = e.toString().contains('Exception:')
             ? e.toString().replaceAll('Exception: ', '')
             : 'Failed to load kits: ${e.toString()}';
-        print('Error loading kits: $e');
       });
     } finally {
       setState(() {
@@ -122,13 +116,12 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
   }
 
   void _onSearchChanged(String query) {
-    // TODO: Add Debouncer here to avoid making a request for every character
-    _loadKits();
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _loadKits();
+    });
   }
 
-  // === NAVIGATION AND ACTION METHODS ===
-
-  // Opens the add/edit kit screen
   Future<void> _navigateToAddEditKit({String? kitId}) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
@@ -136,13 +129,11 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
       ),
     );
 
-    // If true is returned, it means changes were made, and the list needs to be updated
     if (result == true) {
       _loadKits();
     }
   }
 
-  // Opens the kit contents screen
   Future<void> _navigateToKitContents(FirstAidKitListDto kit) async {
     final result = await Navigator.of(context).push(
       MaterialPageRoute(
@@ -151,29 +142,24 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
         ),
       ),
     );
-    // After returning from KitContentsScreen, you might want to refresh the list
-    // to reflect updated status (critical, expired counts) if contents were changed.
-    if (result == true) { // Assume KitContentsScreen returns true if changes occurred
+    if (result == true) {
       _loadKits();
     }
   }
 
-  // Dialog to confirm kit deletion
   Future<bool> _confirmDelete(String kitId, String kitName) async {
     final l10n = AppLocalizations.of(context)!;
-    // --- НОВА ЛОГІКА ПЕРЕВІРКИ МЕДИКАМЕНТІВ ТУТ ---
     try {
-      // *** ЗМІНА ТУТ: ВИКОРИСТОВУЄМО _kitRepository ЗАМІСТЬ _apiService ***
       final medications = await _kitRepository.getMedicationsForKit(kitId);
       if (medications.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.cannotDeleteKitBecauseIsNotEmpty(kitName,medications.length), style: GoogleFonts.notoSans()),
+            content: Text(l10n.cannotDeleteKitBecauseIsNotEmpty(kitName, medications.length), style: GoogleFonts.notoSans()),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 4),
           ),
         );
-        return false; // Заборонити видалення
+        return false;
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -183,9 +169,8 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
           duration: const Duration(seconds: 5),
         ),
       );
-      return false; // Заборонити видалення через помилку
+      return false;
     }
-    // --- КІНЕЦЬ НОВОЇ ЛОГІКИ ---
 
     return await showDialog<bool>(
       context: context,
@@ -195,24 +180,24 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
           content: Text(l10n.deleteKitAlert(kitName), style: GoogleFonts.notoSans()),
           actions: <Widget>[
             TextButton(
-              onPressed: () => Navigator.of(context).pop(false), // Cancel
+              onPressed: () => Navigator.of(context).pop(false),
               child: Text(l10n.cancel, style: GoogleFonts.notoSans(color: Colors.grey)),
             ),
             TextButton(
               onPressed: () async {
                 try {
-                  // Виклик методу deleteKit з _apiService залишається без змін,
-                  // бо ви використовуєте _apiService для API-операцій.
                   await _apiService.deleteKit(kitId);
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text(l10n.kitDeleteSuccessfully(kitName), style: GoogleFonts.notoSans())),
                   );
-                  Navigator.of(context).pop(true); // Confirm deletion
+                  Navigator.of(context).pop(true);
                 } catch (e) {
+                  if (!context.mounted) return;
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('${l10n.deletionError}: ${e.toString().replaceAll('Exception: ', '')}', style: GoogleFonts.notoSans())),
                   );
-                  Navigator.of(context).pop(false); // Cancel
+                  Navigator.of(context).pop(false);
                 }
               },
               child: Text(l10n.delete, style: GoogleFonts.notoSans(color: Colors.red)),
@@ -223,11 +208,11 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
     ) ?? false;
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      backgroundColor: Colors.grey.shade100, // Світлий фон
+      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -243,13 +228,11 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
       ),
       body: Column(
         children: [
-          // Панель пошуку та фільтрів на білому фоні
           Container(
             color: Colors.white,
             padding: const EdgeInsets.only(bottom: 12),
             child: Column(
               children: [
-                // === Пошук ===
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 12.0),
                   child: TextField(
@@ -263,14 +246,12 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade100, // М'який фон замість рамки
+                      fillColor: Colors.grey.shade100,
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     ),
                     onChanged: _onSearchChanged,
                   ),
                 ),
-
-                // === Фільтри ===
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -320,16 +301,12 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
               ],
             ),
           ),
-
-          // Тінь під верхньою панеллю
           Container(
             height: 1,
             decoration: BoxDecoration(
               boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
-
-          // === Список аптечок ===
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -387,10 +364,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
     );
   }
 
-  // --- ВІДЖЕТИ ДЛЯ СУЧАСНОГО UI ---
-
   Widget _buildKitListItemCard(FirstAidKitListDto kit, AppLocalizations l10n) {
-    // Визначаємо колір статусу для бічної смужки
     Color statusColor;
     switch (kit.statusBadge.toLowerCase()) {
       case 'good':
@@ -422,7 +396,6 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Заголовок і статус
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -446,20 +419,14 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
                     _buildSoftBadge(kit.statusBadge, statusColor),
                   ],
                 ),
-                
                 const Padding(
                   padding: EdgeInsets.symmetric(vertical: 12),
                   child: Divider(height: 1, thickness: 1),
                 ),
-
-                // Локація і відповідальний (згруповано)
                 _buildCompactInfoRow(Icons.domain, '${kit.departmentName} • ${kit.roomName}'),
                 const SizedBox(height: 6),
                 _buildCompactInfoRow(Icons.person_outline, '${kit.responsibleUserFirstName} ${kit.responsibleUserLastName}'),
-                
                 const SizedBox(height: 16),
-
-                // Міні-дашборд проблем замість великих чіпів
                 Container(
                   padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                   decoration: BoxDecoration(
@@ -483,7 +450,6 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
     );
   }
 
-  // Сучасний софт-бедж для статусу
   Widget _buildSoftBadge(String text, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -498,7 +464,6 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
     );
   }
 
-  // Компактний рядок інформації
   Widget _buildCompactInfoRow(IconData icon, String text) {
     return Row(
       children: [
@@ -515,7 +480,6 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
     );
   }
 
-  // Мікро-лічильник для дашборда
   Widget _buildMiniCounter(IconData icon, String label, int count, Color activeColor) {
     final hasIssues = count > 0;
     final color = hasIssues ? activeColor : Colors.grey.shade400;
@@ -537,7 +501,6 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
     );
   }
 
-  // Сучасний "Pill" для фільтрів замість Dropdown із рамкою
   Widget _buildFilterPill({
     required String label,
     required IconData icon,
@@ -577,7 +540,6 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
     );
   }
 
-  // Фон для свайпу
   Widget _buildSwipeBackground(IconData icon, Color color, Alignment alignment) {
     return Container(
       decoration: BoxDecoration(

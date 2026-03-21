@@ -282,6 +282,41 @@ class AppLocalizationsUk extends AppLocalizations {
   String get newOrg => 'New organization?';
 
   @override
+  String get reportsAndLists => 'Звіти та Списки';
+
+  @override
+  String get forPurchase => 'На закупівлю';
+
+  @override
+  String get forDisposal => 'На утилізацію';
+
+  @override
+  String get export => 'Експорт';
+
+  @override
+  String get listIsEmpty => 'Список порожній';
+
+  @override
+  String get pdfGenerationInProgress => 'Генерація PDF в розробці...';
+
+  @override
+  String get refill => 'Поповнити';
+
+  @override
+  String refillMedicationTitle(String name) {
+    return 'Поповнення: $name';
+  }
+
+  @override
+  String get newExpirationDate => 'Новий термін';
+
+  @override
+  String get medicationRefilledSuccess => 'Медикамент успішно поповнено!';
+
+  @override
+  String get forSelectedPeriod => 'За обраний період';
+
+  @override
   String get enterDepartmentNameHint => 'Введіть назву підрозділу';
 
   @override

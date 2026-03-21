@@ -1,4 +1,3 @@
-// lib/domain/repositories/user_repository.dart - ОНОВЛЕНА ВЕРСІЯ (з доданими методами керування користувачами)
 import 'dart:io';
 import 'package:frontend/data/dtos/user_dto.dart';
 import 'package:frontend/data/dtos/create_user_request_dto.dart';
@@ -13,8 +12,7 @@ class UserRepository {
     return await _userApiService.getAllUsers();
   }
 
-  /// Отримує деталі користувача за його ID (тільки для адмінів).
-  Future<UserDto> getUserDetails(String userId) async { // <--- НОВИЙ МЕТОД
+  Future<UserDto> getUserDetails(String userId) async {
     return await _userApiService.getUserById(userId);
   }
 
@@ -22,13 +20,11 @@ class UserRepository {
     return await _userApiService.adminCreateUser(newUser);
   }
 
-  /// Оновлює дані користувача за його ID (тільки для адмінів).
-  Future<void> updateUser(String userId, UpdateUserRequestDto updatedUser) async { // <--- ЗМІНА ТИПУ ПОВЕРНЕННЯ
+  Future<void> updateUser(String userId, UpdateUserRequestDto updatedUser) async { 
     return await _userApiService.adminUpdateUser(userId, updatedUser);
   }
 
-  /// Видаляє користувача за його ID (тільки для адмінів).
-  Future<void> deleteUser(String userId) async { // <--- НОВИЙ МЕТОД
+  Future<void> deleteUser(String userId) async {
     return await _userApiService.adminDeleteUser(userId);
   }
 
@@ -36,7 +32,6 @@ class UserRepository {
     return await _userApiService.getAvailableRoles();
   }
 
-  // --- МЕТОДИ ДЛЯ ВЛАСНОГО ПРОФІЛЮ ТА АВАТАРІВ (без змін) ---
   Future<UserDto> getMyProfile() async {
     return await _userApiService.getMyProfile();
   }

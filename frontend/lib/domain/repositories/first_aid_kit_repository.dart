@@ -4,6 +4,7 @@ import 'package:frontend/data/dtos/department_dto.dart';
 import 'package:frontend/data/dtos/first_aid_kit_list_dto.dart';
 import 'package:frontend/data/dtos/medication_dto.dart';
 import 'package:frontend/data/dtos/medication_quantity_update_dto.dart';
+import 'package:frontend/data/dtos/medication_refill_dto.dart';
 import 'package:frontend/data/dtos/medication_write_off_dto.dart';
 import 'package:frontend/data/dtos/room_dto.dart';
 import 'package:frontend/data/dtos/update_kit_dto.dart';
@@ -123,8 +124,6 @@ class FirstAidKitRepository {
     }
   }
 
-  // ==== МЕТОДИ ДЛЯ AddEditKitScreen (без змін) ====
-
   Future<List<RoomDto>> getRoomsByDepartmentId(String departmentId) async {
     try {
       return await _apiService.getRoomsByDepartmentId(departmentId);
@@ -156,4 +155,9 @@ class FirstAidKitRepository {
       rethrow;
     }
   }
+
+  Future<void> refillMedication(String medicationId, MedicationRefillDto dto) async {
+    await _apiService.refillMedication(medicationId, dto);
+  }
+  
 }

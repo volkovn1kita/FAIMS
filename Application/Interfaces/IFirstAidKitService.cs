@@ -9,8 +9,7 @@ public interface IFirstAidKitService
     Task<Guid> AddKitAsync(FirstAidKitCreateDto dto);
     Task<FirstAidKitListDto> GetKitByIdAsync(Guid id);
     Task<FirstAidKitListDto?> GetKitByResponsibleUserIdAsync(Guid userId);
-
-    //Task<IEnumerable<FirstAidKitListDto>> GetAllKitsAsync();
+    Task RefillMedicationAsync(Guid medicationId, MedicationRefillDto dto);
     Task<IEnumerable<FirstAidKitListDto>> GetFilteredFirstAidKitsAsync(
         string? searchTerm,
         string? statusFilter,

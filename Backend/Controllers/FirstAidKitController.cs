@@ -123,7 +123,7 @@ namespace Backend.Controllers
         }
 
         [HttpPut("medications")]
-        [Authorize(Roles = nameof(UserRole.Administrator))] 
+        [Authorize(Roles = nameof(UserRole.Administrator))]
         public async Task<IActionResult> UpdateMedication([FromBody] MedicationUpdateDto dto)
         {
             await _kitService.UpdateMedicationAsync(dto);
@@ -131,32 +131,36 @@ namespace Backend.Controllers
         }
 
         [HttpDelete("medications/{medicationId}")]
-        [Authorize(Roles = nameof(UserRole.Administrator))] // Видаляти запис повністю може тільки адмін
+        [Authorize(Roles = nameof(UserRole.Administrator))]
         public async Task<IActionResult> RemoveMedication(Guid medicationId, [FromQuery] Guid kitId)
         {
             await _kitService.RemoveMedicationAsync(medicationId, kitId);
             return NoContent();
         }
 
-        // НОВІ ЕНДПОІНТИ ДЛЯ СПЕЦІАЛІЗОВАНИХ ДІЙ З МЕДИКАМЕНТАМИ
-        // Для використання медикаменту
         [HttpPost("medications/{medicationId}/use")]
         [Authorize(Roles = nameof(UserRole.Administrator) + "," + nameof(UserRole.User))]
         public async Task<IActionResult> UseMedication(Guid medicationId, [FromBody] MedicationQuantityUpdateDto dto) // Вам потрібно буде створити цей DTO
         {
-            // Очікуємо DTO з одним полем Quantity
             await _kitService.UseMedicationAsync(medicationId, dto.Quantity);
             return NoContent();
         }
 
-        // Для списання медикаменту
         [HttpPost("medications/{medicationId}/write-off")]
         [Authorize(Roles = nameof(UserRole.Administrator) + "," + nameof(UserRole.User))]
         public async Task<IActionResult> WriteOffMedication(Guid medicationId, [FromBody] MedicationWriteOffDto dto) // Вам потрібно буде створити цей DTO
         {
-            // Очікуємо DTO з полями Quantity та Reason
             await _kitService.WriteOffMedicationAsync(medicationId, dto.Quantity, dto.Reason);
             return NoContent();
         }
+
+        [HttpPost("medications/{medicationId}/refill")]
+        [Authorize(Roles = nameof(UserRole.Administrator) + "," + nameof(UserRole.User))]
+        public async Task<IActionResult> RefillMedication(Guid medicationId, [FromBody] MedicationRefillDto dto)
+        {
+            await _kitService.RefillMedicationAsync(medicationId, dto);
+            return NoContent();
+        }
+
     }
 }

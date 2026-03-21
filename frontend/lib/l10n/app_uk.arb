@@ -61,6 +61,12 @@
   "medicationName": "Назва медикаменту",
   "minimumQuantity": "Мін. кількість",
   "unit": "Одиниця виміру",
+  "reportsAndLists": "Звіти та Списки",
+  "forPurchase": "На закупівлю",
+  "forDisposal": "На утилізацію",
+  "export": "Експорт",
+  "listIsEmpty": "Список порожній",
+  "pdfGenerationInProgress": "Генерація PDF в розробці...",
   "fillAllRequiredFields": "Будь ласка, заповніть всі необхідні поля.",
   "passwordMinLength": "Пароль має містити щонайменше 6 символів.",
   "registrationError": "Помилка реєстрації. Перевірте з'єднання.",
@@ -70,8 +76,20 @@
   "clinicNameLabel": "Назва клініки / лікарні *",
   "clinicNameHint": "First City Hospital",
   "addressOptionalLabel": "Адреса (необов'язково)",
+  "forSelectedPeriod": "За обраний період",
   "addressHint": "м. Київ, вул. Головна 1",
   "adminDataLabel": "ДАНІ АДМІНІСТРАТОРА",
+  "refill": "Поповнити",
+  "refillMedicationTitle": "Поповнення: {name}",
+  "@refillMedicationTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newExpirationDate": "Новий термін",
+  "medicationRefilledSuccess": "Медикамент успішно поповнено!",
   "firstNameLabel": "Ім'я *",
   "firstNameHint": "Іван",
   "lastNameLabel": "Прізвище *",

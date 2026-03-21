@@ -595,7 +595,7 @@ public class FirstAidKitService : IFirstAidKitService
         var currentOrgId = _currentUserService.GetOrganizationId();
         var medToDelete = await _kitRepository.GetMedicationByIdAsync(medicationId);
 
-        if (medToDelete == null) return; 
+        if (medToDelete == null) return;
 
         if (medToDelete.FirstAidKitId != kitId)
         {
@@ -632,6 +632,65 @@ public class FirstAidKitService : IFirstAidKitService
             BatchId = medToDelete.Id,
             Quantity = 0,
             Unit = medToDelete.Unit,
+            OrganizationId = currentOrgId
+        });
+
+        await _kitRepository.SaveChangesAsync();
+    }
+    
+    public async Task RefillMedicationAsync(Guid medicationId, MedicationRefillDto dto)
+    {
+        var currentOrgId = _currentUserService.GetOrganizationId();
+        
+        if (dto.AddedQuantity <= 0)
+        {
+            throw new ValidationException("Added quantity must be greater than zero.");
+        }
+
+        var medication = await _kitRepository.GetMedicationByIdAsync(medicationId);
+        if (medication == null)
+        {
+            throw new NotFoundException($"Medication with Id: {medicationId} was not found.");
+        }
+
+        var kit = await _kitRepository.GetKitByIdAsync(medication.FirstAidKitId);
+        if (kit == null)
+        {
+            throw new NotFoundException($"The kit for medication was not found.");
+        }
+
+        var currentUserId = _currentUserService.GetUserId();
+        var currentUserRole = _currentUserService.GetUserRole();
+
+        if (currentUserRole != UserRole.Administrator.ToString() && kit.ResponsibleUserId != currentUserId)
+        {
+            throw new ForbiddenException("You cannot refill medications in this first aid kit.");
+        }
+
+        var oldQuantity = medication.Quantity;
+        var newExpDateUtc = DateTime.SpecifyKind(dto.NewExpirationDate, DateTimeKind.Utc);
+
+        if (newExpDateUtc <= DateTime.UtcNow)
+        {
+            throw new ValidationException("Could not refill with expired medication.");
+        }
+
+        medication.Quantity += dto.AddedQuantity;
+        medication.ExpirationDate = newExpDateUtc;
+        medication.UpdatedDate = DateTime.UtcNow;
+
+        await _kitRepository.UpdateMedicationInKit(medication);
+
+        await _journalRepository.AddEntryAsync(new Journal
+        {
+            ActionType = JournalAction.QuantityChanged,
+            Reason = $"Medication '{medication.Name}' refilled. Quantity changed from {oldQuantity} to {medication.Quantity}. Added {dto.AddedQuantity} {medication.Unit}.",
+            FirstAidKitId = medication.FirstAidKitId,
+            MedicationName = medication.Name,
+            UserId = currentUserId,
+            BatchId = medication.Id,
+            Quantity = dto.AddedQuantity,
+            Unit = medication.Unit,
             OrganizationId = currentOrgId 
         });
 

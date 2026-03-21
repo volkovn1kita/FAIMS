@@ -283,6 +283,41 @@ class AppLocalizationsEn extends AppLocalizations {
   String get newOrg => 'New organization?';
 
   @override
+  String get reportsAndLists => 'Reports & Lists';
+
+  @override
+  String get forPurchase => 'For Purchase';
+
+  @override
+  String get forDisposal => 'For Disposal';
+
+  @override
+  String get export => 'Export';
+
+  @override
+  String get listIsEmpty => 'The list is empty';
+
+  @override
+  String get pdfGenerationInProgress => 'PDF Generation in progress...';
+
+  @override
+  String get refill => 'Refill';
+
+  @override
+  String refillMedicationTitle(String name) {
+    return 'Refill: $name';
+  }
+
+  @override
+  String get newExpirationDate => 'New expiration date';
+
+  @override
+  String get medicationRefilledSuccess => 'Medication successfully refilled!';
+
+  @override
+  String get forSelectedPeriod => 'For selected period';
+
+  @override
   String get enterDepartmentNameHint => 'Enter department name';
 
   @override

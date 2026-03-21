@@ -89,6 +89,24 @@
   "addDepartment": "Add Department",
   "departmentName": "Department Name",
   "newOrg": "New organization?",
+  "reportsAndLists": "Reports & Lists",
+  "forPurchase": "For Purchase",
+  "forDisposal": "For Disposal",
+  "export": "Export",
+  "listIsEmpty": "The list is empty",
+  "pdfGenerationInProgress": "PDF Generation in progress...",
+  "refill": "Refill",
+  "refillMedicationTitle": "Refill: {name}",
+  "@refillMedicationTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "newExpirationDate": "New expiration date",
+  "medicationRefilledSuccess": "Medication successfully refilled!",
+  "forSelectedPeriod": "For selected period",
   "enterDepartmentNameHint": "Enter department name",
   "departmentNameValidator": "Please enter a department name",
   "saveChanges": "Save Changes",

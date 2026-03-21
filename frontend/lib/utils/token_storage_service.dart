@@ -1,22 +1,28 @@
-
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TokenStorageService {
   final FlutterSecureStorage _storage = const FlutterSecureStorage();
-  static const _tokenKey = 'jwt_token';
+  static const String _tokenKey = 'jwt_token';
+  static const String _nameKey = 'user_name';
 
-  // Зберігає JWT токен
   Future<void> saveToken(String token) async {
     await _storage.write(key: _tokenKey, value: token);
   }
 
-  // Отримує JWT токен
   Future<String?> getToken() async {
     return await _storage.read(key: _tokenKey);
   }
 
-  // Видаляє JWT токен (для виходу з системи)
+  Future<void> saveName(String name) async {
+    await _storage.write(key: _nameKey, value: name);
+  }
+
+  Future<String?> getName() async {
+    return await _storage.read(key: _nameKey);
+  }
+
   Future<void> deleteToken() async {
     await _storage.delete(key: _tokenKey);
+    await _storage.delete(key: _nameKey);
   }
 }

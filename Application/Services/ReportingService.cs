@@ -1,6 +1,10 @@
-
 using Application.DTOs;
 using Application.Interfaces;
+using Domain;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Application.Services;
 
@@ -8,12 +12,15 @@ public class ReportingService : IReportingService
 {
     private readonly IMonitoringService _monitoringService;
     private readonly IFirstAidKitRepository _kitRepository;
+    private readonly IJournalRepository _journalRepository;
 
     public ReportingService(IMonitoringService monitoringService,
-                            IFirstAidKitRepository kitRepository)
+                            IFirstAidKitRepository kitRepository,
+                            IJournalRepository journalRepository)
     {
         _monitoringService = monitoringService;
         _kitRepository = kitRepository;
+        _journalRepository = journalRepository;
     }
 
     public async Task<IEnumerable<ReportCriticalItemDto>> GenerateCriticalItemsReportAsync()
@@ -115,5 +122,108 @@ public class ReportingService : IReportingService
         }
 
         return reports.OrderByDescending(r => r.CriticalCount).ToList();
+    }
+
+    public async Task<IEnumerable<ReportItemDto>> GetPurchasingReportAsync(DateTime startDate, DateTime endDate)
+    {
+        var reportItems = new List<ReportItemDto>();
+
+        var lowQuantityMeds = await _monitoringService.GetLowQuantityMedicationsAsync();
+        var deficitItems = lowQuantityMeds
+            .GroupBy(m => new { m.Name, Unit = m.Unit.ToString() })
+            .Select(g => new ReportItemDto
+            {
+                MedicationName = g.Key.Name,
+                Quantity = g.Sum(m => m.MinimumQuantity - m.Quantity),
+                Unit = g.Key.Unit,
+                Reason = "Поточний дефіцит"
+            });
+            
+        reportItems.AddRange(deficitItems);
+
+        var journals = await _journalRepository.GetEntriesByDateRangeAsync(startDate, endDate);
+        var consumptionItems = journals
+            .GroupBy(j => new { j.MedicationName, Unit = j.Unit.ToString() })
+            .Select(g => 
+            {
+                var consumed = g.Where(j => j.ActionType == JournalAction.Used || j.ActionType == JournalAction.WrittenOff)
+                                .Sum(j => Math.Abs(j.Quantity));
+                var refilled = g.Where(j => j.ActionType == JournalAction.Added || j.ActionType == JournalAction.QuantityChanged)
+                                .Sum(j => Math.Abs(j.Quantity));
+                var netNeed = consumed - refilled;
+
+                return new ReportItemDto
+                {
+                    MedicationName = g.Key.MedicationName,
+                    Quantity = netNeed,
+                    Unit = g.Key.Unit,
+                    Reason = "Витрати за період"
+                };
+            })
+            .Where(r => r.Quantity > 0);
+
+        reportItems.AddRange(consumptionItems);
+
+        var finalReport = reportItems
+            .GroupBy(r => new { r.MedicationName, r.Unit })
+            .Select(g => new ReportItemDto
+            {
+                MedicationName = g.Key.MedicationName,
+                Quantity = g.Max(x => x.Quantity),
+                Unit = g.Key.Unit,
+                Reason = g.OrderBy(x => x.Quantity).Last().Reason
+            })
+            .Where(r => r.Quantity > 0)
+            .OrderByDescending(r => r.Quantity)
+            .ToList();
+
+        return finalReport;
+    }
+
+    public async Task<IEnumerable<ReportItemDto>> GetDisposalReportAsync(DateTime startDate, DateTime endDate)
+    {
+        var reportItems = new List<ReportItemDto>();
+
+        var criticalMeds = await _monitoringService.GetCriticalMedicationsAsync();
+        var expiredMeds = criticalMeds.Where(m => m.Status.ToString() == "Expired");
+        
+        foreach (var med in expiredMeds)
+        {
+            reportItems.Add(new ReportItemDto
+            {
+                MedicationName = med.Name,
+                Quantity = med.Quantity,
+                Unit = med.Unit.ToString(),
+                Reason = "Протерміновано в аптечках"
+            });
+        }
+
+        var journals = await _journalRepository.GetEntriesByDateRangeAsync(startDate, endDate);
+        var writtenOffJournals = journals
+            .Where(j => j.ActionType == JournalAction.WrittenOff)
+            .GroupBy(j => new { j.MedicationName, Unit = j.Unit.ToString() })
+            .Select(g => new ReportItemDto
+            {
+                MedicationName = g.Key.MedicationName,
+                Quantity = g.Sum(j => Math.Abs(j.Quantity)),
+                Unit = g.Key.Unit,
+                Reason = "Списано за період"
+            });
+
+        reportItems.AddRange(writtenOffJournals);
+
+        var groupedReport = reportItems
+            .GroupBy(r => new { r.MedicationName, r.Unit })
+            .Select(g => new ReportItemDto
+            {
+                MedicationName = g.Key.MedicationName,
+                Quantity = g.Sum(x => x.Quantity),
+                Unit = g.Key.Unit,
+                Reason = g.First().Reason
+            })
+            .OrderByDescending(r => r.Quantity)
+            .ToList();
+
+        return groupedReport;
     }
 }

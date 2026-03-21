@@ -4,15 +4,18 @@ import 'package:frontend/data/dtos/medication_dto.dart';
 import 'package:frontend/data/dtos/medication_create_dto.dart';
 import 'package:frontend/data/dtos/medication_quantity_update_dto.dart';
 import 'package:frontend/data/dtos/medication_write_off_dto.dart';
+import 'package:frontend/data/dtos/medication_refill_dto.dart';
 import 'package:frontend/domain/repositories/first_aid_kit_repository.dart';
+import 'package:frontend/domain/repositories/auth_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/screens/my_profile_screen.dart';
+import 'package:frontend/presentation/screens/settings_screen.dart';
+import 'package:frontend/presentation/screens/login_screen.dart';
 import 'package:frontend/core/extensions.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend/data/dtos/expiration_status.dart';
 import 'package:frontend/data/dtos/measurement_unit.dart';
-import 'package:frontend/presentation/screens/settings_screen.dart';
 
 class UserHomeScreen extends StatefulWidget {
   final String userName;
@@ -338,6 +341,147 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
+  Future<void> _showRefillDialog(
+      MedicationDto medication, AppLocalizations l10n) async {
+    final qController = TextEditingController();
+    DateTime date = DateTime.now().add(const Duration(days: 365));
+    bool confirmed = false;
+
+    await showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setS) => Padding(
+          padding: EdgeInsets.only(
+              bottom: MediaQuery.of(ctx).viewInsets.bottom),
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius:
+                  BorderRadius.vertical(top: Radius.circular(28)),
+            ),
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _sheetHandle(),
+                  const SizedBox(height: 8),
+                  _sheetTitle(
+                    l10n.refillMedicationTitle(medication.name),
+                    Icons.add_shopping_cart_rounded,
+                    _purple,
+                  ),
+                  const SizedBox(height: 20),
+                  _infoRow(
+                    Icons.info_outline_rounded,
+                    '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
+                    _purple,
+                  ),
+                  const SizedBox(height: 20),
+                  TextField(
+                    controller: qController,
+                    keyboardType: TextInputType.number,
+                    style: GoogleFonts.notoSans(
+                        fontWeight: FontWeight.w600, fontSize: 15),
+                    decoration: _inputStyle(
+                      l10n.quantity,
+                      medication.unit.name.capitalize(),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  GestureDetector(
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: ctx,
+                        initialDate: date,
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime.now()
+                            .add(const Duration(days: 3650)),
+                        builder: (context, child) => Theme(
+                          data: Theme.of(context).copyWith(
+                            colorScheme: const ColorScheme.light(
+                              primary: _purple,
+                              onSurface: Colors.black87,
+                            ),
+                          ),
+                          child: child!,
+                        ),
+                      );
+                      if (picked != null) setS(() => date = picked);
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      decoration: BoxDecoration(
+                        color: _purpleLight,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(
+                            color: _purpleBorder, width: 1.5),
+                      ),
+                      child: Row(children: [
+                        const Icon(Icons.calendar_today_rounded,
+                            size: 18, color: _purpleLabel),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                l10n.newExpirationDate,
+                                style: const TextStyle(
+                                    fontSize: 11,
+                                    color: _purpleLabel,
+                                    fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                DateFormat('dd.MM.yyyy').format(date),
+                                style: GoogleFonts.notoSans(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right_rounded,
+                            color: _purpleLabel),
+                      ]),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+                  _buildActionBtn(l10n.refill, _purple, () {
+                    confirmed = true;
+                    Navigator.pop(ctx);
+                  }),
+                  const SizedBox(height: 4),
+                  _cancelBtn(ctx, l10n.cancel),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    if (confirmed) {
+      final q = int.tryParse(qController.text) ?? 0;
+      if (q > 0) {
+        await _performAction(
+          () => _kitRepository.refillMedication(
+              medication.id,
+              MedicationRefillDto(
+                  addedQuantity: q, newExpirationDate: date)),
+          l10n.medicationRefilledSuccess,
+        );
+      }
+    }
+  }
+
   Future<void> _showWriteOffDialog(
       MedicationDto medication, AppLocalizations l10n) async {
     final qController = TextEditingController();
@@ -633,8 +777,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 letterSpacing: 1.2)),
         leading: IconButton(
             icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
-            onPressed: () => Navigator.of(context)
-                .pushNamedAndRemoveUntil('/login', (r) => false)),
+            onPressed: () async {
+              await AuthRepository().logout();
+              if (!context.mounted) return;
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => const LoginScreen()),
+                (Route<dynamic> route) => false,
+              );
+            }),
         actions: [
           IconButton(
               icon: const Icon(Icons.settings_outlined,
@@ -984,29 +1134,50 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               Colors.grey),
         ]),
         const SizedBox(height: 16),
-        Row(children: [
-          Expanded(
-              child: OutlinedButton(
+        if (med.quantity > 0)
+          Row(children: [
+            Expanded(
+                child: ElevatedButton.icon(
+                    onPressed: () => _showUseMedicationDialog(med, l10n),
+                    icon: const Icon(Icons.medical_services_outlined, size: 18),
+                    label: Text(l10n.use),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: _purple,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        elevation: 0))),
+            const SizedBox(width: 12),
+            Expanded(
+              child: OutlinedButton.icon(
                   onPressed: () => _showWriteOffDialog(med, l10n),
+                  icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                  label: Text(l10n.writeOff),
                   style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.red,
-                      side: BorderSide(color: Colors.red.shade100),
+                      side: BorderSide(color: Colors.red.shade200),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12))),
-                  child: Text(l10n.writeOff))),
-          const SizedBox(width: 12),
-          Expanded(
-              child: ElevatedButton(
-                  onPressed: () => _showUseMedicationDialog(med, l10n),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color.fromARGB(255, 173, 128, 245),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
-                      elevation: 0),
-                  child: Text(l10n.use))),
-        ]),
+                          borderRadius: BorderRadius.circular(12)))),
+            ),
+          ])
+        else
+          Row(children: [
+            Expanded(
+              child: SizedBox(
+                height: 44,
+                child: ElevatedButton.icon(
+                    onPressed: () => _showRefillDialog(med, l10n),
+                    icon: const Icon(Icons.add_shopping_cart_rounded, size: 18),
+                    label: Text(l10n.refill),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: _purpleLight,
+                        foregroundColor: _purple,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)))),
+              ),
+            ),
+          ]),
       ]),
     );
   }

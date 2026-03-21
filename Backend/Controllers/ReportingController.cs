@@ -1,7 +1,10 @@
+using Application.DTOs;
 using Application.Interfaces;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
+using System.Threading.Tasks;
 
 namespace Backend.Controllers
 {
@@ -29,6 +32,26 @@ namespace Backend.Controllers
         {
             var kitStatuses = await _reportingService.GenerateKitStatusReportAsync();
             return Ok(kitStatuses);
+        }
+
+        [HttpGet("purchasing")]
+        public async Task<IActionResult> GetPurchasingReport([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+        {
+            var start = startDate?.ToUniversalTime() ?? DateTime.UtcNow.AddDays(-30);
+            var end = endDate?.ToUniversalTime() ?? DateTime.UtcNow;
+
+            var report = await _reportingService.GetPurchasingReportAsync(start, end);
+            return Ok(report);
+        }
+
+        [HttpGet("disposal")]
+        public async Task<IActionResult> GetDisposalReport([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+        {
+            var start = startDate?.ToUniversalTime() ?? DateTime.UtcNow.AddDays(-30);
+            var end = endDate?.ToUniversalTime() ?? DateTime.UtcNow;
+
+            var report = await _reportingService.GetDisposalReportAsync(start, end);
+            return Ok(report);
         }
     }
 }
