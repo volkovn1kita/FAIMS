@@ -126,7 +126,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Welcome, {userName}'**
-  String welcomeUser(Object userName);
+  String welcomeUser(String userName);
 
   /// No description provided for @overview.
   ///
@@ -360,7 +360,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Use {medicationName}'**
-  String useMedicationTitle(Object medicationName);
+  String useMedicationTitle(String medicationName);
 
   /// No description provided for @available.
   ///
@@ -396,7 +396,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Write Off {medicationName}'**
-  String writeOffMedicationTitle(Object medicationName);
+  String writeOffMedicationTitle(String medicationName);
 
   /// No description provided for @quantityToWriteOff.
   ///
@@ -726,7 +726,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Failed to save department: {error}'**
-  String failedToSaveDepartment(Object error);
+  String failedToSaveDepartment(String error);
 
   /// No description provided for @editKitTitle.
   ///
@@ -960,7 +960,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Error saving first aid kit: {error}'**
-  String kitSaveError(Object error);
+  String kitSaveError(String error);
 
   /// No description provided for @deleteKitTitle.
   ///
@@ -972,7 +972,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Are you sure you want to delete kit \"{name}\" ({number})?'**
-  String deleteKitConfirmation(Object name, Object number);
+  String deleteKitConfirmation(String name, String number);
 
   /// No description provided for @delete.
   ///
@@ -990,7 +990,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Error deleting kit: {error}'**
-  String kitDeleteError(Object error);
+  String kitDeleteError(String error);
 
   /// No description provided for @save.
   ///
@@ -1278,7 +1278,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'{departmentName} Rooms'**
-  String departmentRooms(Object departmentName);
+  String departmentRooms(String departmentName);
 
   /// No description provided for @addNewRoom.
   ///
@@ -1302,7 +1302,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Cannot delete \"{kitName}\" because it still contains medications. Please remove all medications first.'**
-  String cannotDeleteKit(Object kitName);
+  String cannotDeleteKit(String kitName);
 
   /// No description provided for @confirmDeletion.
   ///
@@ -1314,7 +1314,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Are you sure you want to delete this first aid kit: \"{kitName}\"? This action cannot be undone.'**
-  String confirmDeleteFirstAidKit(Object kitName);
+  String confirmDeleteFirstAidKit(String kitName);
 
   /// No description provided for @firstAidKitDeletedSuccessfully.
   ///
@@ -1326,7 +1326,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Are you sure you want to delete \"{medicationName}\"? This action cannot be undone.'**
-  String firstAidKitDeleteAlert(Object medicationName);
+  String firstAidKitDeleteAlert(String medicationName);
 
   /// No description provided for @medicationDeletedSuccessfully.
   ///
@@ -1362,7 +1362,7 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Cannot delete \"{medicationName}\" because its quantity is greater than 0. Please set quantity to 0 first to delete.'**
-  String quantityIsGreaterThan0Erorr(Object medicationName);
+  String quantityIsGreaterThan0Erorr(String medicationName);
 
   /// No description provided for @enterEmailAndPassword.
   ///
@@ -1441,8 +1441,8 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cannot delete \"{kitName}\" because it still contains \"{medicationsLength}\" medication(s). Please remove all medications first.'**
   String cannotDeleteKitBecauseIsNotEmpty(
-    Object kitName,
-    Object medicationsLength,
+    String kitName,
+    String medicationsLength,
   );
 
   /// No description provided for @deleteFirstAidKit.
@@ -1455,13 +1455,13 @@ abstract class AppLocalizations {
   ///
   /// In en, this message translates to:
   /// **'Are you sure you want to delete the kit \"{kitName}\"? This action cannot be undone.'**
-  String deleteKitAlert(Object kitName);
+  String deleteKitAlert(String kitName);
 
   /// No description provided for @kitDeleteSuccessfully.
   ///
   /// In en, this message translates to:
   /// **'Kit \"{kitName}\" deleted successfully!'**
-  String kitDeleteSuccessfully(Object kitName);
+  String kitDeleteSuccessfully(String kitName);
 
   /// No description provided for @errorCheckingMedicationsForKit.
   ///

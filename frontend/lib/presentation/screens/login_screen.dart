@@ -24,6 +24,8 @@ class _LoginScreenState extends State<LoginScreen> {
   String _errorMessage = '';
   bool _isPasswordVisible = false;
 
+  static const _primaryColor = Color.fromARGB(255, 143, 88, 225);
+
   @override
   void initState() {
     super.initState();
@@ -109,6 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final dto = LoginDto(email: email, password: password);
       final authResult = await _authRepository.login(dto);
 
+      if (!mounted) return;
+
       if (authResult.role == 'Administrator') {
         Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => HomeScreen(
@@ -124,15 +128,18 @@ class _LoginScreenState extends State<LoginScreen> {
         ));
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = e.toString().contains('Exception:')
             ? e.toString().replaceAll('Exception: ', '')
             : 'Login error: check API.';
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -144,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return const Scaffold(
         backgroundColor: Colors.white,
         body: Center(
-          child: CircularProgressIndicator(color: Color.fromARGB(255, 143, 88, 225)),
+          child: CircularProgressIndicator(color: _primaryColor),
         ),
       );
     }
@@ -162,13 +169,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.1),
+                    color: _primaryColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.medical_services_rounded,
                     size: 56,
-                    color: Color.fromARGB(255, 143, 88, 225),
+                    color: _primaryColor,
                   ),
                 ),
                 const SizedBox(height: 24),
@@ -177,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: GoogleFonts.notoSans(
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
-                    color: const Color.fromARGB(255, 143, 88, 225),
+                    color: _primaryColor,
                     letterSpacing: 2.5,
                   ),
                 ),
@@ -222,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+                      backgroundColor: _primaryColor,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
@@ -292,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         l10n.registerButtonText,
                         style: GoogleFonts.notoSans(
-                          color: const Color.fromARGB(255, 143, 88, 225),
+                          color: _primaryColor,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -358,7 +365,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
             ),
           ),
         ),

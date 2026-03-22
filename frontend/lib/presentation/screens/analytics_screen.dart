@@ -51,7 +51,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         title: Text(
           l10n.globalAnalytics,
           style: GoogleFonts.notoSans(
-            fontSize: 22, // Трохи збільшили для статусу головного заголовка
+            fontSize: 22,
             color: Colors.black87, 
             fontWeight: FontWeight.w700,
             letterSpacing: -0.3,
@@ -70,7 +70,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -142,9 +142,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     return Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(8), // Трохи зменшили паддінг іконки
+          padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: color.withOpacity(0.1),
+            color: color.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(icon, color: color, size: 22),
@@ -154,8 +154,8 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           child: Text(
             title,
             style: GoogleFonts.notoSans(
-              fontSize: 16, // Було 18, стало 16 - тепер це чіткий підзаголовок
-              fontWeight: FontWeight.w600, // Зробили трохи м'якшим
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
               color: Colors.black87,
             ),
           ),
@@ -209,7 +209,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
         ],
       ),
       padding: const EdgeInsets.fromLTRB(16, 32, 24, 20),

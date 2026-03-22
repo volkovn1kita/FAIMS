@@ -1,11 +1,11 @@
-
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'package:frontend/core/constants.dart';
 import 'package:http/http.dart' as http;
 import '../models/auth_result.dart';
 import '../dtos/login_dto.dart';
 import '../dtos/register_organization_dto.dart';
-import 'dart:async'; 
+import 'dart:async';
 
 class AuthApiService {
   Future<AuthResult> login(LoginDto dto) async {
@@ -30,10 +30,8 @@ class AuthApiService {
         throw Exception(errorBody['message'] ?? 'Server error. Status: ${response.statusCode}');
       }
     } on TimeoutException catch (e) {
-
       throw Exception(e.message);
     } catch (e) {
-
       rethrow;
     }
   }
@@ -73,20 +71,18 @@ class AuthApiService {
         Uri.parse('${Constants.baseUrl}/users/update-fcm-token'),
         headers: <String, String>{
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $authToken', // Обов'язково передаємо токен авторизації
+          'Authorization': 'Bearer $authToken',
         },
         body: jsonEncode({'token': fcmToken}),
       );
 
       if (response.statusCode == 200) {
-        print('✅ FCM Token updated successfully on server');
+        developer.log('✅ FCM Token updated successfully on server', name: 'AuthApiService');
       } else {
-        print('⚠️ Failed to update FCM Token. Status: ${response.statusCode}, Body: ${response.body}');
+        developer.log('⚠️ Failed to update FCM Token. Status: ${response.statusCode}, Body: ${response.body}', name: 'AuthApiService');
       }
     } catch (e) {
-      print('❌ Error updating FCM Token: $e');
-      // Ми не кидаємо помилку далі (rethrow), щоб не ламати процес логіну
+      developer.log('❌ Error updating FCM Token: $e', name: 'AuthApiService');
     }
   }
-
 }

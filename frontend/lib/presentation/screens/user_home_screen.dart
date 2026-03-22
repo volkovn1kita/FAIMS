@@ -174,7 +174,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 22),
@@ -197,9 +197,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         padding:
             const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.18)),
+          border: Border.all(color: color.withValues(alpha: 0.18)),
         ),
         child: Row(
           children: [
@@ -224,14 +224,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         child: DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [color, color.withOpacity(0.78)],
+              colors: [color, color.withValues(alpha: 0.78)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.35),
+                color: color.withValues(alpha: 0.35),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),
@@ -796,54 +796,61 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(
-              child: CircularProgressIndicator(color: _purple))
-          : RefreshIndicator(
-              onRefresh: _loadMyKitAndMedications,
-              color: _purple,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 20, vertical: 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildWelcomeHeader(l10n),
-                    const SizedBox(height: 24),
-                    if (_myKit != null) ...[
-                      _buildKitInfoCard(l10n),
-                      const SizedBox(height: 32),
-                      _buildSectionHeader(l10n),
-                      const SizedBox(height: 16),
-                      _buildFilterSection(l10n),
-                      _buildMedicationList(l10n),
-                    ] else
-                      Center(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(
-                              vertical: 60.0, horizontal: 20.0),
-                          child: Column(
-                            children: [
-                              Icon(Icons.inventory_2_outlined,
-                                  size: 64, color: Colors.grey.shade300),
-                              const SizedBox(height: 16),
-                              Text(
-                                l10n.notAssignedToKit,
-                                textAlign: TextAlign.center,
-                                style: GoogleFonts.notoSans(
-                                  fontSize: 16,
-                                  color: Colors.grey.shade600,
-                                  fontWeight: FontWeight.w500,
-                                ),
+          ? const Center(child: CircularProgressIndicator(color: _purple))
+          : _errorMessage.isNotEmpty
+              ? Center(
+                  child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Text(_errorMessage,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.red)),
+                ))
+              : RefreshIndicator(
+                  onRefresh: _loadMyKitAndMedications,
+                  color: _purple,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildWelcomeHeader(l10n),
+                        const SizedBox(height: 24),
+                        if (_myKit != null) ...[
+                          _buildKitInfoCard(l10n),
+                          const SizedBox(height: 32),
+                          _buildSectionHeader(l10n),
+                          const SizedBox(height: 16),
+                          _buildFilterSection(l10n),
+                          _buildMedicationList(l10n),
+                        ] else
+                          Center(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 60.0, horizontal: 20.0),
+                              child: Column(
+                                children: [
+                                  Icon(Icons.inventory_2_outlined,
+                                      size: 64, color: Colors.grey.shade300),
+                                  const SizedBox(height: 16),
+                                  Text(
+                                    l10n.notAssignedToKit,
+                                    textAlign: TextAlign.center,
+                                    style: GoogleFonts.notoSans(
+                                      fontSize: 16,
+                                      color: Colors.grey.shade600,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        ),
-                      ),
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
-            ),
       bottomNavigationBar: _buildBottomNav(l10n),
     );
   }
@@ -862,7 +869,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             padding:
                 const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-                color: Colors.blue.withOpacity(0.1),
+                color: Colors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(20)),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               const Icon(Icons.medical_information_rounded,
@@ -890,7 +897,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-                color: _purple.withOpacity(0.3),
+                color: _purple.withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 8))
           ],
@@ -901,7 +908,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle),
                 child: const Icon(Icons.inventory_2_rounded,
                     color: Colors.white, size: 28)),
@@ -922,7 +929,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             _buildKitStatusBadge(l10n, _myKit!.statusBadge),
           ]),
           const SizedBox(height: 20),
-          Container(height: 1, color: Colors.white.withOpacity(0.15)),
+          Container(height: 1, color: Colors.white.withValues(alpha: 0.15)),
           const SizedBox(height: 20),
           _buildKitDetailRow(
               Icons.business_rounded, l10n.department, _myKit!.departmentName),
@@ -969,7 +976,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   Widget _buildKitWarningBox(AppLocalizations l10n) => Container(
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.1),
+            color: Colors.white.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(16)),
         child: Row(children: [
           const Icon(Icons.warning_amber_rounded,
@@ -1011,7 +1018,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withOpacity(0.03),
+                    color: Colors.black.withValues(alpha: 0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 4))
               ]),
@@ -1063,7 +1070,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   : _statusFilters.remove(status);
               _applyFilters();
             }),
-        selectedColor: color.withOpacity(0.1),
+        selectedColor: color.withValues(alpha: 0.1),
         checkmarkColor: color,
         backgroundColor: Colors.white,
         shape: const StadiumBorder(
@@ -1096,7 +1103,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withOpacity(0.02),
+                color: Colors.black.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4))
           ]),
@@ -1106,7 +1113,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                  color: sColor.withOpacity(0.1),
+                  color: sColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12)),
               child: Icon(Icons.vaccines_rounded, color: sColor, size: 24)),
           const SizedBox(width: 16),
@@ -1216,7 +1223,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(8)),
       child: Text(text,
           style: TextStyle(
@@ -1242,7 +1249,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   Widget _buildBottomNav(AppLocalizations l10n) => Container(
         decoration: BoxDecoration(boxShadow: [
           BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 20,
               offset: const Offset(0, -5))
         ]),

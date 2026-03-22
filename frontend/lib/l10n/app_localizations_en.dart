@@ -21,7 +21,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get faimsMenu => 'FAIMS MENU';
 
   @override
-  String welcomeUser(Object userName) {
+  String welcomeUser(String userName) {
     return 'Welcome, $userName';
   }
 
@@ -140,7 +140,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get lowStockWarning => '(Low!)';
 
   @override
-  String useMedicationTitle(Object medicationName) {
+  String useMedicationTitle(String medicationName) {
     return 'Use $medicationName';
   }
 
@@ -160,7 +160,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get medicationUsedSuccess => 'Medication used successfully!';
 
   @override
-  String writeOffMedicationTitle(Object medicationName) {
+  String writeOffMedicationTitle(String medicationName) {
     return 'Write Off $medicationName';
   }
 
@@ -333,7 +333,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get departmentAddedSuccess => 'Department added successfully!';
 
   @override
-  String failedToSaveDepartment(Object error) {
+  String failedToSaveDepartment(String error) {
     return 'Failed to save department: $error';
   }
 
@@ -453,7 +453,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kitUpdatedSuccess => 'First aid kit successfully updated!';
 
   @override
-  String kitSaveError(Object error) {
+  String kitSaveError(String error) {
     return 'Error saving first aid kit: $error';
   }
 
@@ -461,7 +461,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteKitTitle => 'Delete Kit';
 
   @override
-  String deleteKitConfirmation(Object name, Object number) {
+  String deleteKitConfirmation(String name, String number) {
     return 'Are you sure you want to delete kit \"$name\" ($number)?';
   }
 
@@ -472,7 +472,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get kitDeleteSuccess => 'Kit deleted successfully!';
 
   @override
-  String kitDeleteError(Object error) {
+  String kitDeleteError(String error) {
     return 'Error deleting kit: $error';
   }
 
@@ -620,7 +620,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get globalAnalytics => 'Global Analytics';
 
   @override
-  String departmentRooms(Object departmentName) {
+  String departmentRooms(String departmentName) {
     return '$departmentName Rooms';
   }
 
@@ -634,7 +634,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteRoom => 'Delete Room';
 
   @override
-  String cannotDeleteKit(Object kitName) {
+  String cannotDeleteKit(String kitName) {
     return 'Cannot delete \"$kitName\" because it still contains medications. Please remove all medications first.';
   }
 
@@ -642,7 +642,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmDeletion => 'Confirm Deletion';
 
   @override
-  String confirmDeleteFirstAidKit(Object kitName) {
+  String confirmDeleteFirstAidKit(String kitName) {
     return 'Are you sure you want to delete this first aid kit: \"$kitName\"? This action cannot be undone.';
   }
 
@@ -651,7 +651,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'First aid kit deleted successfully!';
 
   @override
-  String firstAidKitDeleteAlert(Object medicationName) {
+  String firstAidKitDeleteAlert(String medicationName) {
     return 'Are you sure you want to delete \"$medicationName\"? This action cannot be undone.';
   }
 
@@ -672,7 +672,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noMedicationsFoundInThisKit => 'No medications found in this kit.';
 
   @override
-  String quantityIsGreaterThan0Erorr(Object medicationName) {
+  String quantityIsGreaterThan0Erorr(String medicationName) {
     return 'Cannot delete \"$medicationName\" because its quantity is greater than 0. Please set quantity to 0 first to delete.';
   }
 
@@ -717,8 +717,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String cannotDeleteKitBecauseIsNotEmpty(
-    Object kitName,
-    Object medicationsLength,
+    String kitName,
+    String medicationsLength,
   ) {
     return 'Cannot delete \"$kitName\" because it still contains \"$medicationsLength\" medication(s). Please remove all medications first.';
   }
@@ -727,12 +727,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteFirstAidKit => 'Delete First Aid Kit';
 
   @override
-  String deleteKitAlert(Object kitName) {
+  String deleteKitAlert(String kitName) {
     return 'Are you sure you want to delete the kit \"$kitName\"? This action cannot be undone.';
   }
 
   @override
-  String kitDeleteSuccessfully(Object kitName) {
+  String kitDeleteSuccessfully(String kitName) {
     return 'Kit \"$kitName\" deleted successfully!';
   }
 

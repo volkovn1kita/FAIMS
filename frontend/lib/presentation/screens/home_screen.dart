@@ -30,6 +30,8 @@ class _HomeScreenState extends State<HomeScreen> {
   String _overviewError = '';
   late String _userName;
 
+  static const _primaryColor = Color.fromARGB(255, 143, 88, 225);
+
   @override
   void initState() {
     super.initState();
@@ -61,8 +63,9 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         _overviewError = 'Failed to load data: ${e.toString()}';
       });
-    } finally {
-      if (!mounted) return;
+    }
+    
+    if (mounted) {
       setState(() {
         _isOverviewLoading = false;
       });
@@ -85,13 +88,13 @@ class _HomeScreenState extends State<HomeScreen> {
       MaterialPageRoute(builder: (context) => const MyProfileScreen()),
     );
 
-    if (!mounted) return;
-
-    if (updatedName != null) {
-      setState(() => _userName = updatedName);
+    if (mounted) {
+      if (updatedName != null) {
+        setState(() => _userName = updatedName);
+      }
+      setState(() => _selectedIndex = 0);
+      _loadOverviewData();
     }
-    setState(() => _selectedIndex = 0);
-    _loadOverviewData();
   }
 
   @override
@@ -117,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: GoogleFonts.notoSans(
             fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: const Color.fromARGB(255, 143, 88, 225),
+            color: _primaryColor,
             letterSpacing: 1.2,
           ),
         ),
@@ -140,7 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10, offset: const Offset(2, 0))
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(2, 0))
                 ],
               ),
               child: _buildSideMenu(l10n, isWeb),
@@ -155,7 +158,7 @@ class _HomeScreenState extends State<HomeScreen> {
           : Container(
               decoration: BoxDecoration(
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -5)),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -5)),
                 ],
               ),
               child: BottomNavigationBar(
@@ -172,7 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
                 currentIndex: 0,
-                selectedItemColor: const Color.fromARGB(255, 143, 88, 225),
+                selectedItemColor: _primaryColor,
                 unselectedItemColor: Colors.grey.shade400,
                 selectedLabelStyle: GoogleFonts.notoSans(fontWeight: FontWeight.bold, fontSize: 12),
                 unselectedLabelStyle: GoogleFonts.notoSans(fontWeight: FontWeight.w600, fontSize: 12),
@@ -202,7 +205,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.medical_services_rounded, color: Colors.white, size: 40),
@@ -262,7 +265,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 iconColor: Colors.redAccent,
                 onTap: () async {
                   await AuthRepository().logout();
-                  if (!context.mounted) return;
+                  if (!mounted) return;
                   Navigator.of(context).pushReplacementNamed('/login');
                 },
               ),
@@ -288,19 +291,19 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.1),
+              color: _primaryColor.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.verified_user_outlined, size: 16, color: Color.fromARGB(255, 143, 88, 225)),
+                const Icon(Icons.verified_user_outlined, size: 16, color: _primaryColor),
                 const SizedBox(width: 6),
                 Text(
                   widget.userRole,
                   style: GoogleFonts.notoSans(
                     fontSize: 13,
-                    color: const Color.fromARGB(255, 143, 88, 225),
+                    color: _primaryColor,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -329,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           title: l10n.manageKits,
                           value: _overviewData!.totalKits.toString(),
                           icon: Icons.inventory_2_outlined,
-                          color: const Color.fromARGB(255, 143, 88, 225),
+                          color: _primaryColor,
                           onTap: () async {
                             await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageKitsScreen()));
                             _loadOverviewData();
@@ -422,7 +425,7 @@ class _HomeScreenState extends State<HomeScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: color.withOpacity(0.08), blurRadius: 15, offset: const Offset(0, 8)),
+          BoxShadow(color: color.withValues(alpha: 0.08), blurRadius: 15, offset: const Offset(0, 8)),
         ],
       ),
       child: Material(
@@ -438,7 +441,7 @@ class _HomeScreenState extends State<HomeScreen> {
               children: [
                 Container(
                   padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: color.withOpacity(0.12), shape: BoxShape.circle),
+                  decoration: BoxDecoration(color: color.withValues(alpha: 0.12), shape: BoxShape.circle),
                   child: Icon(icon, color: color, size: 30),
                 ),
                 const SizedBox(height: 16),

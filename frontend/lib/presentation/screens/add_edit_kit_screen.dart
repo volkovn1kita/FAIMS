@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:frontend/data/dtos/create_kit_dto.dart';
 import 'package:frontend/data/services/first_aid_kit_api_service.dart';
@@ -118,7 +119,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
         }).toList();
       });
     } catch (e) {
-      print('Error loading rooms: $e');
+      developer.log('Error loading rooms: $e', name: 'AddEditKitScreen');
     } finally {
       if (mounted) setState(() => _isRoomsLoading = false);
     }
@@ -218,7 +219,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                Container(height: 1, decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))])),
+                Container(height: 1, decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))])),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20.0),
@@ -274,7 +275,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
                               onChanged: (val) => setState(() => _selectedResponsibleUser = val),
                             ),
                           ]),
-                          const SizedBox(height: 100), // Space for bottom buttons
+                          const SizedBox(height: 100),
                         ],
                       ),
                     ),
@@ -301,7 +302,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
                 decoration: BoxDecoration(
                   gradient: const LinearGradient(colors: [Color.fromARGB(255, 163, 108, 245), Color.fromARGB(255, 123, 68, 205)]),
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.35), blurRadius: 15, offset: const Offset(0, 8))],
+                  boxShadow: [BoxShadow(color: const Color.fromARGB(255, 143, 88, 225).withValues(alpha: 0.35), blurRadius: 15, offset: const Offset(0, 8))],
                 ),
                 child: ElevatedButton(
                   onPressed: _isSaving ? null : _saveKit,
@@ -328,7 +329,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   Widget _buildCard(List<Widget> children) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8))]),
+      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8))]),
       child: Column(children: children),
     );
   }
@@ -368,7 +369,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
             prefixIcon: Icon(Icons.fingerprint_rounded, color: Colors.grey.shade400, size: 22),
             suffixIcon: widget.kitId == null ? IconButton(icon: const Icon(Icons.refresh_rounded, color: Color.fromARGB(255, 143, 88, 225)), onPressed: _generateUniqueNumber) : null,
             filled: true,
-            fillColor: Colors.deepPurple.withOpacity(0.03),
+            fillColor: Colors.deepPurple.withValues(alpha: 0.03),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
           style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 143, 88, 225)),

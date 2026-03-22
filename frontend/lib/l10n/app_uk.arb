@@ -1,11 +1,17 @@
 {
   "@@locale": "uk",
-
   "settings": "Налаштування",
   "analytics": "Аналітика",
   "logout": "Вийти",
   "faimsMenu": "FAIMS МЕНЮ",
   "welcomeUser": "Вітаємо, {userName}",
+  "@welcomeUser": {
+    "placeholders": {
+      "userName": {
+        "type": "String"
+      }
+    }
+  },
   "welcomeBack": "З поверненням",
   "signInLabel": "Увійдіть, щоб керувати наборами, ліками та сповіщеннями",
   "login": "Увійти",
@@ -21,9 +27,9 @@
   "items": "одиниць",
   "add": "Додати",
   "searchMedicationHint": "Пошук за назвою...",
-  "expired": "Протерміновано",
-  "critical": "Критично",
-  "lowStock": "Закінчується",
+  "expired": "Expired",
+  "critical": "Critical",
+  "lowStock": "Low",
   "noMedicationsYet": "Медикаментів ще немає",
   "tapToAddMedication": "Натисніть 'Додати', щоб додати перший медикамент",
   "noMedicationsFound": "Медикаментів не знайдено",
@@ -47,12 +53,26 @@
   "statusGood": "Добре",
   "lowStockWarning": "(Закінчується!)",
   "useMedicationTitle": "Використати {medicationName}",
+  "@useMedicationTitle": {
+    "placeholders": {
+      "medicationName": {
+        "type": "String"
+      }
+    }
+  },
   "available": "Доступно",
   "quantityToUse": "Кількість для використання",
   "enterValidQuantity": "Будь ласка, введіть дійсну кількість",
   "notEnoughAvailable": "Недостатньо медикаментів",
   "medicationUsedSuccess": "Медикамент успішно використано!",
   "writeOffMedicationTitle": "Списати {medicationName}",
+  "@writeOffMedicationTitle": {
+    "placeholders": {
+      "medicationName": {
+        "type": "String"
+      }
+    }
+  },
   "quantityToWriteOff": "Кількість для списання",
   "reasonHint": "напр., Пошкоджено, Протерміновано, Втрачено",
   "reasonIsRequired": "Причина є обов'язковою",
@@ -117,6 +137,13 @@
   "departmentUpdatedSuccess": "Підрозділ успішно оновлено!",
   "departmentAddedSuccess": "Підрозділ успішно додано!",
   "failedToSaveDepartment": "Не вдалося зберегти підрозділ: {error}",
+  "@failedToSaveDepartment": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "editKitTitle": "Редагувати аптечку",
   "addKitTitle": "Додати нову аптечку",
   "kitDetails": "Деталі аптечки",
@@ -153,11 +180,35 @@
   "kitAddedSuccess": "Аптечку успішно додано!",
   "kitUpdatedSuccess": "Аптечку успішно оновлено!",
   "kitSaveError": "Помилка збереження аптечки: {error}",
+  "@kitSaveError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "deleteKitTitle": "Видалити Аптечку",
   "deleteKitConfirmation": "Ви впевнені, що хочете видалити аптечку \"{name}\" ({number})?",
+  "@deleteKitConfirmation": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "number": {
+        "type": "String"
+      }
+    }
+  },
   "delete": "Видалити",
   "kitDeleteSuccess": "Аптечку успішно видалено!",
   "kitDeleteError": "Помилка видалення аптечки: {error}",
+  "@kitDeleteError": {
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
   "save": "Зберегти",
   "update": "Оновити",
   "editMedication": "Редагувати медикамент",
@@ -173,7 +224,6 @@
   "minimumQuantityMustBeANonNegativeNumber": "Мінімальна кількість повинна бути невід'ємним числом",
   "selectExpirationDate": "Оберіть термін придатності",
   "expirationDateCannotBeInThePastForNewMedications": "Термін придатності нових ліків не може бути минулим",
-
   "selectDepartment": "Виберіть відділ",
   "roomUpdatedSuccessfully": "Кімнату оновлено!",
   "roomAddedSuccessfully": "Кімнату додано!",
@@ -182,7 +232,6 @@
   "roomName": "Назва кімнати",
   "roomNameHint": "Введіть назву кімнати",
   "roomNameMissError": "Будь-ласка введіть назву кімнати",
-
   "editUser": "Редагувати користувача",
   "addNewUser": "Додати нового користувача",
   "addUser": "Новий користувач",
@@ -204,29 +253,60 @@
   "role": "Роль",
   "selectRole": "Виберіть роль",
   "createUser": "Створити користувача",
-
   "noDataAvailableYet": "Дані ще не доступні",
   "mostExpiredORwrittenOff": "Найбільш списані",
   "mostUsedMedications": "Найбільш використовувані ліки",
   "globalAnalytics": "Глобальна аналітика",
-
   "departmentRooms": "{departmentName} кімнати",
+  "@departmentRooms": {
+    "placeholders": {
+      "departmentName": {
+        "type": "String"
+      }
+    }
+  },
   "addNewRoom": "Додати нову кімнату",
   "noRoomsFound": "Не знайдено кімнат для цього відділу. Додайте одну зараз!",
   "deleteRoom": "Видалити кімнату",
-
   "cannotDeleteKit": "Неможливо видалити \"{kitName}\", оскільки він все ще містить ліки. Спочатку видаліть усі ліки.",
+  "@cannotDeleteKit": {
+    "placeholders": {
+      "kitName": {
+        "type": "String"
+      }
+    }
+  },
   "confirmDeletion": "Підтвердити видалення",
   "confirmDeleteFirstAidKit": "Ви впевнені, що хочете видалити цю аптечку: \"{kitName}\"? Цю дію неможливо скасувати.",
+  "@confirmDeleteFirstAidKit": {
+    "placeholders": {
+      "kitName": {
+        "type": "String"
+      }
+    }
+  },
   "firstAidKitDeletedSuccessfully": "First aid kit deleted successfully!",
   "firstAidKitDeleteAlert": "Ви впевнені, що хочете видалити? \"{medicationName}\"? Цю дію неможливо скасувати.",
-  "medicationDeletedSuccessfully" : "Ліки успішно видалені!",
+  "@firstAidKitDeleteAlert": {
+    "placeholders": {
+      "medicationName": {
+        "type": "String"
+      }
+    }
+  },
+  "medicationDeletedSuccessfully": "Ліки успішно видалені!",
   "kitsContent": "Вміст аптечки",
   "kitDetailsNotFound": "Деталі аптечки не знайдено",
   "medication": "Ліки",
   "noMedicationsFoundInThisKit": "У цій аптечці немає ліків.",
   "quantityIsGreaterThan0Erorr": "Неможливо видалити \"{medicationName}\" оскільки його кількість перевищує 0. Для видалення спочатку встановіть кількість 0.",
-
+  "@quantityIsGreaterThan0Erorr": {
+    "placeholders": {
+      "medicationName": {
+        "type": "String"
+      }
+    }
+  },
   "cannotDeleteDepartmentWithExistingRooms": "Неможливо видалити відділ, у якому є кімнати. Спочатку видаліть кімнати.",
   "deleteDepartmentAlert": "Ви впевнені, що хочете видалити цей відділ? Цю дію неможливо скасувати.",
   "departmentDeletedSuccessfully": "Відділ успішно видалено!",
@@ -234,11 +314,34 @@
   "addNewDepartment": "Додати новий відділ",
   "noDepartmentsFound": "Відділів не знайдено. Додайте один зараз!",
   "deleteDepartment": "Видалити відділ",
-
   "cannotDeleteKitBecauseIsNotEmpty": "Неможливо видалити \"{kitName}\" тому що він все ще містить \"{medicationsLength}\" ліки. Спочатку видаліть усі ліки.",
+  "@cannotDeleteKitBecauseIsNotEmpty": {
+    "placeholders": {
+      "kitName": {
+        "type": "String"
+      },
+      "medicationsLength": {
+        "type": "String"
+      }
+    }
+  },
   "deleteFirstAidKit": "Видалити аптечку першої допомоги",
   "deleteKitAlert": "Ви впевнені, що хочете видалити комплект? \"{kitName}\"? Цю дію неможливо скасувати.",
+  "@deleteKitAlert": {
+    "placeholders": {
+      "kitName": {
+        "type": "String"
+      }
+    }
+  },
   "kitDeleteSuccessfully": "Аптечка \"{kitName}\" видалена успішно!",
+  "@kitDeleteSuccessfully": {
+    "placeholders": {
+      "kitName": {
+        "type": "String"
+      }
+    }
+  },
   "errorCheckingMedicationsForKit": "Помилка перевірки ліків для набору",
   "deletionError": "Помилка видалення",
   "needsAttention": "Потребує уваги",
@@ -247,7 +350,6 @@
   "responsible": "Відповідальний",
   "noKitsFoundMatchingYourCriteria": "Не знайдено комплектів, що відповідають вашим критеріям.",
   "uniqueID": "Унікальне ID",
-
   "deleteUserAlert": "Ви впевнені, що хочете видалити цього користувача? Цю дію неможливо скасувати.",
   "searchByNameOrEmail": "Пошук за іменем або email",
   "filterByRole": "Фільтрувати за роллю",
@@ -255,8 +357,7 @@
   "sortByLastName": "Сортувати за прізв.",
   "noUsersFoundMatchingYourCriteria": "Не знайдено користувачів, що відповідають вашим критеріям.",
   "deleteUser": "Видалити користувача",
-
-  "newPassAndConfirmPassDoNotMatch" : "Новий пароль і підтвердження пароля не збігаються.",
+  "newPassAndConfirmPassDoNotMatch": "Новий пароль і підтвердження пароля не збігаються.",
   "failedToGetAvatar": "Не вдалося отримати URL-адресу аватара після завантаження.",
   "photoLibrary": "Фотобібліотека",
   "removeAvatar": "Видалити аватар",
@@ -267,6 +368,9 @@
   "firstNameCannotBeEmpty": "Ім'я не може бути порожнім",
   "lastNameCannotBeEmpty": "Прізвище не може бути порожнім",
   "emailCannotBeEmpty": "Email не може бути порожнім",
-  "camera": "Камера"
-
+  "camera": "Камера",
+  "register": "Зареєструватися",
+  "newOrg": "Нова організація?",
+  "enterEmailAndPassword": "Будь ласка, введіть email та пароль",
+  "processing": "Обробка..."
 }

@@ -21,7 +21,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get faimsMenu => 'FAIMS МЕНЮ';
 
   @override
-  String welcomeUser(Object userName) {
+  String welcomeUser(String userName) {
     return 'Вітаємо, $userName';
   }
 
@@ -62,13 +62,13 @@ class AppLocalizationsUk extends AppLocalizations {
   String get searchMedicationHint => 'Пошук за назвою...';
 
   @override
-  String get expired => 'Протерміновано';
+  String get expired => 'Expired';
 
   @override
-  String get critical => 'Критично';
+  String get critical => 'Critical';
 
   @override
-  String get lowStock => 'Закінчується';
+  String get lowStock => 'Low';
 
   @override
   String get noMedicationsYet => 'Медикаментів ще немає';
@@ -141,7 +141,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get lowStockWarning => '(Закінчується!)';
 
   @override
-  String useMedicationTitle(Object medicationName) {
+  String useMedicationTitle(String medicationName) {
     return 'Використати $medicationName';
   }
 
@@ -161,7 +161,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get medicationUsedSuccess => 'Медикамент успішно використано!';
 
   @override
-  String writeOffMedicationTitle(Object medicationName) {
+  String writeOffMedicationTitle(String medicationName) {
     return 'Списати $medicationName';
   }
 
@@ -196,7 +196,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get enterMedicationName => 'Будь ласка, введіть назву медикаменту';
 
   @override
-  String get register => 'Register';
+  String get register => 'Зареєструватися';
 
   @override
   String get fillAllRequiredFields =>
@@ -279,7 +279,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get departmentName => 'Назва підрозділу';
 
   @override
-  String get newOrg => 'New organization?';
+  String get newOrg => 'Нова організація?';
 
   @override
   String get reportsAndLists => 'Звіти та Списки';
@@ -332,7 +332,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get departmentAddedSuccess => 'Підрозділ успішно додано!';
 
   @override
-  String failedToSaveDepartment(Object error) {
+  String failedToSaveDepartment(String error) {
     return 'Не вдалося зберегти підрозділ: $error';
   }
 
@@ -453,7 +453,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get kitUpdatedSuccess => 'Аптечку успішно оновлено!';
 
   @override
-  String kitSaveError(Object error) {
+  String kitSaveError(String error) {
     return 'Помилка збереження аптечки: $error';
   }
 
@@ -461,7 +461,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get deleteKitTitle => 'Видалити Аптечку';
 
   @override
-  String deleteKitConfirmation(Object name, Object number) {
+  String deleteKitConfirmation(String name, String number) {
     return 'Ви впевнені, що хочете видалити аптечку \"$name\" ($number)?';
   }
 
@@ -472,7 +472,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get kitDeleteSuccess => 'Аптечку успішно видалено!';
 
   @override
-  String kitDeleteError(Object error) {
+  String kitDeleteError(String error) {
     return 'Помилка видалення аптечки: $error';
   }
 
@@ -621,7 +621,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get globalAnalytics => 'Глобальна аналітика';
 
   @override
-  String departmentRooms(Object departmentName) {
+  String departmentRooms(String departmentName) {
     return '$departmentName кімнати';
   }
 
@@ -636,7 +636,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get deleteRoom => 'Видалити кімнату';
 
   @override
-  String cannotDeleteKit(Object kitName) {
+  String cannotDeleteKit(String kitName) {
     return 'Неможливо видалити \"$kitName\", оскільки він все ще містить ліки. Спочатку видаліть усі ліки.';
   }
 
@@ -644,7 +644,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get confirmDeletion => 'Підтвердити видалення';
 
   @override
-  String confirmDeleteFirstAidKit(Object kitName) {
+  String confirmDeleteFirstAidKit(String kitName) {
     return 'Ви впевнені, що хочете видалити цю аптечку: \"$kitName\"? Цю дію неможливо скасувати.';
   }
 
@@ -653,7 +653,7 @@ class AppLocalizationsUk extends AppLocalizations {
       'First aid kit deleted successfully!';
 
   @override
-  String firstAidKitDeleteAlert(Object medicationName) {
+  String firstAidKitDeleteAlert(String medicationName) {
     return 'Ви впевнені, що хочете видалити? \"$medicationName\"? Цю дію неможливо скасувати.';
   }
 
@@ -673,12 +673,12 @@ class AppLocalizationsUk extends AppLocalizations {
   String get noMedicationsFoundInThisKit => 'У цій аптечці немає ліків.';
 
   @override
-  String quantityIsGreaterThan0Erorr(Object medicationName) {
+  String quantityIsGreaterThan0Erorr(String medicationName) {
     return 'Неможливо видалити \"$medicationName\" оскільки його кількість перевищує 0. Для видалення спочатку встановіть кількість 0.';
   }
 
   @override
-  String get enterEmailAndPassword => 'Please enter email and password';
+  String get enterEmailAndPassword => 'Будь ласка, введіть email та пароль';
 
   @override
   String get welcomeBack => 'З поверненням';
@@ -688,7 +688,7 @@ class AppLocalizationsUk extends AppLocalizations {
       'Увійдіть, щоб керувати наборами, ліками та сповіщеннями';
 
   @override
-  String get processing => 'Processing';
+  String get processing => 'Обробка...';
 
   @override
   String get login => 'Увійти';
@@ -718,8 +718,8 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String cannotDeleteKitBecauseIsNotEmpty(
-    Object kitName,
-    Object medicationsLength,
+    String kitName,
+    String medicationsLength,
   ) {
     return 'Неможливо видалити \"$kitName\" тому що він все ще містить \"$medicationsLength\" ліки. Спочатку видаліть усі ліки.';
   }
@@ -728,12 +728,12 @@ class AppLocalizationsUk extends AppLocalizations {
   String get deleteFirstAidKit => 'Видалити аптечку першої допомоги';
 
   @override
-  String deleteKitAlert(Object kitName) {
+  String deleteKitAlert(String kitName) {
     return 'Ви впевнені, що хочете видалити комплект? \"$kitName\"? Цю дію неможливо скасувати.';
   }
 
   @override
-  String kitDeleteSuccessfully(Object kitName) {
+  String kitDeleteSuccessfully(String kitName) {
     return 'Аптечка \"$kitName\" видалена успішно!';
   }
 

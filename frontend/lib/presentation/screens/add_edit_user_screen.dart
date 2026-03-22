@@ -19,6 +19,9 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   final _formKey = GlobalKey<FormState>();
   final UserRepository _userRepository = UserRepository();
 
+  static const _primaryColor = Color(0xFF8F58E1);
+  static const _primaryColorDark = Color(0xFF7B44CD);
+
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -85,8 +88,9 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
             ? e.toString().replaceAll('Exception: ', '')
             : 'Failed to load data: ${e.toString()}';
       });
-    } finally {
-      if (!mounted) return;
+    }
+    
+    if (mounted) {
       setState(() {
         _isLoading = false;
       });
@@ -153,7 +157,9 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           ),
         );
       }
-      Navigator.of(context).pop(true);
+      if (mounted) {
+        Navigator.of(context).pop(true);
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -161,8 +167,9 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
             ? e.toString().replaceAll('Exception: ', '')
             : 'Failed to save user: ${e.toString()}';
       });
-    } finally {
-      if (!mounted) return;
+    }
+    
+    if (mounted) {
       setState(() {
         _isSaving = false;
       });
@@ -193,7 +200,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -231,7 +238,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8)),
+                              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
                             ],
                           ),
                           padding: const EdgeInsets.all(24),
@@ -321,14 +328,14 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                           height: 56,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color.fromARGB(255, 163, 108, 245), Color.fromARGB(255, 123, 68, 205)],
+                              colors: [_primaryColor, _primaryColorDark],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.35),
+                                color: _primaryColor.withValues(alpha: 0.35),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -419,7 +426,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -465,7 +472,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
             ),
           ),
           items: _availableRoles.map((role) {

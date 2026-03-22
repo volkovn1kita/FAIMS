@@ -28,6 +28,10 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
   final DepartmentRepository _departmentRepository = DepartmentRepository();
+  
+  static const _primaryColor = Color(0xFF8F58E1);
+  static const _primaryColorDark = Color(0xFF7B44CD);
+
   bool _isLoading = false;
   String _errorMessage = '';
   List<DepartmentDto> _departments = [];
@@ -186,7 +190,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -224,7 +228,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8)),
+                              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
                             ],
                           ),
                           padding: const EdgeInsets.all(24),
@@ -260,14 +264,14 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
                           height: 56,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color.fromARGB(255, 163, 108, 245), Color.fromARGB(255, 123, 68, 205)],
+                              colors: [_primaryColor, _primaryColorDark],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.35),
+                                color: _primaryColor.withValues(alpha: 0.35),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -352,7 +356,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -398,7 +402,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
             ),
           ),
           items: _departments.map((department) {

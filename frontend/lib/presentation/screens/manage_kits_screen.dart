@@ -40,6 +40,8 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
   List<UserDto> _responsibleUsers = [];
   List<DepartmentDto> _departments = [];
 
+  static const _primaryColor = Color.fromARGB(255, 143, 88, 225);
+
   @override
   void initState() {
     super.initState();
@@ -151,10 +153,12 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
     final l10n = AppLocalizations.of(context)!;
     try {
       final medications = await _kitRepository.getMedicationsForKit(kitId);
+      if (!mounted) return false;
+
       if (medications.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.cannotDeleteKitBecauseIsNotEmpty(kitName, medications.length), style: GoogleFonts.notoSans()),
+            content: Text(l10n.cannotDeleteKitBecauseIsNotEmpty(kitName, medications.length.toString()), style: GoogleFonts.notoSans()),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 4),
           ),
@@ -162,6 +166,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
         return false;
       }
     } catch (e) {
+      if (!mounted) return false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('${l10n.errorCheckingMedicationsForKit}: ${e.toString().replaceAll('Exception: ', '')}', style: GoogleFonts.notoSans()),
@@ -172,7 +177,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
       return false;
     }
 
-    return await showDialog<bool>(
+    final dialogResult = await showDialog<bool>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -184,28 +189,32 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
               child: Text(l10n.cancel, style: GoogleFonts.notoSans(color: Colors.grey)),
             ),
             TextButton(
-              onPressed: () async {
-                try {
-                  await _apiService.deleteKit(kitId);
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(l10n.kitDeleteSuccessfully(kitName), style: GoogleFonts.notoSans())),
-                  );
-                  Navigator.of(context).pop(true);
-                } catch (e) {
-                  if (!context.mounted) return;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('${l10n.deletionError}: ${e.toString().replaceAll('Exception: ', '')}', style: GoogleFonts.notoSans())),
-                  );
-                  Navigator.of(context).pop(false);
-                }
-              },
+              onPressed: () => Navigator.of(context).pop(true),
               child: Text(l10n.delete, style: GoogleFonts.notoSans(color: Colors.red)),
             ),
           ],
         );
       },
-    ) ?? false;
+    );
+
+    if (dialogResult == true) {
+      try {
+        await _apiService.deleteKit(kitId);
+        if (!mounted) return false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(l10n.kitDeleteSuccessfully(kitName), style: GoogleFonts.notoSans())),
+        );
+        return true;
+      } catch (e) {
+        if (!mounted) return false;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('${l10n.deletionError}: ${e.toString().replaceAll('Exception: ', '')}', style: GoogleFonts.notoSans())),
+        );
+        return false;
+      }
+    }
+    
+    return false;
   }
 
   @override
@@ -304,7 +313,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -356,7 +365,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToAddEditKit(),
-        backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+        backgroundColor: _primaryColor,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -382,7 +391,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
         ],
         border: Border(left: BorderSide(color: statusColor, width: 4)),
       ),
@@ -409,7 +418,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
                             overflow: TextOverflow.ellipsis,
                           ),
                           Text(
-                            'ID: ${kit.uniqueNumber}',
+                            '${l10n.uniqueID}: ${kit.uniqueNumber}',
                             style: GoogleFonts.notoSans(fontSize: 12, color: Colors.grey.shade500),
                           ),
                         ],
@@ -436,9 +445,9 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildMiniCounter(Icons.error_outline, 'Critical', kit.criticalItemsCount, Colors.redAccent),
-                      _buildMiniCounter(Icons.calendar_today_outlined, 'Expired', kit.expiredItemsCount, Colors.orangeAccent),
-                      _buildMiniCounter(Icons.inventory_2_outlined, 'Low', kit.lowQuantityItemsCount, Colors.amber.shade600),
+                      _buildMiniCounter(Icons.error_outline, l10n.critical, kit.criticalItemsCount, Colors.redAccent),
+                      _buildMiniCounter(Icons.calendar_today_outlined, l10n.expired, kit.expiredItemsCount, Colors.orangeAccent),
+                      _buildMiniCounter(Icons.inventory_2_outlined, l10n.lowStock, kit.lowQuantityItemsCount, Colors.amber.shade600),
                     ],
                   ),
                 ),
@@ -454,7 +463,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
+        color: color.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
@@ -514,9 +523,9 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
       height: 36,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: isActive ? const Color.fromARGB(255, 143, 88, 225).withOpacity(0.1) : Colors.white,
+        color: isActive ? _primaryColor.withValues(alpha: 0.1) : Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isActive ? const Color.fromARGB(255, 143, 88, 225) : Colors.grey.shade300),
+        border: Border.all(color: isActive ? _primaryColor : Colors.grey.shade300),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
@@ -525,13 +534,13 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
             padding: EdgeInsets.only(left: 4.0),
             child: Icon(Icons.keyboard_arrow_down_rounded, size: 18),
           ),
-          iconEnabledColor: isActive ? const Color.fromARGB(255, 143, 88, 225) : Colors.grey.shade600,
+          iconEnabledColor: isActive ? _primaryColor : Colors.grey.shade600,
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(12),
           style: GoogleFonts.notoSans(
             fontSize: 13, 
             fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-            color: isActive ? const Color.fromARGB(255, 143, 88, 225) : Colors.black87,
+            color: isActive ? _primaryColor : Colors.black87,
           ),
           onChanged: onChanged,
           items: options,

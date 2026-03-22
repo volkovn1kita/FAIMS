@@ -202,9 +202,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: purple.withOpacity(0.05),
+                  color: purple.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: purple.withOpacity(0.1)),
+                  border: Border.all(color: purple.withValues(alpha: 0.1)),
                 ),
                 child: Row(
                   children: [
@@ -220,7 +220,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                         ),
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_down_rounded, color: purple.withOpacity(0.7)),
+                    Icon(Icons.keyboard_arrow_down_rounded, color: purple.withValues(alpha: 0.7)),
                   ],
                 ),
               ),
@@ -278,7 +278,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -289,7 +289,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: iconColor.withOpacity(0.1),
+                  color: iconColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Icon(icon, color: iconColor, size: 24),

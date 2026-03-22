@@ -53,6 +53,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
       final loadedKit = await _kitRepository.getFirstAidKitById(widget.kitId);
       final loadedMedications = await _kitRepository.getMedicationsForKit(widget.kitId);
 
+      if (!mounted) return;
       setState(() {
         _kitName = loadedKit.name;
         _kitDetails = loadedKit;
@@ -60,15 +61,18 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         _medications.sort((a, b) => a.expirationDate.compareTo(b.expirationDate));
       });
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = e.toString().contains('Exception:')
             ? e.toString().replaceAll('Exception: ', '')
             : 'Error loading kit details or contents: ${e.toString()}';
       });
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -149,6 +153,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         );
         Navigator.of(context).pop(true); 
       } catch (e) {
+        if (!mounted) return;
         setState(() {
           _errorMessage = e.toString().contains('Exception:')
               ? e.toString().replaceAll('Exception: ', '')
@@ -161,9 +166,11 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
           ),
         );
       } finally {
-        setState(() {
-          _isLoading = false;
-        });
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
       }
     }
   }
@@ -212,6 +219,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         ),
       );
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         _errorMessage = e.toString().contains('Exception:')
             ? e.toString().replaceAll('Exception: ', '')
@@ -224,9 +232,11 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         ),
       );
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -270,7 +280,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icon, color: color, size: 22),
@@ -293,9 +303,9 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         padding:
             const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.08),
+          color: color.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: color.withOpacity(0.18)),
+          border: Border.all(color: color.withValues(alpha: 0.18)),
         ),
         child: Row(
           children: [
@@ -320,14 +330,14 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         child: DecoratedBox(
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [color, color.withOpacity(0.78)],
+              colors: [color, color.withValues(alpha: 0.78)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
             borderRadius: BorderRadius.circular(14),
             boxShadow: [
               BoxShadow(
-                color: color.withOpacity(0.35),
+                color: color.withValues(alpha: 0.35),
                 blurRadius: 14,
                 offset: const Offset(0, 6),
               ),
@@ -628,7 +638,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -750,7 +760,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
             color: Colors.white,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 2)),
+              BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
             ],
             border: Border(left: BorderSide(color: statusColor, width: 4)),
           ),
@@ -775,7 +785,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: statusColor.withOpacity(0.1),
+                          color: statusColor.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Text(

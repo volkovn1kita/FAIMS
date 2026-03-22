@@ -26,8 +26,11 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _repository = FirstAidKitRepository();
 
+  static const _primaryColor = Color(0xFF8F58E1);
+  static const _primaryColorDark = Color(0xFF7B44CD);
+
   bool _isLoading = false;
-  bool _isSaving = false; // Додано окремий стейт для кнопки збереження
+  bool _isSaving = false; 
   String _errorMessage = '';
 
   final TextEditingController _nameController = TextEditingController();
@@ -107,13 +110,13 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color.fromARGB(255, 143, 88, 225), // Наш фірмовий фіолетовий
+              primary: _primaryColor, 
               onPrimary: Colors.white, 
               onSurface: Colors.black87, 
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: const Color.fromARGB(255, 143, 88, 225), 
+                foregroundColor: _primaryColor, 
               ),
             ),
           ),
@@ -224,7 +227,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -262,7 +265,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 15, offset: const Offset(0, 8)),
+                              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
                             ],
                           ),
                           padding: const EdgeInsets.all(24),
@@ -353,14 +356,14 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
                           height: 56,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [Color.fromARGB(255, 163, 108, 245), Color.fromARGB(255, 123, 68, 205)],
+                              colors: [_primaryColor, _primaryColorDark],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.35),
+                                color: _primaryColor.withValues(alpha: 0.35),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -451,7 +454,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -497,7 +500,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
             ),
           ),
           items: MeasurementUnit.values.map((unit) {

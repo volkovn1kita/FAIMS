@@ -34,6 +34,9 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   bool _isEditing = false;
   bool _isPasswordVisible = false;
 
+  static const _primaryColor = Color.fromARGB(255, 143, 88, 225);
+  static const _primaryColorDark = Color.fromARGB(255, 123, 68, 205);
+
   @override
   void initState() {
     super.initState();
@@ -306,7 +309,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.2), width: 4),
+                        border: Border.all(color: _primaryColor.withValues(alpha: 0.2), width: 4),
                       ),
                       child: CircleAvatar(
                         radius: 56,
@@ -326,7 +329,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: const Color.fromARGB(255, 143, 88, 225),
+                            color: _primaryColor,
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 3),
                           ),
@@ -341,7 +344,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -389,7 +392,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       padding: const EdgeInsets.all(20),
@@ -439,12 +442,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   ? Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.1),
+                        color: _primaryColor.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         value,
-                        style: GoogleFonts.notoSans(fontSize: 13, color: const Color.fromARGB(255, 143, 88, 225), fontWeight: FontWeight.bold),
+                        style: GoogleFonts.notoSans(fontSize: 13, color: _primaryColor, fontWeight: FontWeight.bold),
                       ),
                     )
                   : Text(
@@ -468,7 +471,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
               ],
             ),
             padding: const EdgeInsets.all(20),
@@ -509,7 +512,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
               ],
             ),
             padding: const EdgeInsets.all(20),
@@ -569,8 +572,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [
-                  Color.fromARGB(255, 163, 108, 245), 
-                  Color.fromARGB(255, 123, 68, 205)
+                  _primaryColor, 
+                  _primaryColorDark
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -578,7 +581,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: const Color.fromARGB(255, 143, 88, 225).withOpacity(0.35),
+                  color: _primaryColor.withValues(alpha: 0.35),
                   blurRadius: 15,
                   offset: const Offset(0, 8),
                 ),
@@ -657,7 +660,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),

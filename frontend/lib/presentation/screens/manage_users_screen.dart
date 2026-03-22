@@ -1,3 +1,4 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:frontend/core/constants.dart';
 import 'package:frontend/data/dtos/user_dto.dart';
@@ -26,6 +27,8 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   UserRoleDto? _selectedRoleFilter;
   List<UserRoleDto> _availableRoles = [];
   bool _sortAscending = true;
+
+  static const _primaryColor = Color.fromARGB(255, 143, 88, 225);
 
   @override
   void initState() {
@@ -60,10 +63,11 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         _errorMessage = e.toString().contains('Exception:')
             ? e.toString().replaceAll('Exception: ', '')
             : 'Failed to load data: ${e.toString()}';
-        print('Error loading users or roles: $e');
       });
-    } finally {
-      if (!mounted) return;
+      developer.log('Error loading users or roles: $e', name: 'ManageUsersScreen');
+    }
+    
+    if (mounted) {
       setState(() {
         _isLoading = false;
       });
@@ -105,7 +109,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       ),
     );
     if (result == true) {
-      _loadData(); // Перезавантажити дані, якщо була зміна
+      _loadData(); 
     }
   }
 
@@ -126,7 +130,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-              child: Text(l10n.delete, style: TextStyle(color: Colors.white)),
+              child: Text(l10n.delete, style: const TextStyle(color: Colors.white)),
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
@@ -139,35 +143,40 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     if (confirm == true) {
       if (!mounted) return;
       setState(() {
-        _isLoading = true; // Можна створити окремий стан _isDeleting для більш гранульованого контролю
+        _isLoading = true; 
         _errorMessage = '';
       });
       try {
-        await _userRepository.deleteUser(userId); // ВИКОРИСТОВУЄМО НОВИЙ МЕТОД
+        await _userRepository.deleteUser(userId); 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('User deleted successfully!')),
         );
-        _loadData(); // Перезавантажити список
+        _loadData(); 
       } catch (e) {
         if (!mounted) return;
         setState(() {
           _errorMessage = e.toString().contains('Exception:')
               ? e.toString().replaceAll('Exception: ', '')
               : 'Failed to delete user: ${e.toString()}';
-          _isLoading = false; // Повернути isLoading до false у випадку помилки
         });
-        print('Error deleting user: $e');
+        developer.log('Error deleting user: $e', name: 'ManageUsersScreen');
+      }
+      
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
       }
     }
   }
 
-@override
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     
     return Scaffold(
-      backgroundColor: Colors.grey.shade100, // Світлий фон для контрасту
+      backgroundColor: Colors.grey.shade100, 
       appBar: AppBar(
         title: Text(
           l10n.manageUsers,
@@ -184,13 +193,11 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       ),
       body: Column(
         children: [
-          // === Верхня панель (Пошук і Фільтри) на білому фоні ===
           Container(
             color: Colors.white,
             padding: const EdgeInsets.only(bottom: 12),
             child: Column(
               children: [
-                // Пошук
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 12.0),
                   child: TextField(
@@ -204,23 +211,21 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade50, // Дуже м'який сірий
+                      fillColor: Colors.grey.shade50, 
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     ),
                     onChanged: (value) => _applyFiltersAndSort(),
                   ),
                 ),
                 
-                // Фільтри та Сортування
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: Row(
                     children: [
-                      // Кнопка сортування (Pill)
                       _buildActionPill(
                         icon: _sortAscending ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-                        label: l10n.sortByLastName, // Або просто "Сортувати"
+                        label: l10n.sortByLastName, 
                         isActive: true,
                         onTap: () {
                           setState(() => _sortAscending = !_sortAscending);
@@ -228,7 +233,6 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         },
                       ),
                       const SizedBox(width: 8),
-                      // Фільтр ролей (Dropdown Pill)
                       _buildRoleFilterPill(l10n),
                     ],
                   ),
@@ -237,15 +241,13 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             ),
           ),
 
-          // Тінь під панеллю
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
 
-          // === Список користувачів ===
           Expanded(
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
@@ -293,10 +295,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
           ),
         ],
       ),
-      // Повертаємо FAB для додавання користувача — це економить купу місця зверху!
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToAddEditUser(),
-        backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+        backgroundColor: _primaryColor,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -304,35 +305,30 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     );
   }
 
-  // --- ВІДЖЕТИ ДЛЯ СУЧАСНОГО UI ---
-
-  // Картка користувача (БЕЗ зайвих кнопок редагування, бо є свайп)
   Widget _buildUserCard(UserDto user) {
-    // Визначаємо колір беджа залежно від ролі
     final isAdmin = user.role == 'Administrator';
-    final roleColor = isAdmin ? const Color.fromARGB(255, 143, 88, 225) : Colors.blue.shade600;
+    final roleColor = isAdmin ? _primaryColor : Colors.blue.shade600;
 
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _navigateToAddEditUser(userId: user.id), // Тап по картці теж відкриває редагування
+          onTap: () => _navigateToAddEditUser(userId: user.id), 
           borderRadius: BorderRadius.circular(16),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                // Аватар
                 CircleAvatar(
                   radius: 24,
-                  backgroundColor: user.avatarUrl != null ? Colors.transparent : roleColor.withOpacity(0.15),
+                  backgroundColor: user.avatarUrl != null ? Colors.transparent : roleColor.withValues(alpha: 0.15),
                   backgroundImage: user.avatarUrl != null
                       ? NetworkImage('$_baseUrl${user.avatarUrl!}') as ImageProvider<Object>?
                       : null,
@@ -345,7 +341,6 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                 ),
                 const SizedBox(width: 16),
                 
-                // Інформація користувача
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -367,11 +362,10 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                 ),
                 const SizedBox(width: 12),
 
-                // Soft Badge для ролі
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
-                    color: roleColor.withOpacity(0.1),
+                    color: roleColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -387,7 +381,6 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     );
   }
 
-  // Фільтр ролей у вигляді капсули
   Widget _buildRoleFilterPill(AppLocalizations l10n) {
     bool isActive = _selectedRoleFilter != null;
     
@@ -396,9 +389,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       constraints: const BoxConstraints(maxWidth: 140),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: isActive ? const Color.fromARGB(255, 143, 88, 225).withOpacity(0.1) : Colors.grey.shade50,
+        color: isActive ? _primaryColor.withValues(alpha: 0.1) : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isActive ? const Color.fromARGB(255, 143, 88, 225) : Colors.grey.shade200),
+        border: Border.all(color: isActive ? _primaryColor : Colors.grey.shade200),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<UserRoleDto?>(
@@ -408,18 +401,18 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             padding: EdgeInsets.only(left: 4.0),
             child: Icon(Icons.keyboard_arrow_down_rounded, size: 18),
           ),
-          iconEnabledColor: isActive ? const Color.fromARGB(255, 143, 88, 225) : Colors.grey.shade600,
+          iconEnabledColor: isActive ? _primaryColor : Colors.grey.shade600,
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(16),
           hint: Text(
-            l10n.filterByRole, // "All Roles" 
+            l10n.filterByRole, 
             style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
             overflow: TextOverflow.ellipsis,
           ),
           style: GoogleFonts.notoSans(
             fontSize: 14, 
             fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-            color: isActive ? const Color.fromARGB(255, 143, 88, 225) : Colors.black87,
+            color: isActive ? _primaryColor : Colors.black87,
           ),
           items: [
             const DropdownMenuItem<UserRoleDto?>(
@@ -442,7 +435,6 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     );
   }
 
-  // Кнопка-капсула для дій (як сортування)
   Widget _buildActionPill({required IconData icon, required String label, required bool isActive, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
@@ -470,7 +462,6 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     );
   }
 
-  // Фон для свайпу
   Widget _buildSwipeBackground(IconData icon, Color color, Alignment alignment) {
     return Container(
       decoration: BoxDecoration(
