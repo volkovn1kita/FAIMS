@@ -6,7 +6,7 @@ class LocaleProvider extends ChangeNotifier {
   Locale? _locale;
 
   LocaleProvider() {
-    _loadLocale(); // Завантажуємо мову при старті
+    _loadLocale();
   }
 
   Locale? get locale => _locale;
@@ -19,7 +19,6 @@ class LocaleProvider extends ChangeNotifier {
       _locale = Locale(languageCode);
       notifyListeners();
     }
-    // Якщо null, _locale залишиться null, і додаток використає мову системи
   }
 
   Future<void> setLocale(Locale newLocale) async {
@@ -28,11 +27,11 @@ class LocaleProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_localeKey, newLocale.languageCode);
     
-    notifyListeners(); // Повідомляємо всім віджетам, що треба перебудуватися
+    notifyListeners();
   }
 
   void clearLocale() async {
-    _locale = null; // Скидаємо до мови системи
+    _locale = null;
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove(_localeKey);
     notifyListeners();

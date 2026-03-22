@@ -806,6 +806,54 @@ abstract class AppLocalizations {
   /// **'Unique Number is required'**
   String get uniqueNumberRequired;
 
+  /// No description provided for @columnName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get columnName;
+
+  /// No description provided for @columnQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Quantity'**
+  String get columnQuantity;
+
+  /// No description provided for @reasonCurrentDeficit.
+  ///
+  /// In en, this message translates to:
+  /// **'Current deficit'**
+  String get reasonCurrentDeficit;
+
+  /// No description provided for @reasonPeriodExpenses.
+  ///
+  /// In en, this message translates to:
+  /// **'Period expenses'**
+  String get reasonPeriodExpenses;
+
+  /// No description provided for @columnUnit.
+  ///
+  /// In en, this message translates to:
+  /// **'Unit'**
+  String get columnUnit;
+
+  /// No description provided for @columnReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Reason'**
+  String get columnReason;
+
+  /// No description provided for @reasonExpiredInKits.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired in kits'**
+  String get reasonExpiredInKits;
+
+  /// No description provided for @reasonWrittenOffPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Written off for the period'**
+  String get reasonWrittenOffPeriod;
+
   /// No description provided for @ownershipAndLocation.
   ///
   /// In en, this message translates to:

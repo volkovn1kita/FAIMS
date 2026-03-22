@@ -136,7 +136,7 @@ public class ReportingService : IReportingService
                 MedicationName = g.Key.Name,
                 Quantity = g.Sum(m => m.MinimumQuantity - m.Quantity),
                 Unit = g.Key.Unit,
-                Reason = "Поточний дефіцит"
+                Reason = "current_deficit"
             });
             
         reportItems.AddRange(deficitItems);
@@ -157,7 +157,7 @@ public class ReportingService : IReportingService
                     MedicationName = g.Key.MedicationName,
                     Quantity = netNeed,
                     Unit = g.Key.Unit,
-                    Reason = "Витрати за період"
+                    Reason = "period_expenses"
                 };
             })
             .Where(r => r.Quantity > 0);
@@ -194,7 +194,7 @@ public class ReportingService : IReportingService
                 MedicationName = med.Name,
                 Quantity = med.Quantity,
                 Unit = med.Unit.ToString(),
-                Reason = "Протерміновано в аптечках"
+                Reason = "expired_in_kits"
             });
         }
 
@@ -207,7 +207,7 @@ public class ReportingService : IReportingService
                 MedicationName = g.Key.MedicationName,
                 Quantity = g.Sum(j => Math.Abs(j.Quantity)),
                 Unit = g.Key.Unit,
-                Reason = "Списано за період"
+                Reason = "written_off_period"
             });
 
         reportItems.AddRange(writtenOffJournals);

@@ -1,4 +1,4 @@
-using Application.Interfaces; // Інтерфейс з Application
+using Application.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,7 +13,6 @@ namespace Backend.Services
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<ExpirationCheckHostedService> _logger;
         
-        // 24 години
         private readonly TimeSpan _checkInterval = TimeSpan.FromHours(24);
 
         public ExpirationCheckHostedService(IServiceProvider serviceProvider, ILogger<ExpirationCheckHostedService> logger)
@@ -30,13 +29,10 @@ namespace Backend.Services
             {
                 try
                 {
-                    // Створюємо Scope, бо сервіси Application зазвичай Scoped
                     using (var scope = _serviceProvider.CreateScope())
                     {
-                        // 1. Отримуємо наш новий сервіс з Application шару
                         var alertService = scope.ServiceProvider.GetRequiredService<IExpirationAlertService>();
                         
-                        // 2. Викликаємо метод (вся логіка тепер там)
                         await alertService.CheckAndNotifyExpiringMedicationsAsync();
                     }
                 }
@@ -44,8 +40,6 @@ namespace Backend.Services
                 {
                     _logger.LogError(ex, "❌ Error in Background Service.");
                 }
-
-                // Чекаємо наступного разу
                 await Task.Delay(_checkInterval, stoppingToken);
             }
         }

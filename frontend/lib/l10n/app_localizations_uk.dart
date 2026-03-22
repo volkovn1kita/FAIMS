@@ -377,6 +377,30 @@ class AppLocalizationsUk extends AppLocalizations {
   String get uniqueNumberRequired => 'Унікальний номер є обов\'язковим';
 
   @override
+  String get columnName => 'Назва';
+
+  @override
+  String get columnQuantity => 'Кількість';
+
+  @override
+  String get reasonCurrentDeficit => 'Поточний дефіцит';
+
+  @override
+  String get reasonPeriodExpenses => 'Витрати за період';
+
+  @override
+  String get columnUnit => 'Одиниці';
+
+  @override
+  String get columnReason => 'Причина';
+
+  @override
+  String get reasonExpiredInKits => 'Протерміновано в аптечках';
+
+  @override
+  String get reasonWrittenOffPeriod => 'Списано за період';
+
+  @override
   String get ownershipAndLocation => 'Власник та локація';
 
   @override

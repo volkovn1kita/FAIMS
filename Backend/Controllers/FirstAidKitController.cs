@@ -162,5 +162,20 @@ namespace Backend.Controllers
             return NoContent();
         }
 
+        [HttpGet("test-alerts")]
+        [AllowAnonymous]
+        public async Task<IActionResult> TriggerAlertsNow([FromServices] IExpirationAlertService alertService)
+        {
+            try 
+            {
+                await alertService.CheckAndNotifyExpiringMedicationsAsync();
+                return Ok("✅ Пуші успішно відправлені! Перевір телефон.");
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"❌ ПОМИЛКА: {ex.Message} \n\n Стек: {ex.StackTrace}");
+            }
+        }
+
     }
 }

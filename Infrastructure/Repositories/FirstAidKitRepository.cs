@@ -155,13 +155,28 @@ public class FirstAidKitRepository : IFirstAidKitRepository
     }
 
     public async Task<IEnumerable<Medication>> GetMedicationsExpiringOnDateWithUsersAsync(DateTime date)
-        {
-            return await _dbContext.Medications
-                .IgnoreQueryFilters()
-                .Include(m => m.FirstAidKit)
-                    .ThenInclude(k => k.ResponsibleUser)
-                .Where(m => m.ExpirationDate.Date == date.Date)
-                .ToListAsync();
-        }
+    {
+        var targetUtc = DateTime.SpecifyKind(date.Date, DateTimeKind.Utc);
+        
+        var startWindow = targetUtc.AddHours(-12);
+        var endWindow = targetUtc.AddHours(36);
+
+        return await _dbContext.Medications
+            .IgnoreQueryFilters()
+            .Include(m => m.FirstAidKit)
+            .ThenInclude(k => k.ResponsibleUser)
+            .Where(m => m.ExpirationDate >= startWindow && m.ExpirationDate <= endWindow)
+            .ToListAsync();
+    }
+    
+    public async Task<IEnumerable<Medication>> GetLowStockMedicationsWithUsersAsync()
+    {
+        return await _dbContext.Medications
+            .IgnoreQueryFilters()
+            .Include(m => m.FirstAidKit)
+            .ThenInclude(k => k.ResponsibleUser)
+            .Where(m => m.Quantity < m.MinimumQuantity)
+            .ToListAsync();
+    }
 
 }

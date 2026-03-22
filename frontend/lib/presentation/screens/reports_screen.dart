@@ -4,6 +4,8 @@ import 'package:intl/intl.dart';
 import 'package:frontend/data/dtos/report_item_dto.dart';
 import 'package:frontend/domain/repositories/reports_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
+import 'package:frontend/utils/pdf_generator.dart';
+import 'package:printing/printing.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -99,6 +101,58 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
     }
   }
 
+  String _translateReason(String reasonKey, AppLocalizations l10n) {
+    switch (reasonKey) {
+      case 'current_deficit': return l10n.reasonCurrentDeficit;
+      case 'period_expenses': return l10n.reasonPeriodExpenses;
+      case 'expired_in_kits': return l10n.reasonExpiredInKits;
+      case 'written_off_period': return l10n.reasonWrittenOffPeriod;
+      default: return reasonKey;
+    }
+  }
+
+  Future<void> _exportPdf(AppLocalizations l10n) async {
+    final isPurchaseTab = _tabController.index == 0;
+    final items = isPurchaseTab ? _purchaseList : _disposalList;
+    final title = isPurchaseTab ? l10n.forPurchase : l10n.forDisposal;
+
+    if (items.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.listIsEmpty)),
+      );
+      return;
+    }
+
+    try {
+      final headers = [l10n.columnName, l10n.columnQuantity, l10n.columnUnit, l10n.columnReason];
+      
+      final tableData = items.map((item) {
+        return [
+          item.medicationName,
+          '+${item.quantity}',
+          item.unit,
+          _translateReason(item.reason, l10n),
+        ];
+      }).toList();
+
+      final pdfBytes = await PdfGenerator.generateReport(
+        title: title,
+        tableData: tableData,
+        headers: headers,
+        startDate: _startDate,
+        endDate: _endDate,
+      );
+      
+      final filename = '${isPurchaseTab ? "purchase" : "disposal"}_report.pdf';
+      await Printing.sharePdf(bytes: pdfBytes, filename: filename);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error generating PDF: $e'), backgroundColor: Colors.red),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -188,11 +242,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(l10n.pdfGenerationInProgress)),
-          );
-        },
+        onPressed: () => _exportPdf(l10n),
         backgroundColor: purple,
         icon: const Icon(Icons.picture_as_pdf_rounded, color: Colors.white),
         label: Text(
@@ -218,6 +268,8 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
+        final translatedReason = _translateReason(item.reason, l10n);
+
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
@@ -257,7 +309,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      l10n.forSelectedPeriod,
+                      translatedReason,
                       style: GoogleFonts.notoSans(
                         fontSize: 13,
                         color: Colors.grey.shade500,

@@ -377,6 +377,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get uniqueNumberRequired => 'Unique Number is required';
 
   @override
+  String get columnName => 'Name';
+
+  @override
+  String get columnQuantity => 'Quantity';
+
+  @override
+  String get reasonCurrentDeficit => 'Current deficit';
+
+  @override
+  String get reasonPeriodExpenses => 'Period expenses';
+
+  @override
+  String get columnUnit => 'Unit';
+
+  @override
+  String get columnReason => 'Reason';
+
+  @override
+  String get reasonExpiredInKits => 'Expired in kits';
+
+  @override
+  String get reasonWrittenOffPeriod => 'Written off for the period';
+
+  @override
   String get ownershipAndLocation => 'Ownership & location';
 
   @override

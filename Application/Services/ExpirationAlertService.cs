@@ -24,13 +24,25 @@ namespace Application.Services
 
         public async Task CheckAndNotifyExpiringMedicationsAsync()
         {
-            var targetDate = DateTime.UtcNow.Date.AddDays(7);
+            var today = DateTime.SpecifyKind(DateTime.UtcNow.Date, DateTimeKind.Utc);
+            var in7Days = DateTime.SpecifyKind(today.AddDays(7), DateTimeKind.Utc);
+            var in30Days = DateTime.SpecifyKind(today.AddDays(30), DateTimeKind.Utc);
+
+            await ProcessExpirationAlertsAsync(in30Days, "Термін дії закінчується через 30 днів", "через місяць");
+            await Task.Delay(500); 
             
-            _logger.LogInformation($"Checking expiration for date: {targetDate:yyyy-MM-dd}");
+            await ProcessExpirationAlertsAsync(in7Days, "Термін дії закінчується через 7 днів", "через тиждень");
+            await Task.Delay(500);
+            
+            await ProcessExpirationAlertsAsync(today, "Термін дії вичерпано", "сьогодні");
+            await Task.Delay(500);
+            
+            await ProcessLowStockAlertsAsync();
+        }
 
-            // Використовуємо твій новий метод з репозиторію
+        private async Task ProcessExpirationAlertsAsync(DateTime targetDate, string title, string timeFrame)
+        {
             var expiringMeds = await _repository.GetMedicationsExpiringOnDateWithUsersAsync(targetDate);
-
             if (!expiringMeds.Any()) return;
 
             var medsByUser = expiringMeds
@@ -41,19 +53,38 @@ namespace Application.Services
             {
                 var user = group.Key;
                 var count = group.Count();
-                var itemName = group.First().Name;
+                var firstItem = group.First();
+                var kitName = firstItem.FirstAidKit?.Name ?? "Аптечка";
 
                 string body = count == 1 
-                    ? $"Термін придатності '{itemName}' спливає через тиждень!" 
-                    : $"Увага! {count} препаратів зіпсуються через тиждень.";
+                    ? $"Термін придатності '{firstItem.Name}' в '{kitName}' спливає {timeFrame}!" 
+                    : $"Увага! {count} препаратів у '{kitName}' зіпсуються {timeFrame}.";
 
-                _logger.LogInformation($"Sending alert to {user.Email}");
+                await _notificationService.SendNotificationAsync(user.FcmToken!, $"⚠️ {title}", body);
+            }
+        }
 
-                await _notificationService.SendNotificationAsync(
-                    user.FcmToken!,
-                    "⚠️ Перевірка аптечки",
-                    body
-                );
+        private async Task ProcessLowStockAlertsAsync()
+        {
+            var lowStockMeds = await _repository.GetLowStockMedicationsWithUsersAsync();
+            if (!lowStockMeds.Any()) return;
+
+            var medsByUser = lowStockMeds
+                .Where(m => m.FirstAidKit?.ResponsibleUser?.FcmToken != null)
+                .GroupBy(m => m.FirstAidKit!.ResponsibleUser!);
+
+            foreach (var group in medsByUser)
+            {
+                var user = group.Key;
+                var count = group.Count();
+                var firstItem = group.First();
+                var kitName = firstItem.FirstAidKit?.Name ?? "Аптечка";
+
+                string body = count == 1 
+                    ? $"Дефіцит: '{firstItem.Name}' в '{kitName}' (залишок: {firstItem.Quantity} з {firstItem.MinimumQuantity})." 
+                    : $"Увага! {count} препаратів у '{kitName}' в дефіциті. Поповніть запаси.";
+
+                await _notificationService.SendNotificationAsync(user.FcmToken!, "📉 Дефіцит препаратів", body);
             }
         }
     }
