@@ -5,6 +5,7 @@ using Domain.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -14,6 +15,7 @@ namespace Backend.Controllers
 {
     [Route("api/users")]
     [ApiController]
+    [EnableRateLimiting("ApiPolicy")]
     [Authorize]
     public class UserController : ControllerBase
     {
@@ -27,6 +29,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("login")]
+        [EnableRateLimiting("AuthPolicy")]
         [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] UserLoginDto dto)
         {
@@ -39,6 +42,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("register-organization")]
+        [EnableRateLimiting("AuthPolicy")]
         [AllowAnonymous]
         public async Task<IActionResult> RegisterOrganization([FromBody] RegisterOrganizationDto dto)
         {

@@ -5,11 +5,13 @@ using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Backend.Controllers
 {
     [Route("api/kits")]
     [ApiController]
+    [EnableRateLimiting("ApiPolicy")]
     [Authorize]
     public class FirstAidKitController : ControllerBase
     {
@@ -37,14 +39,12 @@ namespace Backend.Controllers
 
             if (currentUserRole != nameof(UserRole.Administrator) && responsibleUserId == null)
             {
-                responsibleUserId = currentUserId; // Автоматично фільтруємо за поточним користувачем
+                responsibleUserId = currentUserId; 
             }
             else if (currentUserRole != nameof(UserRole.Administrator) && responsibleUserId != currentUserId)
             {
-                // Якщо не адміністратор намагається фільтрувати за чужим ID
                 return Forbid("You are not authorized to view kits not assigned to you.");
             }
-
 
             var kits = await _kitService.GetFilteredFirstAidKitsAsync(searchTerm, statusFilter, responsibleUserId, departmentId);
             return Ok(kits);
@@ -62,7 +62,6 @@ namespace Backend.Controllers
 
             return Ok(kit);
         }
-
 
         [HttpGet("{id}")]
         [Authorize(Roles = nameof(UserRole.Administrator) + "," + nameof(UserRole.User))]
@@ -96,8 +95,6 @@ namespace Backend.Controllers
             return NoContent();
         }
 
-        // MEDICATIONS
-
         [HttpGet("{kitId}/medications")]
         [Authorize(Roles = nameof(UserRole.Administrator) + "," + nameof(UserRole.User))]
         public async Task<IActionResult> GetMedicationsByKit(Guid kitId)
@@ -115,7 +112,7 @@ namespace Backend.Controllers
         }
 
         [HttpPost("medications")]
-        [Authorize(Roles = nameof(UserRole.Administrator) + "," + nameof(UserRole.User))] // Дозволити обом ролям додавати (поповнювати)
+        [Authorize(Roles = nameof(UserRole.Administrator) + "," + nameof(UserRole.User))]
         public async Task<IActionResult> AddMedication([FromBody] MedicationCreateDto dto)
         {
             var medicationId = await _kitService.AddMedicationAsync(dto);
@@ -140,7 +137,7 @@ namespace Backend.Controllers
 
         [HttpPost("medications/{medicationId}/use")]
         [Authorize(Roles = nameof(UserRole.Administrator) + "," + nameof(UserRole.User))]
-        public async Task<IActionResult> UseMedication(Guid medicationId, [FromBody] MedicationQuantityUpdateDto dto) // Вам потрібно буде створити цей DTO
+        public async Task<IActionResult> UseMedication(Guid medicationId, [FromBody] MedicationQuantityUpdateDto dto) 
         {
             await _kitService.UseMedicationAsync(medicationId, dto.Quantity);
             return NoContent();
@@ -148,7 +145,7 @@ namespace Backend.Controllers
 
         [HttpPost("medications/{medicationId}/write-off")]
         [Authorize(Roles = nameof(UserRole.Administrator) + "," + nameof(UserRole.User))]
-        public async Task<IActionResult> WriteOffMedication(Guid medicationId, [FromBody] MedicationWriteOffDto dto) // Вам потрібно буде створити цей DTO
+        public async Task<IActionResult> WriteOffMedication(Guid medicationId, [FromBody] MedicationWriteOffDto dto) 
         {
             await _kitService.WriteOffMedicationAsync(medicationId, dto.Quantity, dto.Reason);
             return NoContent();
@@ -176,6 +173,5 @@ namespace Backend.Controllers
                 return BadRequest($"❌ ПОМИЛКА: {ex.Message} \n\n Стек: {ex.StackTrace}");
             }
         }
-
     }
 }

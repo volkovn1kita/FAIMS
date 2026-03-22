@@ -3,12 +3,14 @@ using Application.Interfaces;
 using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System;
 using System.Threading.Tasks;
 
 namespace Backend.Controllers
 {
     [Route("api/reports")]
+    [EnableRateLimiting("ApiPolicy")]
     [ApiController]
     [Authorize(Roles = nameof(UserRole.Administrator))]
     public class ReportingController : ControllerBase

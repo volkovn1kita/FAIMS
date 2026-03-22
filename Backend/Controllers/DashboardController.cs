@@ -3,10 +3,12 @@ using Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace Backend.Controllers
 {
     [Route("api/[controller]")]
+    [EnableRateLimiting("ApiPolicy")]
     [ApiController]
     [Authorize(Roles = nameof(UserRole.Administrator))]
     public class DashboardController : ControllerBase

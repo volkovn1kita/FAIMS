@@ -13,12 +13,35 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Backend.Services;
 using Backend.Middleware;
+using System.Threading.RateLimiting;
+using Microsoft.AspNetCore.RateLimiting;
+
 var builder = WebApplication.CreateBuilder(args);
 
 var connectionString = builder.Configuration.GetConnectionString("PostgreSqlConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString)
 );
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+
+    options.AddFixedWindowLimiter("AuthPolicy", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 5;
+        opt.QueueLimit = 0;
+    });
+
+    options.AddFixedWindowLimiter("ApiPolicy", opt =>
+    {
+        opt.Window = TimeSpan.FromMinutes(1);
+        opt.PermitLimit = 150;
+        opt.QueueLimit = 5;
+        opt.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+    });
+});
 
 builder.Services.AddControllers();
 
@@ -31,8 +54,6 @@ builder.Services.AddCors(options =>
               .AllowAnyHeader();
     });
 });
-
-builder.Services.AddControllers();
 
 builder.Services.AddSwaggerGen(options =>
 {
@@ -49,7 +70,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Вставте JWT токен у форматі: Bearer {токен}"
+        Description = "Bearer {token}"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -63,18 +84,18 @@ builder.Services.AddSwaggerGen(options =>
                     Id = "Bearer"
                 }
             },
-            new string[] {}
+            Array.Empty<string>()
         }
     });
 });
 
-// Repositories DI
 builder.Services.AddScoped<IFirstAidKitRepository, FirstAidKitRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IJournalRepository, JournalRepository>();
+builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+builder.Services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
 
-//Services DI
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
@@ -83,9 +104,7 @@ builder.Services.AddScoped<IMonitoringService, MonitoringService>();
 builder.Services.AddScoped<IDepartmentService, DepartmentService>();
 builder.Services.AddScoped<IReportingService, ReportingService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
-builder.Services.AddScoped<IAnalyticsRepository, AnalyticsRepository>();
 builder.Services.AddScoped<IAnalyticsService, AnalyticsService>();
-builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
 
 builder.Services.AddHostedService<ExpirationCheckHostedService>();
 
@@ -121,7 +140,6 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
-
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
 var app = builder.Build();
@@ -134,17 +152,20 @@ if (app.Environment.IsDevelopment())
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "First Aid Kit API V1");
     });
 }
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
 app.UseRouting();
+
+app.UseRateLimiter(); 
+
 app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-app.UseStaticFiles(); // Дозволяє віддавати файли з папки wwwroot
+app.UseStaticFiles();
 
-// Створюємо папку "avatars" всередині "wwwroot", якщо вона не існує
 var avatarsPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot", "avatars");
 if (!Directory.Exists(avatarsPath))
 {
