@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend/data/dtos/report_item_dto.dart';
 import 'package:frontend/domain/repositories/reports_repository.dart';
@@ -82,7 +82,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: const ColorScheme.light(
-              primary: Color.fromARGB(255, 143, 88, 225),
+              primary: AppTheme.primary,
               onPrimary: Colors.white,
               onSurface: Colors.black87,
             ),
@@ -156,7 +156,6 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    const purple = Color.fromARGB(255, 143, 88, 225);
     final dateformat = DateFormat('dd.MM.yyyy');
 
     return Scaffold(
@@ -171,7 +170,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
         ),
         title: Text(
           l10n.reportsAndLists,
-          style: GoogleFonts.notoSans(
+          style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
@@ -179,12 +178,12 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
         ),
         bottom: TabBar(
           controller: _tabController,
-          labelColor: purple,
+          labelColor: AppTheme.primary,
           unselectedLabelColor: Colors.grey.shade500,
-          indicatorColor: purple,
+          indicatorColor: AppTheme.primary,
           indicatorWeight: 3,
-          labelStyle: GoogleFonts.notoSans(fontWeight: FontWeight.bold, fontSize: 15),
-          unselectedLabelStyle: GoogleFonts.notoSans(fontWeight: FontWeight.w600, fontSize: 15),
+          labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
           tabs: [
             Tab(text: l10n.forPurchase),
             Tab(text: l10n.forDisposal),
@@ -202,25 +201,25 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: purple.withValues(alpha: 0.05),
+                  color: AppTheme.primary.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: purple.withValues(alpha: 0.1)),
+                  border: Border.all(color: AppTheme.primary.withValues(alpha: 0.1)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.calendar_month_rounded, color: purple, size: 22),
+                    const Icon(Icons.calendar_month_rounded, color: AppTheme.primary, size: 22),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         '${dateformat.format(_startDate)} - ${dateformat.format(_endDate)}',
-                        style: GoogleFonts.notoSans(
-                          color: purple,
+                        style: TextStyle(
+                          color: AppTheme.primary,
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
                         ),
                       ),
                     ),
-                    Icon(Icons.keyboard_arrow_down_rounded, color: purple.withValues(alpha: 0.7)),
+                    Icon(Icons.keyboard_arrow_down_rounded, color: AppTheme.primary.withValues(alpha: 0.7)),
                   ],
                 ),
               ),
@@ -228,7 +227,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
           ),
           Expanded(
             child: _isLoading
-                ? const Center(child: CircularProgressIndicator(color: purple))
+                ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
                 : _errorMessage.isNotEmpty
                     ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red)))
                     : TabBarView(
@@ -243,11 +242,11 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _exportPdf(l10n),
-        backgroundColor: purple,
+        backgroundColor: AppTheme.primary,
         icon: const Icon(Icons.picture_as_pdf_rounded, color: Colors.white),
         label: Text(
           l10n.export,
-          style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
         ),
       ),
     );
@@ -258,7 +257,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
       return Center(
         child: Text(
           l10n.listIsEmpty,
-          style: GoogleFonts.notoSans(color: Colors.grey, fontSize: 16),
+          style: TextStyle(color: Colors.grey, fontSize: 16),
         ),
       );
     }
@@ -301,7 +300,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                   children: [
                     Text(
                       item.medicationName,
-                      style: GoogleFonts.notoSans(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
@@ -310,7 +309,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     const SizedBox(height: 4),
                     Text(
                       translatedReason,
-                      style: GoogleFonts.notoSans(
+                      style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade500,
                       ),
@@ -323,7 +322,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                 children: [
                   Text(
                     '+${item.quantity}',
-                    style: GoogleFonts.notoSans(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
                       color: Colors.black87,
@@ -331,7 +330,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                   ),
                   Text(
                     item.unit,
-                    style: GoogleFonts.notoSans(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: Colors.grey.shade500,

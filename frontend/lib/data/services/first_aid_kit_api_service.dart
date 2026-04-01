@@ -95,12 +95,16 @@ class FirstAidKitApiService {
     String? statusFilter,
     String? responsibleUserId,
     String? departmentId,
+    int pageNumber = 1,
+    int pageSize = 20,
   }) async {
     final Map<String, String> queryParams = {};
     if (searchTerm != null && searchTerm.isNotEmpty) queryParams['searchTerm'] = searchTerm;
     if (statusFilter != null && statusFilter.isNotEmpty) queryParams['statusFilter'] = statusFilter;
     if (responsibleUserId != null && responsibleUserId.isNotEmpty && responsibleUserId != 'All') queryParams['responsibleUserId'] = responsibleUserId;
     if (departmentId != null && departmentId.isNotEmpty && departmentId != 'All') queryParams['departmentId'] = departmentId;
+    queryParams['pageNumber'] = pageNumber.toString();
+    queryParams['pageSize'] = pageSize.toString();
 
     final Uri uri = Uri.parse('$_baseUrl/kits').replace(queryParameters: queryParams);
     try {

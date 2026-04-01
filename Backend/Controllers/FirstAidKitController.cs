@@ -32,21 +32,23 @@ namespace Backend.Controllers
             [FromQuery] string? searchTerm,
             [FromQuery] string? statusFilter,
             [FromQuery] Guid? responsibleUserId,
-            [FromQuery] Guid? departmentId)
+            [FromQuery] Guid? departmentId,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 20)
         {
             var currentUserId = _currentUserService.GetUserId();
             var currentUserRole = _currentUserService.GetUserRole();
 
             if (currentUserRole != nameof(UserRole.Administrator) && responsibleUserId == null)
             {
-                responsibleUserId = currentUserId; 
+                responsibleUserId = currentUserId;
             }
             else if (currentUserRole != nameof(UserRole.Administrator) && responsibleUserId != currentUserId)
             {
                 return Forbid("You are not authorized to view kits not assigned to you.");
             }
 
-            var kits = await _kitService.GetFilteredFirstAidKitsAsync(searchTerm, statusFilter, responsibleUserId, departmentId);
+            var kits = await _kitService.GetFilteredFirstAidKitsAsync(searchTerm, statusFilter, responsibleUserId, departmentId, pageNumber, pageSize);
             return Ok(kits);
         }
 

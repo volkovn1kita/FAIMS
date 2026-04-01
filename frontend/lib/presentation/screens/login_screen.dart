@@ -1,12 +1,11 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/screens/register_organization_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
 import '../../data/dtos/login_dto.dart';
 import '../../domain/repositories/auth_repository.dart';
-import 'home_screen.dart';
-import 'user_home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,8 +22,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = true;
   String _errorMessage = '';
   bool _isPasswordVisible = false;
-
-  static const _primaryColor = Color.fromARGB(255, 143, 88, 225);
 
   @override
   void initState() {
@@ -50,11 +47,11 @@ class _LoginScreenState extends State<LoginScreen> {
       final token = await _authRepository.getToken();
       if (token != null && token.isNotEmpty) {
         final payload = _decodeJwt(token);
-        
+
         final role = payload['role'] ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
-        
+
         final savedName = await _authRepository.getName();
-        
+
         String name = savedName ?? '';
 
         if (name.isEmpty) {
@@ -69,13 +66,9 @@ class _LoginScreenState extends State<LoginScreen> {
         if (role != null) {
           if (!mounted) return;
           if (role == 'Administrator') {
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => HomeScreen(userName: name, userRole: role),
-            ));
+            context.go('/home', extra: {'userName': name, 'userRole': role});
           } else {
-            Navigator.of(context).pushReplacement(MaterialPageRoute(
-              builder: (context) => UserHomeScreen(userName: name),
-            ));
+            context.go('/user-home', extra: name);
           }
           return;
         }
@@ -114,18 +107,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (authResult.role == 'Administrator') {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => HomeScreen(
-            userName: authResult.name ?? authResult.email.split('@')[0],
-            userRole: authResult.role,
-          ),
-        ));
+        context.go('/home', extra: {
+          'userName': authResult.name ?? authResult.email.split('@')[0],
+          'userRole': authResult.role,
+        });
       } else {
-        Navigator.of(context).pushReplacement(MaterialPageRoute(
-          builder: (context) => UserHomeScreen(
-            userName: authResult.name ?? authResult.email.split('@')[0],
-          ),
-        ));
+        context.go('/user-home', extra: authResult.name ?? authResult.email.split('@')[0]);
       }
     } catch (e) {
       if (!mounted) return;
@@ -151,7 +138,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return const Scaffold(
         backgroundColor: Colors.white,
         body: Center(
-          child: CircularProgressIndicator(color: _primaryColor),
+          child: CircularProgressIndicator(color: AppTheme.primary),
         ),
       );
     }
@@ -169,29 +156,29 @@ class _LoginScreenState extends State<LoginScreen> {
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: _primaryColor.withValues(alpha: 0.1),
+                    color: AppTheme.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.medical_services_rounded,
                     size: 56,
-                    color: _primaryColor,
+                    color: AppTheme.primary,
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text(
+                const Text(
                   'FAIMS',
-                  style: GoogleFonts.notoSans(
+                  style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w900,
-                    color: _primaryColor,
+                    color: AppTheme.primary,
                     letterSpacing: 2.5,
                   ),
                 ),
                 const SizedBox(height: 40),
                 Text(
                   l10n.welcomeBack,
-                  style: GoogleFonts.notoSans(
+                  style: const TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -200,7 +187,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 8),
                 Text(
                   l10n.signInLabel,
-                  style: GoogleFonts.notoSans(
+                  style: TextStyle(
                     fontSize: 15,
                     color: Colors.grey.shade500,
                   ),
@@ -229,7 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _primaryColor,
+                      backgroundColor: AppTheme.primary,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
@@ -241,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           )
                         : Text(
                             l10n.login,
-                            style: GoogleFonts.notoSans(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                            style: const TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),
@@ -263,7 +250,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Flexible(
                             child: Text(
                               _errorMessage,
-                              style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w600, fontSize: 13),
+                              style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w600, fontSize: 13),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -277,7 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   children: [
                     Text(
                       l10n.newClinicQuestion,
-                      style: GoogleFonts.notoSans(
+                      style: TextStyle(
                         color: Colors.grey.shade600,
                         fontSize: 14,
                       ),
@@ -296,10 +283,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: Text(
-                        l10n.registerButtonText,
-                        style: GoogleFonts.notoSans(
-                          color: _primaryColor,
+                      child: const Text(
+                        'Register',
+                        style: TextStyle(
+                          color: AppTheme.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
                         ),
@@ -330,14 +317,14 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
           ),
         ),
         TextField(
           controller: controller,
           obscureText: isPassword && !_isPasswordVisible,
           keyboardType: keyboardType,
-          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          style: const TextStyle(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
@@ -365,7 +352,7 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
             ),
           ),
         ),

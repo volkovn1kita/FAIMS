@@ -10,9 +10,9 @@ import 'package:frontend/domain/repositories/auth_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/screens/my_profile_screen.dart';
 import 'package:frontend/presentation/screens/settings_screen.dart';
-import 'package:frontend/presentation/screens/login_screen.dart';
 import 'package:frontend/core/extensions.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend/data/dtos/expiration_status.dart';
 import 'package:frontend/data/dtos/measurement_unit.dart';
@@ -42,10 +42,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   final Set<ExpirationStatus> _statusFilters = {};
   bool _filterLowStock = false;
 
-  static const _purple = Color(0xFF8F58E1);
-  static const _purpleLight = Color(0xFFF5F3FF);
-  static const _purpleBorder = Color(0xFFE8E0FF);
-  static const _purpleLabel = Color(0xFF9E86C8);
 
   @override
   void initState() {
@@ -139,19 +135,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         labelText: label,
         suffixText: suffix,
         filled: true,
-        fillColor: _purpleLight,
-        labelStyle: const TextStyle(color: _purpleLabel, fontSize: 14),
+        fillColor: AppTheme.primaryContainer,
+        labelStyle: const TextStyle(color: AppTheme.primaryLabel, fontSize: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: _purpleBorder, width: 1.5),
+          borderSide: const BorderSide(color: AppTheme.primaryBorder, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: _purple, width: 2),
+          borderSide: const BorderSide(color: AppTheme.primary, width: 2),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -183,7 +179,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.notoSans(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: Colors.black87,
@@ -247,7 +243,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             ),
             child: Text(
               label,
-              style: GoogleFonts.notoSans(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -297,19 +293,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               _sheetTitle(
                 l10n.useMedicationTitle(medication.name),
                 Icons.medication_liquid_rounded,
-                _purple,
+                AppTheme.primary,
               ),
               const SizedBox(height: 20),
               _infoRow(
                 Icons.inventory_2_outlined,
                 '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
-                _purple,
+                AppTheme.primary,
               ),
               const SizedBox(height: 20),
               TextField(
                 controller: quantityController,
                 keyboardType: TextInputType.number,
-                style: GoogleFonts.notoSans(
+                style: TextStyle(
                     fontWeight: FontWeight.w600, fontSize: 15),
                 decoration: _inputStyle(
                   l10n.quantityToUse,
@@ -317,7 +313,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ),
               ),
               const SizedBox(height: 28),
-              _buildActionBtn(l10n.use, _purple, () {
+              _buildActionBtn(l10n.use, AppTheme.primary, () {
                 confirmed = true;
                 Navigator.pop(ctx);
               }),
@@ -372,19 +368,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   _sheetTitle(
                     l10n.refillMedicationTitle(medication.name),
                     Icons.add_shopping_cart_rounded,
-                    _purple,
+                    AppTheme.primary,
                   ),
                   const SizedBox(height: 20),
                   _infoRow(
                     Icons.info_outline_rounded,
                     '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
-                    _purple,
+                    AppTheme.primary,
                   ),
                   const SizedBox(height: 20),
                   TextField(
                     controller: qController,
                     keyboardType: TextInputType.number,
-                    style: GoogleFonts.notoSans(
+                    style: TextStyle(
                         fontWeight: FontWeight.w600, fontSize: 15),
                     decoration: _inputStyle(
                       l10n.quantity,
@@ -403,7 +399,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         builder: (context, child) => Theme(
                           data: Theme.of(context).copyWith(
                             colorScheme: const ColorScheme.light(
-                              primary: _purple,
+                              primary: AppTheme.primary,
                               onSurface: Colors.black87,
                             ),
                           ),
@@ -416,14 +412,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                        color: _purpleLight,
+                        color: AppTheme.primaryContainer,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                            color: _purpleBorder, width: 1.5),
+                            color: AppTheme.primaryBorder, width: 1.5),
                       ),
                       child: Row(children: [
                         const Icon(Icons.calendar_today_rounded,
-                            size: 18, color: _purpleLabel),
+                            size: 18, color: AppTheme.primaryLabel),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -434,12 +430,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 l10n.newExpirationDate,
                                 style: const TextStyle(
                                     fontSize: 11,
-                                    color: _purpleLabel,
+                                    color: AppTheme.primaryLabel,
                                     fontWeight: FontWeight.w500),
                               ),
                               Text(
                                 DateFormat('dd.MM.yyyy').format(date),
-                                style: GoogleFonts.notoSans(
+                                style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black87,
@@ -449,12 +445,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                           ),
                         ),
                         const Icon(Icons.chevron_right_rounded,
-                            color: _purpleLabel),
+                            color: AppTheme.primaryLabel),
                       ]),
                     ),
                   ),
                   const SizedBox(height: 28),
-                  _buildActionBtn(l10n.refill, _purple, () {
+                  _buildActionBtn(l10n.refill, AppTheme.primary, () {
                     confirmed = true;
                     Navigator.pop(ctx);
                   }),
@@ -523,7 +519,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               TextField(
                 controller: qController,
                 keyboardType: TextInputType.number,
-                style: GoogleFonts.notoSans(
+                style: TextStyle(
                     fontWeight: FontWeight.w600, fontSize: 15),
                 decoration: _inputStyle(
                   l10n.quantityToWriteOff,
@@ -534,7 +530,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               TextField(
                 controller: rController,
                 maxLines: 3,
-                style: GoogleFonts.notoSans(fontSize: 14),
+                style: TextStyle(fontSize: 14),
                 decoration:
                     _inputStyle(l10n.reasonRequired, null).copyWith(
                   hintText: l10n.reasonHint,
@@ -600,13 +596,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   _sheetTitle(
                     l10n.addNewMedication,
                     Icons.add_circle_outline_rounded,
-                    _purple,
+                    AppTheme.primary,
                   ),
                   const SizedBox(height: 24),
                   TextField(
                     controller: nameC,
                     textCapitalization: TextCapitalization.sentences,
-                    style: GoogleFonts.notoSans(
+                    style: TextStyle(
                         fontWeight: FontWeight.w600, fontSize: 15),
                     decoration: _inputStyle(l10n.medicationName, null),
                   ),
@@ -616,7 +612,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       child: TextField(
                         controller: qC,
                         keyboardType: TextInputType.number,
-                        style: GoogleFonts.notoSans(
+                        style: TextStyle(
                             fontWeight: FontWeight.w600, fontSize: 15),
                         decoration: _inputStyle(l10n.quantity, null),
                       ),
@@ -626,7 +622,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       child: TextField(
                         controller: minC,
                         keyboardType: TextInputType.number,
-                        style: GoogleFonts.notoSans(
+                        style: TextStyle(
                             fontWeight: FontWeight.w600, fontSize: 15),
                         decoration: _inputStyle(l10n.minRequired, null),
                       ),
@@ -642,7 +638,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               value: u,
                               child: Text(
                                 u.name.capitalize(),
-                                style: GoogleFonts.notoSans(
+                                style: TextStyle(
                                     fontWeight: FontWeight.w500),
                               ),
                             ))
@@ -661,7 +657,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         builder: (context, child) => Theme(
                           data: Theme.of(context).copyWith(
                             colorScheme: const ColorScheme.light(
-                              primary: _purple,
+                              primary: AppTheme.primary,
                               onSurface: Colors.black87,
                             ),
                           ),
@@ -674,14 +670,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                        color: _purpleLight,
+                        color: AppTheme.primaryContainer,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                            color: _purpleBorder, width: 1.5),
+                            color: AppTheme.primaryBorder, width: 1.5),
                       ),
                       child: Row(children: [
                         const Icon(Icons.calendar_today_rounded,
-                            size: 18, color: _purple),
+                            size: 18, color: AppTheme.primary),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -692,12 +688,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 l10n.expirationDate,
                                 style: const TextStyle(
                                     fontSize: 11,
-                                    color: _purpleLabel,
+                                    color: AppTheme.primaryLabel,
                                     fontWeight: FontWeight.w500),
                               ),
                               Text(
                                 DateFormat('dd.MM.yyyy').format(date),
-                                style: GoogleFonts.notoSans(
+                                style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black87,
@@ -707,12 +703,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                           ),
                         ),
                         const Icon(Icons.chevron_right_rounded,
-                            color: _purpleLabel),
+                            color: AppTheme.primaryLabel),
                       ]),
                     ),
                   ),
                   const SizedBox(height: 28),
-                  _buildActionBtn(l10n.add, _purple, () {
+                  _buildActionBtn(l10n.add, AppTheme.primary, () {
                     confirmed = true;
                     Navigator.pop(ctx);
                   }),
@@ -770,20 +766,17 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         elevation: 0,
         centerTitle: true,
         title: Text('FAIMS',
-            style: GoogleFonts.notoSans(
+            style: TextStyle(
                 fontSize: 22,
                 fontWeight: FontWeight.w800,
-                color: _purple,
+                color: AppTheme.primary,
                 letterSpacing: 1.2)),
         leading: IconButton(
             icon: const Icon(Icons.logout_rounded, color: Colors.redAccent),
             onPressed: () async {
               await AuthRepository().logout();
               if (!context.mounted) return;
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => const LoginScreen()),
-                (Route<dynamic> route) => false,
-              );
+              context.go('/login');
             }),
         actions: [
           IconButton(
@@ -796,7 +789,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         ],
       ),
       body: _isLoading
-          ? const Center(child: CircularProgressIndicator(color: _purple))
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primary))
           : _errorMessage.isNotEmpty
               ? Center(
                   child: Padding(
@@ -807,7 +800,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 ))
               : RefreshIndicator(
                   onRefresh: _loadMyKitAndMedications,
-                  color: _purple,
+                  color: AppTheme.primary,
                   child: SingleChildScrollView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.symmetric(
@@ -837,7 +830,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                   Text(
                                     l10n.notAssignedToKit,
                                     textAlign: TextAlign.center,
-                                    style: GoogleFonts.notoSans(
+                                    style: TextStyle(
                                       fontSize: 16,
                                       color: Colors.grey.shade600,
                                       fontWeight: FontWeight.w500,
@@ -859,7 +852,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(l10n.welcomeUser(_userName),
-              style: GoogleFonts.notoSans(
+              style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -876,7 +869,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   size: 14, color: Colors.blue),
               const SizedBox(width: 6),
               Text(l10n.userRoleUser,
-                  style: GoogleFonts.notoSans(
+                  style: TextStyle(
                       fontSize: 12,
                       color: Colors.blue,
                       fontWeight: FontWeight.bold)),
@@ -888,16 +881,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   Widget _buildKitInfoCard(AppLocalizations l10n) => Container(
         decoration: BoxDecoration(
           gradient: const LinearGradient(
-              colors: [
-                Color.fromARGB(255, 163, 108, 245),
-                Color.fromARGB(255, 123, 68, 205)
-              ],
+              colors: [AppTheme.primaryLight, AppTheme.primaryDark],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight),
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-                color: _purple.withValues(alpha: 0.3),
+                color: AppTheme.primary.withValues(alpha: 0.3),
                 blurRadius: 15,
                 offset: const Offset(0, 8))
           ],
@@ -918,12 +908,12 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                   Text(_myKit!.name,
-                      style: GoogleFonts.notoSans(
+                      style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.white)),
                   Text('ID: ${_myKit!.uniqueNumber}',
-                      style: GoogleFonts.notoSans(
+                      style: TextStyle(
                           fontSize: 12, color: Colors.white70)),
                 ])),
             _buildKitStatusBadge(l10n, _myKit!.statusBadge),
@@ -995,7 +985,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   Widget _buildSectionHeader(AppLocalizations l10n) =>
       Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
         Text(l10n.medications,
-            style: GoogleFonts.notoSans(
+            style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: Colors.black87)),
@@ -1004,9 +994,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           icon: const Icon(Icons.add_rounded, size: 20),
           label: Text(l10n.add),
           style: TextButton.styleFrom(
-            foregroundColor: _purple,
+            foregroundColor: AppTheme.primary,
             textStyle:
-                GoogleFonts.notoSans(fontWeight: FontWeight.bold),
+                TextStyle(fontWeight: FontWeight.bold),
           ),
         ),
       ]);
@@ -1122,7 +1112,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                 Text(med.name,
-                    style: GoogleFonts.notoSans(
+                    style: TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold)),
                 Text(
                     '${l10n.expires}: ${DateFormat('dd.MM.yyyy').format(med.expirationDate)}',
@@ -1149,7 +1139,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     icon: const Icon(Icons.medical_services_outlined, size: 18),
                     label: Text(l10n.use),
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: _purple,
+                        backgroundColor: AppTheme.primary,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)),
@@ -1177,8 +1167,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     icon: const Icon(Icons.add_shopping_cart_rounded, size: 18),
                     label: Text(l10n.refill),
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: _purpleLight,
-                        foregroundColor: _purple,
+                        backgroundColor: AppTheme.primaryContainer,
+                        foregroundColor: AppTheme.primary,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12)))),
@@ -1257,7 +1247,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           elevation: 0,
           backgroundColor: Colors.white,
           currentIndex: _selectedIndex,
-          selectedItemColor: _purple,
+          selectedItemColor: AppTheme.primary,
           onTap: _onItemTapped,
           items: [
             BottomNavigationBarItem(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:frontend/data/dtos/medication_create_dto.dart';
 import 'package:frontend/data/dtos/medication_update_dto.dart';
@@ -25,9 +25,6 @@ class AddEditMedicationScreen extends StatefulWidget {
 class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
   final _formKey = GlobalKey<FormState>();
   final _repository = FirstAidKitRepository();
-
-  static const _primaryColor = Color(0xFF8F58E1);
-  static const _primaryColorDark = Color(0xFF7B44CD);
 
   bool _isLoading = false;
   bool _isSaving = false; 
@@ -110,13 +107,13 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
         return Theme(
           data: ThemeData.light().copyWith(
             colorScheme: const ColorScheme.light(
-              primary: _primaryColor, 
+              primary: AppTheme.primary, 
               onPrimary: Colors.white, 
               onSurface: Colors.black87, 
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: _primaryColor, 
+                foregroundColor: AppTheme.primary, 
               ),
             ),
           ),
@@ -214,7 +211,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
         elevation: 0,
         title: Text(
           _isEditing ? l10n.editMedication : l10n.addMedication,
-          style: GoogleFonts.notoSans(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -253,7 +250,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
                                 Expanded(
                                   child: Text(
                                     _errorMessage,
-                                    style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w500),
+                                    style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w500),
                                   ),
                                 ),
                               ],
@@ -356,14 +353,14 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
                           height: 56,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [_primaryColor, _primaryColorDark],
+                              colors: [AppTheme.primary, AppTheme.primaryDark],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: _primaryColor.withValues(alpha: 0.35),
+                                color: AppTheme.primary.withValues(alpha: 0.35),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -388,7 +385,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
                                           const SizedBox(width: 8),
                                           Text(
                                             _isEditing ? l10n.saveChanges : l10n.addMedication,
-                                            style: GoogleFonts.notoSans(
+                                            style: TextStyle(
                                               fontSize: 16, 
                                               color: Colors.white, 
                                               fontWeight: FontWeight.bold,
@@ -427,7 +424,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
           ),
         ),
         TextFormField(
@@ -436,7 +433,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           readOnly: readOnly,
           onTap: onTap,
           validator: validator,
-          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
@@ -454,7 +451,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -478,13 +475,13 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             l10n.unit,
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
           ),
         ),
         DropdownButtonFormField<MeasurementUnit>(
           initialValue: _selectedUnit,
           icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
-          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
             prefixIcon: Icon(Icons.science_outlined, color: Colors.grey.shade500),
             filled: true,
@@ -500,13 +497,13 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
             ),
           ),
           items: MeasurementUnit.values.map((unit) {
             return DropdownMenuItem(
               value: unit,
-              child: Text(unit.name.capitalize(), style: GoogleFonts.notoSans()),
+              child: Text(unit.name.capitalize(), style: TextStyle()),
             );
           }).toList(),
           onChanged: (MeasurementUnit? newValue) {

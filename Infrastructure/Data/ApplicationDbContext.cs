@@ -23,6 +23,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Medication> Medications { get; set; } = null!;
     public DbSet<Journal> Journals { get; set; } = null!;
     public DbSet<Organization> Organizations { get; set; } = null!;
+    public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -48,5 +49,12 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<FirstAidKit>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
         modelBuilder.Entity<Medication>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
         modelBuilder.Entity<Journal>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
+
+        // RefreshToken: no multi-tenancy filter — tokens are looked up globally by value
+        modelBuilder.Entity<RefreshToken>()
+            .HasOne(rt => rt.User)
+            .WithMany(u => u.RefreshTokens)
+            .HasForeignKey(rt => rt.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

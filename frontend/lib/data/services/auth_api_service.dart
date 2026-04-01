@@ -65,6 +65,23 @@ class AuthApiService {
     }
   }
 
+  Future<AuthResult?> refreshToken(String refreshToken) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${Constants.baseUrl}/users/refresh-token'),
+        headers: <String, String>{'Content-Type': 'application/json'},
+        body: jsonEncode({'refreshToken': refreshToken}),
+      ).timeout(const Duration(seconds: 30));
+
+      if (response.statusCode == 200) {
+        return AuthResult.fromJson(jsonDecode(response.body));
+      }
+      return null;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> updateFcmToken(String authToken, String fcmToken) async {
     try {
       final response = await http.post(

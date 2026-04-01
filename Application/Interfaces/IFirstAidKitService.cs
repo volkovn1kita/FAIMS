@@ -14,7 +14,9 @@ public interface IFirstAidKitService
         string? searchTerm,
         string? statusFilter,
         Guid? responsibleUserId,
-        Guid? departmentId);
+        Guid? departmentId,
+        int pageNumber = 1,
+        int pageSize = 20);
     Task UpdateKitAsync(FirstAidKitUpdateDto dto);
     Task DeleteKitAsync(Guid id);
 

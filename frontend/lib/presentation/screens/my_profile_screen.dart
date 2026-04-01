@@ -4,7 +4,7 @@ import 'package:frontend/core/constants.dart';
 import 'package:frontend/data/dtos/user_dto.dart';
 import 'package:frontend/domain/repositories/user_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MyProfileScreen extends StatefulWidget {
@@ -33,9 +33,6 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
 
   bool _isEditing = false;
   bool _isPasswordVisible = false;
-
-  static const _primaryColor = Color.fromARGB(255, 143, 88, 225);
-  static const _primaryColorDark = Color.fromARGB(255, 123, 68, 205);
 
   @override
   void initState() {
@@ -227,7 +224,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               children: <Widget>[
                 ListTile(
                   leading: const Icon(Icons.photo_library_outlined, color: Colors.black87),
-                  title: Text(l10n.photoLibrary, style: GoogleFonts.notoSans(fontWeight: FontWeight.w500)),
+                  title: Text(l10n.photoLibrary, style: TextStyle(fontWeight: FontWeight.w500)),
                   onTap: () {
                     _pickImage(ImageSource.gallery);
                     Navigator.of(context).pop();
@@ -235,7 +232,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 ),
                 ListTile(
                   leading: const Icon(Icons.photo_camera_outlined, color: Colors.black87),
-                  title: Text(l10n.camera, style: GoogleFonts.notoSans(fontWeight: FontWeight.w500)),
+                  title: Text(l10n.camera, style: TextStyle(fontWeight: FontWeight.w500)),
                   onTap: () {
                     _pickImage(ImageSource.camera);
                     Navigator.of(context).pop();
@@ -244,7 +241,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 if (_userProfile?.avatarUrl != null)
                   ListTile(
                     leading: const Icon(Icons.delete_outline_rounded, color: Colors.redAccent),
-                    title: Text(l10n.removeAvatar, style: GoogleFonts.notoSans(color: Colors.redAccent, fontWeight: FontWeight.w500)),
+                    title: Text(l10n.removeAvatar, style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.w500)),
                     onTap: () {
                       _deleteAvatar();
                       Navigator.of(context).pop();
@@ -267,7 +264,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       appBar: AppBar(
         title: Text(
           l10n.myProfile,
-          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -309,7 +306,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     Container(
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        border: Border.all(color: _primaryColor.withValues(alpha: 0.2), width: 4),
+                        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2), width: 4),
                       ),
                       child: CircleAvatar(
                         radius: 56,
@@ -329,7 +326,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                         child: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: _primaryColor,
+                            color: AppTheme.primary,
                             shape: BoxShape.circle,
                             border: Border.all(color: Colors.white, width: 3),
                           ),
@@ -370,7 +367,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                                 Expanded(
                                   child: Text(
                                     _errorMessage,
-                                    style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w500),
+                                    style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w500),
                                   ),
                                 ),
                               ],
@@ -435,24 +432,24 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             children: [
               Text(
                 label,
-                style: GoogleFonts.notoSans(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 4),
               isRole
                   ? Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: _primaryColor.withValues(alpha: 0.1),
+                        color: AppTheme.primary.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         value,
-                        style: GoogleFonts.notoSans(fontSize: 13, color: _primaryColor, fontWeight: FontWeight.bold),
+                        style: TextStyle(fontSize: 13, color: AppTheme.primary, fontWeight: FontWeight.bold),
                       ),
                     )
                   : Text(
                       value,
-                      style: GoogleFonts.notoSans(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w600),
+                      style: TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w600),
                     ),
             ],
           ),
@@ -525,7 +522,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     const SizedBox(width: 8),
                     Text(
                       l10n.changePassword,
-                      style: GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
                     ),
                   ],
                 ),
@@ -572,8 +569,8 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [
-                  _primaryColor, 
-                  _primaryColorDark
+                  AppTheme.primary, 
+                  AppTheme.primaryDark
                 ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
@@ -581,7 +578,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: _primaryColor.withValues(alpha: 0.35),
+                  color: AppTheme.primary.withValues(alpha: 0.35),
                   blurRadius: 15,
                   offset: const Offset(0, 8),
                 ),
@@ -595,7 +592,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 child: Center(
                   child: Text(
                     'Save Changes', 
-                    style: GoogleFonts.notoSans(
+                    style: TextStyle(
                       fontSize: 16, 
                       color: Colors.white, 
                       fontWeight: FontWeight.bold,
@@ -626,7 +623,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
           ),
         ),
         TextFormField(
@@ -634,7 +631,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           obscureText: isPassword && !_isPasswordVisible,
           keyboardType: keyboardType,
           validator: validator,
-          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.grey.shade500),
             suffixIcon: isPassword
@@ -660,7 +657,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),

@@ -4,7 +4,7 @@ import 'package:frontend/domain/repositories/department_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/screens/add_edit_department_screen.dart';
 import 'package:frontend/presentation/screens/department_detail_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 
 class ManageDepartmentsScreen extends StatefulWidget {
   const ManageDepartmentsScreen({super.key});
@@ -44,7 +44,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
               : 'Failed to load departments: ${e.toString()}';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_errorMessage, style: GoogleFonts.notoSans()),
+              content: Text(_errorMessage, style: TextStyle()),
               backgroundColor: Colors.red,
             ),
           );
@@ -97,7 +97,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(l10n.cannotDeleteDepartmentWithExistingRooms,
-                  style: GoogleFonts.notoSans()),
+                  style: TextStyle()),
               backgroundColor: Colors.orange,
             ),
           );
@@ -112,7 +112,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
               : 'Failed to check department rooms: ${e.toString()}';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_errorMessage, style: GoogleFonts.notoSans()),
+              content: Text(_errorMessage, style: TextStyle()),
               backgroundColor: Colors.red,
             ),
           );
@@ -132,20 +132,20 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(l10n.confirmDeletion, style: GoogleFonts.notoSans(fontWeight: FontWeight.bold)),
+        title: Text(l10n.confirmDeletion, style: TextStyle(fontWeight: FontWeight.bold)),
         content: Text(
           l10n.deleteDepartmentAlert,
-          style: GoogleFonts.notoSans(),
+          style: TextStyle(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel, style: GoogleFonts.notoSans(color: Colors.grey)),
+            child: Text(l10n.cancel, style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text(l10n.delete, style: GoogleFonts.notoSans(color: Colors.white)),
+            child: Text(l10n.delete, style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -161,7 +161,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(l10n.departmentDeletedSuccessfully, style: GoogleFonts.notoSans()),
+              content: Text(l10n.departmentDeletedSuccessfully, style: TextStyle()),
               backgroundColor: Colors.green,
             ),
           );
@@ -175,7 +175,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
                 : 'Failed to delete department: ${e.toString()}';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(_errorMessage, style: GoogleFonts.notoSans()),
+                content: Text(_errorMessage, style: TextStyle()),
                 backgroundColor: Colors.red,
               ),
             );
@@ -199,7 +199,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
       appBar: AppBar(
         title: Text(
           l10n.manageDepartments,
-          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -215,14 +215,14 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(_errorMessage, textAlign: TextAlign.center, style: GoogleFonts.notoSans(color: Colors.red, fontSize: 16)),
+                    child: Text(_errorMessage, textAlign: TextAlign.center, style: TextStyle(color: Colors.red, fontSize: 16)),
                   ),
                 )
               : _departments.isEmpty
                   ? Center(
                       child: Text(
                         l10n.noDepartmentsFound,
-                        style: GoogleFonts.notoSans(fontSize: 15, color: Colors.grey.shade500),
+                        style: TextStyle(fontSize: 15, color: Colors.grey.shade500),
                         textAlign: TextAlign.center,
                       ),
                     )
@@ -255,7 +255,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
                     ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addDepartment,
-        backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+        backgroundColor: AppTheme.primary,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -305,7 +305,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
                 Expanded(
                   child: Text(
                     department.name,
-                    style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

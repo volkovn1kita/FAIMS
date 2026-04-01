@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/screens/add_edit_kit_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:frontend/data/dtos/first_aid_kit_list_dto.dart';
 import 'package:frontend/data/dtos/medication_dto.dart';
 import 'package:frontend/domain/repositories/first_aid_kit_repository.dart';
@@ -31,11 +31,6 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
   String _kitName = '';
 
   final _kitRepository = FirstAidKitRepository();
-
-  static const _purpleLabel = Color(0xFF9E86C8);
-  static const _purpleLight = Color(0xFFF5F3FF);
-  static const _purpleBorder = Color(0xFFE8E0FF);
-  static const _purple = Color(0xFF8F58E1);
 
   @override
   void initState() {
@@ -110,7 +105,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
     if (_medications.isNotEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.cannotDeleteKit(_kitName), style: GoogleFonts.notoSans()),
+          content: Text(l10n.cannotDeleteKit(_kitName), style: TextStyle()),
           backgroundColor: Colors.red,
           duration: const Duration(seconds: 4),
         ),
@@ -121,16 +116,16 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(l10n.confirmDeletion, style: GoogleFonts.notoSans(fontWeight: FontWeight.bold)),
-          content: Text(l10n.confirmDeleteFirstAidKit(_kitName), style: GoogleFonts.notoSans()),
+          title: Text(l10n.confirmDeletion, style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Text(l10n.confirmDeleteFirstAidKit(_kitName), style: TextStyle()),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.cancel, style: GoogleFonts.notoSans(color: Colors.grey)),
+              child: Text(l10n.cancel, style: TextStyle(color: Colors.grey)),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(l10n.delete, style: GoogleFonts.notoSans(color: Colors.red)),
+              child: Text(l10n.delete, style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -147,7 +142,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.firstAidKitDeletedSuccessfully, style: GoogleFonts.notoSans()),
+            content: Text(l10n.firstAidKitDeletedSuccessfully, style: TextStyle()),
             backgroundColor: Colors.green,
           ),
         );
@@ -161,7 +156,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_errorMessage, style: GoogleFonts.notoSans()),
+            content: Text(_errorMessage, style: TextStyle()),
             backgroundColor: Colors.red,
           ),
         );
@@ -181,16 +176,16 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text(l10n.confirmDeletion, style: GoogleFonts.notoSans(fontWeight: FontWeight.bold)),
-          content: Text(l10n.firstAidKitDeleteAlert(medicationName), style: GoogleFonts.notoSans()),
+          title: Text(l10n.confirmDeletion, style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Text(l10n.firstAidKitDeleteAlert(medicationName), style: TextStyle()),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.cancel, style: GoogleFonts.notoSans(color: Colors.grey)),
+              child: Text(l10n.cancel, style: TextStyle(color: Colors.grey)),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text(l10n.delete, style: GoogleFonts.notoSans(color: Colors.red)),
+              child: Text(l10n.delete, style: TextStyle(color: Colors.red)),
             ),
           ],
         );
@@ -214,7 +209,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.medicationDeletedSuccessfully, style: GoogleFonts.notoSans()),
+          content: Text(l10n.medicationDeletedSuccessfully, style: TextStyle()),
           backgroundColor: Colors.green,
         ),
       );
@@ -227,7 +222,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(_errorMessage, style: GoogleFonts.notoSans()),
+          content: Text(_errorMessage, style: TextStyle()),
           backgroundColor: Colors.red,
         ),
       );
@@ -245,19 +240,19 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         labelText: label,
         suffixText: suffix,
         filled: true,
-        fillColor: _purpleLight,
-        labelStyle: const TextStyle(color: _purpleLabel, fontSize: 14),
+        fillColor: AppTheme.primaryContainer,
+        labelStyle: const TextStyle(color: AppTheme.primaryLabel, fontSize: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: _purpleBorder, width: 1.5),
+          borderSide: const BorderSide(color: AppTheme.primaryBorder, width: 1.5),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: _purple, width: 2),
+          borderSide: const BorderSide(color: AppTheme.primary, width: 2),
         ),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -289,7 +284,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
           Expanded(
             child: Text(
               text,
-              style: GoogleFonts.notoSans(
+              style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
                 color: Colors.black87,
@@ -353,7 +348,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
             ),
             child: Text(
               label,
-              style: GoogleFonts.notoSans(
+              style: TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -406,19 +401,19 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                   _sheetTitle(
                     l10n.refillMedicationTitle(medication.name),
                     Icons.add_shopping_cart_rounded,
-                    _purple,
+                    AppTheme.primary,
                   ),
                   const SizedBox(height: 20),
                   _infoRow(
                     Icons.info_outline_rounded,
                     '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
-                    _purple,
+                    AppTheme.primary,
                   ),
                   const SizedBox(height: 20),
                   TextField(
                     controller: qController,
                     keyboardType: TextInputType.number,
-                    style: GoogleFonts.notoSans(
+                    style: TextStyle(
                         fontWeight: FontWeight.w600, fontSize: 15),
                     decoration: _inputStyle(
                       l10n.quantity,
@@ -437,7 +432,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                         builder: (context, child) => Theme(
                           data: Theme.of(context).copyWith(
                             colorScheme: const ColorScheme.light(
-                              primary: _purple,
+                              primary: AppTheme.primary,
                               onSurface: Colors.black87,
                             ),
                           ),
@@ -450,14 +445,14 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                        color: _purpleLight,
+                        color: AppTheme.primaryContainer,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                            color: _purpleBorder, width: 1.5),
+                            color: AppTheme.primaryBorder, width: 1.5),
                       ),
                       child: Row(children: [
                         const Icon(Icons.calendar_today_rounded,
-                            size: 18, color: _purpleLabel),
+                            size: 18, color: AppTheme.primaryLabel),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -468,12 +463,12 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                                 l10n.newExpirationDate,
                                 style: const TextStyle(
                                     fontSize: 11,
-                                    color: _purpleLabel,
+                                    color: AppTheme.primaryLabel,
                                     fontWeight: FontWeight.w500),
                               ),
                               Text(
                                 DateFormat('dd.MM.yyyy').format(date),
-                                style: GoogleFonts.notoSans(
+                                style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black87,
@@ -483,12 +478,12 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                           ),
                         ),
                         const Icon(Icons.chevron_right_rounded,
-                            color: _purpleLabel),
+                            color: AppTheme.primaryLabel),
                       ]),
                     ),
                   ),
                   const SizedBox(height: 28),
-                  _buildActionBtn(l10n.refill, _purple, () {
+                  _buildActionBtn(l10n.refill, AppTheme.primary, () {
                     confirmed = true;
                     Navigator.pop(ctx);
                   }),
@@ -538,7 +533,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         elevation: 0,
         title: Text(
           _kitDetails?.name ?? l10n.kitsContent,
-          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
           overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
@@ -562,7 +557,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
           : _errorMessage.isNotEmpty
               ? Center(child: Text(_errorMessage, style: const TextStyle(color: Colors.red, fontSize: 16)))
               : _kitDetails == null
-                  ? Center(child: Text(l10n.kitDetailsNotFound, style: GoogleFonts.notoSans()))
+                  ? Center(child: Text(l10n.kitDetailsNotFound, style: TextStyle()))
                   : CustomScrollView(
                       slivers: [
                         SliverToBoxAdapter(
@@ -578,7 +573,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                                   children: [
                                     Text(
                                       l10n.medication,
-                                      style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -588,7 +583,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                                       ),
                                       child: Text(
                                         '${_medications.length}',
-                                        style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, color: Colors.black54),
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
                                       ),
                                     )
                                   ],
@@ -604,7 +599,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                             child: Center(
                               child: Text(
                                 l10n.noMedicationsFoundInThisKit,
-                                style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade500),
+                                style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -623,7 +618,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                     ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToAddEditMedication(),
-        backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+        backgroundColor: AppTheme.primary,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -661,12 +656,12 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                   children: [
                     Text(
                       _kitDetails!.name,
-                      style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'ID: ${_kitDetails!.uniqueNumber}',
-                      style: GoogleFonts.notoSans(fontSize: 13, color: Colors.grey.shade500),
+                      style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
                     ),
                   ],
                 ),
@@ -695,7 +690,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         Expanded(
           child: Text(
             text,
-            style: GoogleFonts.notoSans(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -778,7 +773,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                       Expanded(
                         child: Text(
                           medication.name,
-                          style: GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -790,7 +785,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                         ),
                         child: Text(
                           statusText,
-                          style: GoogleFonts.notoSans(fontSize: 12, color: statusColor, fontWeight: FontWeight.w700),
+                          style: TextStyle(fontSize: 12, color: statusColor, fontWeight: FontWeight.w700),
                         ),
                       ),
                     ],
@@ -802,7 +797,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                       const SizedBox(width: 6),
                       Text(
                         '${medication.quantity} ${medication.unit.name.capitalize()}',
-                        style: GoogleFonts.notoSans(
+                        style: TextStyle(
                           fontSize: 14, 
                           fontWeight: FontWeight.w600, 
                           color: isLowQuantity ? Colors.red : Colors.black87
@@ -817,7 +812,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                       const SizedBox(width: 6),
                       Text(
                         DateFormat('dd.MM.yyyy').format(medication.expirationDate),
-                        style: GoogleFonts.notoSans(fontSize: 14, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 14, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
@@ -831,8 +826,8 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                         icon: const Icon(Icons.add_shopping_cart_rounded, size: 18),
                         label: Text(l10n.refill),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: _purple,
-                          side: const BorderSide(color: _purpleBorder),
+                          foregroundColor: AppTheme.primary,
+                          side: const BorderSide(color: AppTheme.primaryBorder),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
                           ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/data/dtos/create_kit_dto.dart';
 import 'package:frontend/data/services/first_aid_kit_api_service.dart';
 import 'package:frontend/l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:uuid/uuid.dart';
 import 'package:frontend/data/dtos/user_dto.dart';
 import 'package:frontend/data/dtos/department_dto.dart';
@@ -205,7 +205,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
       appBar: AppBar(
         title: Text(
           widget.kitId == null ? l10n.addKitTitle : l10n.editKitTitle,
-          style: GoogleFonts.notoSans(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -300,16 +300,16 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
               child: Container(
                 height: 56,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(colors: [Color.fromARGB(255, 163, 108, 245), Color.fromARGB(255, 123, 68, 205)]),
+                  gradient: const LinearGradient(colors: [AppTheme.primaryLight, AppTheme.primaryDark]),
                   borderRadius: BorderRadius.circular(16),
-                  boxShadow: [BoxShadow(color: const Color.fromARGB(255, 143, 88, 225).withValues(alpha: 0.35), blurRadius: 15, offset: const Offset(0, 8))],
+                  boxShadow: [BoxShadow(color: AppTheme.primary.withValues(alpha: 0.35), blurRadius: 15, offset: const Offset(0, 8))],
                 ),
                 child: ElevatedButton(
                   onPressed: _isSaving ? null : _saveKit,
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
                   child: _isSaving
                       ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                      : Text(widget.kitId == null ? l10n.save : l10n.update, style: GoogleFonts.notoSans(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+                      : Text(widget.kitId == null ? l10n.save : l10n.update, style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
                 ),
               ),
             ),
@@ -322,7 +322,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   Widget _buildSectionTitle(String title) {
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 12),
-      child: Text(title, style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.grey.shade500, letterSpacing: 0.5)),
+      child: Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.grey.shade500, letterSpacing: 0.5)),
     );
   }
 
@@ -338,7 +338,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.notoSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
@@ -349,7 +349,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
             filled: true,
             fillColor: Colors.grey.shade50,
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5)),
+            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.primary, width: 1.5)),
           ),
         ),
       ],
@@ -360,19 +360,19 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.uniqueNumber, style: GoogleFonts.notoSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text(l10n.uniqueNumber, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
         const SizedBox(height: 8),
         TextFormField(
           controller: _uniqueNumberController,
           readOnly: true,
           decoration: InputDecoration(
             prefixIcon: Icon(Icons.fingerprint_rounded, color: Colors.grey.shade400, size: 22),
-            suffixIcon: widget.kitId == null ? IconButton(icon: const Icon(Icons.refresh_rounded, color: Color.fromARGB(255, 143, 88, 225)), onPressed: _generateUniqueNumber) : null,
+            suffixIcon: widget.kitId == null ? IconButton(icon: const Icon(Icons.refresh_rounded, color: AppTheme.primary), onPressed: _generateUniqueNumber) : null,
             filled: true,
             fillColor: Colors.deepPurple.withValues(alpha: 0.03),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
-          style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 143, 88, 225)),
+          style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
         ),
       ],
     );
@@ -382,7 +382,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.notoSans(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
         const SizedBox(height: 8),
         DropdownButtonFormField<T>(
           initialValue: value,
@@ -405,7 +405,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(color: Colors.red.shade50, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.red.shade100)),
-      child: Row(children: [const Icon(Icons.error_outline_rounded, color: Colors.red), const SizedBox(width: 8), Expanded(child: Text(message, style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w500)))]),
+      child: Row(children: [const Icon(Icons.error_outline_rounded, color: Colors.red), const SizedBox(width: 8), Expanded(child: Text(message, style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w500)))]),
     );
   }
 }

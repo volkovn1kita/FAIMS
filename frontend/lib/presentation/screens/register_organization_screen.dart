@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/l10n/app_localizations.dart'; // <--- ДОДАНО ІМПОРТ
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:frontend/core/app_theme.dart';
 import '../../data/dtos/register_organization_dto.dart';
 import '../../domain/repositories/auth_repository.dart';
-import 'home_screen.dart';
 
 class RegisterOrganizationScreen extends StatefulWidget {
   const RegisterOrganizationScreen({super.key});
@@ -27,7 +27,6 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
   bool _isPasswordVisible = false;
 
   Future<void> _handleRegistration() async {
-    // Отримуємо l10n для використання в повідомленнях про помилки
     final l10n = AppLocalizations.of(context)!;
 
     setState(() {
@@ -71,15 +70,10 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
       final authResult = await _authRepository.registerOrganization(dto);
 
       if (mounted) {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => HomeScreen(
-              userName: authResult.name ?? authResult.email.split('@')[0],
-              userRole: authResult.role,
-            ),
-          ),
-          (Route<dynamic> route) => false,
-        );
+        context.go('/home', extra: {
+          'userName': authResult.name ?? authResult.email.split('@')[0],
+          'userRole': authResult.role,
+        });
       }
     } catch (e) {
       setState(() {
@@ -98,7 +92,6 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
 
   @override
   Widget build(BuildContext context) {
-    // Отримуємо l10n для UI
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -120,7 +113,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
               children: [
                 Text(
                   l10n.registerClinicTitle,
-                  style: GoogleFonts.notoSans(
+                  style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -130,7 +123,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                 const SizedBox(height: 8),
                 Text(
                   l10n.registerClinicSubtitle,
-                  style: GoogleFonts.notoSans(
+                  style: TextStyle(
                     fontSize: 15,
                     color: Colors.grey.shade500,
                   ),
@@ -140,7 +133,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                 
                 Text(
                   l10n.organizationDataLabel,
-                  style: GoogleFonts.notoSans(fontSize: 12, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 143, 88, 225)),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary),
                 ),
                 const SizedBox(height: 16),
                 _buildTextField(
@@ -161,7 +154,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                 
                 Text(
                   l10n.adminDataLabel,
-                  style: GoogleFonts.notoSans(fontSize: 12, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 143, 88, 225)),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary),
                 ),
                 const SizedBox(height: 16),
                 Row(
@@ -209,7 +202,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleRegistration,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+                      backgroundColor: AppTheme.primary,
                       elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     ),
@@ -221,7 +214,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                           )
                         : Text(
                             l10n.createClinicButton,
-                            style: GoogleFonts.notoSans(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                            style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
                           ),
                   ),
                 ),
@@ -244,7 +237,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                           Flexible(
                             child: Text(
                               _errorMessage,
-                              style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w600, fontSize: 13),
+                              style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w600, fontSize: 13),
                               textAlign: TextAlign.center,
                             ),
                           ),
@@ -276,14 +269,14 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
           ),
         ),
         TextField(
           controller: controller,
           obscureText: isPassword && !_isPasswordVisible,
           keyboardType: keyboardType,
-          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
@@ -311,7 +304,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: Color.fromARGB(255, 143, 88, 225), width: 1.5),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
             ),
           ),
         ),

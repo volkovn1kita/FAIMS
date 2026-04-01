@@ -4,7 +4,7 @@ import 'package:frontend/data/dtos/update_user_request_dto.dart';
 import 'package:frontend/data/dtos/user_role_dto.dart';
 import 'package:frontend/domain/repositories/user_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 
 class AddEditUserScreen extends StatefulWidget {
   final String? userId; 
@@ -19,8 +19,6 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   final _formKey = GlobalKey<FormState>();
   final UserRepository _userRepository = UserRepository();
 
-  static const _primaryColor = Color(0xFF8F58E1);
-  static const _primaryColorDark = Color(0xFF7B44CD);
 
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -185,7 +183,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
       appBar: AppBar(
         title: Text(
           _isEditing ? l10n.editUser : l10n.addNewUser,
-          style: GoogleFonts.notoSans(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -226,7 +224,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                                 Expanded(
                                   child: Text(
                                     _errorMessage,
-                                    style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w500),
+                                    style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w500),
                                   ),
                                 ),
                               ],
@@ -284,7 +282,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                                 
                                 Text(
                                   _isEditing ? l10n.changePassword : l10n.password,
-                                  style: GoogleFonts.notoSans(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black87),
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black87),
                                 ),
                                 const SizedBox(height: 16),
                                 
@@ -328,14 +326,14 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                           height: 56,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [_primaryColor, _primaryColorDark],
+                              colors: [AppTheme.primary, AppTheme.primaryDark],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: _primaryColor.withValues(alpha: 0.35),
+                                color: AppTheme.primary.withValues(alpha: 0.35),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -355,7 +353,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                                       )
                                     : Text(
                                         _isEditing ? l10n.saveChanges : l10n.createUser,
-                                        style: GoogleFonts.notoSans(
+                                        style: TextStyle(
                                           fontSize: 16, 
                                           color: Colors.white, 
                                           fontWeight: FontWeight.bold,
@@ -392,7 +390,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
           ),
         ),
         TextFormField(
@@ -400,7 +398,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           obscureText: isPassword && !isPasswordVisible,
           keyboardType: keyboardType,
           validator: validator,
-          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
             prefixIcon: Icon(icon, color: Colors.grey.shade500),
             suffixIcon: isPassword
@@ -426,7 +424,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -450,13 +448,13 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             l10n.role,
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
           ),
         ),
         DropdownButtonFormField<UserRoleDto>(
           initialValue: _selectedRole,
           icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
-          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
             prefixIcon: Icon(Icons.badge_outlined, color: Colors.grey.shade500),
             filled: true,
@@ -472,7 +470,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
             ),
           ),
           items: _availableRoles.map((role) {

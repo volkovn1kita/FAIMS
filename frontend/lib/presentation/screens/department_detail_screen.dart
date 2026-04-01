@@ -4,7 +4,7 @@ import 'package:frontend/data/dtos/room_list_dto.dart';
 import 'package:frontend/domain/repositories/department_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/screens/add_edit_room_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 
 class DepartmentDetailScreen extends StatefulWidget {
   final String departmentId;
@@ -51,7 +51,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
               : 'Failed to load department details: ${e.toString()}';
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(_errorMessage, style: GoogleFonts.notoSans()),
+              content: Text(_errorMessage, style: TextStyle()),
               backgroundColor: Colors.red,
             ),
           );
@@ -98,20 +98,20 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirm Deletion', style: GoogleFonts.notoSans(fontWeight: FontWeight.bold)),
+        title: Text('Confirm Deletion', style: TextStyle(fontWeight: FontWeight.bold)),
         content: Text(
           'Are you sure you want to delete this room? This action cannot be undone.',
-          style: GoogleFonts.notoSans(),
+          style: TextStyle(),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: GoogleFonts.notoSans(color: Colors.grey)),
+            child: Text('Cancel', style: TextStyle(color: Colors.grey)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Delete', style: GoogleFonts.notoSans(color: Colors.white)),
+            child: Text('Delete', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -127,7 +127,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Room deleted successfully!', style: GoogleFonts.notoSans()),
+              content: Text('Room deleted successfully!', style: TextStyle()),
               backgroundColor: Colors.green,
             ),
           );
@@ -141,7 +141,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
                 : 'Failed to delete room: ${e.toString()}';
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: Text(_errorMessage, style: GoogleFonts.notoSans()),
+                content: Text(_errorMessage, style: TextStyle()),
                 backgroundColor: Colors.red,
               ),
             );
@@ -165,7 +165,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
       appBar: AppBar(
         title: Text(
           l10n.departmentRooms(widget.departmentName),
-          style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
@@ -181,14 +181,14 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
               ? Center(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Text(_errorMessage, textAlign: TextAlign.center, style: GoogleFonts.notoSans(color: Colors.red, fontSize: 16)),
+                    child: Text(_errorMessage, textAlign: TextAlign.center, style: TextStyle(color: Colors.red, fontSize: 16)),
                   ),
                 )
               : _departmentDetail == null || _departmentDetail!.rooms.isEmpty
                   ? Center(
                       child: Text(
                         l10n.noRoomsFound,
-                        style: GoogleFonts.notoSans(fontSize: 15, color: Colors.grey.shade500),
+                        style: TextStyle(fontSize: 15, color: Colors.grey.shade500),
                         textAlign: TextAlign.center,
                       ),
                     )
@@ -221,7 +221,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
                     ),
       floatingActionButton: FloatingActionButton(
         onPressed: _addRoom,
-        backgroundColor: const Color.fromARGB(255, 143, 88, 225),
+        backgroundColor: AppTheme.primary,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -259,7 +259,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
                 Expanded(
                   child: Text(
                     room.name,
-                    style: GoogleFonts.notoSans(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

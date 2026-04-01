@@ -10,7 +10,8 @@ import 'package:frontend/presentation/screens/manage_kits_screen.dart';
 import 'package:frontend/presentation/screens/my_profile_screen.dart';
 import 'package:frontend/presentation/screens/settings_screen.dart';
 import 'package:frontend/presentation/screens/reports_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
+import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
   final String userName;
@@ -30,7 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
   String _overviewError = '';
   late String _userName;
 
-  static const _primaryColor = Color.fromARGB(255, 143, 88, 225);
 
   @override
   void initState() {
@@ -117,10 +117,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
         title: Text(
           'FAIMS',
-          style: GoogleFonts.notoSans(
+          style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: _primaryColor,
+            color: AppTheme.primary,
             letterSpacing: 1.2,
           ),
         ),
@@ -175,10 +175,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
                 currentIndex: 0,
-                selectedItemColor: _primaryColor,
+                selectedItemColor: AppTheme.primary,
                 unselectedItemColor: Colors.grey.shade400,
-                selectedLabelStyle: GoogleFonts.notoSans(fontWeight: FontWeight.bold, fontSize: 12),
-                unselectedLabelStyle: GoogleFonts.notoSans(fontWeight: FontWeight.w600, fontSize: 12),
+                selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                 type: BottomNavigationBarType.fixed,
                 onTap: _onItemTapped,
               ),
@@ -194,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.only(top: 40, bottom: 30),
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color.fromARGB(255, 163, 108, 245), Color.fromARGB(255, 123, 68, 205)],
+              colors: [AppTheme.primaryLight, AppTheme.primaryDark],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -213,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 16),
               Text(
                 l10n.faimsMenu,
-                style: GoogleFonts.notoSans(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: 1.5),
+                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w800, letterSpacing: 1.5),
               ),
             ],
           ),
@@ -266,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onTap: () async {
                   await AuthRepository().logout();
                   if (!mounted) return;
-                  Navigator.of(context).pushReplacementNamed('/login');
+                  context.go('/login');
                 },
               ),
             ],
@@ -284,26 +284,26 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(
             l10n.welcomeUser(_userName),
-            style: GoogleFonts.notoSans(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87, letterSpacing: -0.5),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87, letterSpacing: -0.5),
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: _primaryColor.withValues(alpha: 0.1),
+              color: AppTheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.verified_user_outlined, size: 16, color: _primaryColor),
+                const Icon(Icons.verified_user_outlined, size: 16, color: AppTheme.primary),
                 const SizedBox(width: 6),
                 Text(
                   widget.userRole,
-                  style: GoogleFonts.notoSans(
+                  style: TextStyle(
                     fontSize: 13,
-                    color: _primaryColor,
+                    color: AppTheme.primary,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -313,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 40),
           Text(
             l10n.overview,
-            style: GoogleFonts.notoSans(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
           ),
           const SizedBox(height: 16),
           _isOverviewLoading
@@ -332,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           title: l10n.manageKits,
                           value: _overviewData!.totalKits.toString(),
                           icon: Icons.inventory_2_outlined,
-                          color: _primaryColor,
+                          color: AppTheme.primary,
                           onTap: () async {
                             await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageKitsScreen()));
                             _loadOverviewData();
@@ -399,7 +399,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 16),
                 Text(
                   title,
-                  style: GoogleFonts.notoSans(
+                  style: TextStyle(
                     color: textColor,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -447,13 +447,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 16),
                 Text(
                   value,
-                  style: GoogleFonts.notoSans(fontSize: 34, fontWeight: FontWeight.w800, color: Colors.black87, height: 1.0),
+                  style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Colors.black87, height: 1.0),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   title,
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade600, height: 1.2),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade600, height: 1.2),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),

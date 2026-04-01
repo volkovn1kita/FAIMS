@@ -1,0 +1,37 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter pub:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet ef:*)",
+      "Bash(grep \"\\\\.cs$\")",
+      "Bash(for f:*)",
+      "Bash(do echo:*)",
+      "Read(//e/Diploma/App/**)",
+      "Bash(done)",
+      "Bash(dotnet clean:*)",
+      "Bash(tasklist)",
+      "Bash(tasklist /FI \"IMAGENAME eq dotnet.exe\")",
+      "Bash(tasklist /FI \"IMAGENAME eq Backend.exe\")",
+      "Bash(timeout 20 dotnet run)",
+      "Bash(timeout 40 dotnet run)",
+      "Bash(echo \"EXIT: $?\")",
+      "Bash(curl -s http://localhost:5076/swagger/index.html)",
+      "Bash(echo \"curl exit: $?\")",
+      "Bash(kill 678)",
+      "Bash(time timeout:*)",
+      "Bash(time dotnet:*)",
+      "Bash(do)",
+      "Bash(if grep:*)",
+      "Bash(then)",
+      "Bash(echo \"=== $f ===\")",
+      "Read(//e/Diploma/App/Backend/**)",
+      "Bash(kill 21292)",
+      "Bash(xargs kill:*)",
+      "Bash(/dev/null cd:*)",
+      "Bash(taskkill //F //IM dotnet.exe)",
+      "Bash(docker exec:*)"
+    ]
+  }
+}

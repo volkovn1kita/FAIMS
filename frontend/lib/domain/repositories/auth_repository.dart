@@ -12,9 +12,12 @@ class AuthRepository {
 
   Future<AuthResult> login(LoginDto dto) async {
     final authResult = await _apiService.login(dto);
-    
+
     await _tokenStorageService.saveToken(authResult.token);
-    
+    if (authResult.refreshToken != null) {
+      await _tokenStorageService.saveRefreshToken(authResult.refreshToken!);
+    }
+
     final nameToSave = authResult.name ?? authResult.email.split('@')[0];
     await _tokenStorageService.saveName(nameToSave);
 
@@ -44,11 +47,31 @@ class AuthRepository {
     await _tokenStorageService.deleteToken();
   }
 
+  Future<AuthResult?> tryRefreshToken() async {
+    final storedRefresh = await _tokenStorageService.getRefreshToken();
+    if (storedRefresh == null) return null;
+
+    final authResult = await _apiService.refreshToken(storedRefresh);
+    if (authResult == null) {
+      await _tokenStorageService.deleteToken();
+      return null;
+    }
+
+    await _tokenStorageService.saveToken(authResult.token);
+    if (authResult.refreshToken != null) {
+      await _tokenStorageService.saveRefreshToken(authResult.refreshToken!);
+    }
+    return authResult;
+  }
+
   Future<AuthResult> registerOrganization(RegisterOrganizationDto dto) async {
     final authResult = await _apiService.registerOrganization(dto);
 
     await _tokenStorageService.saveToken(authResult.token);
-    
+    if (authResult.refreshToken != null) {
+      await _tokenStorageService.saveRefreshToken(authResult.refreshToken!);
+    }
+
     final nameToSave = authResult.name ?? authResult.email.split('@')[0];
     await _tokenStorageService.saveName(nameToSave);
 

@@ -12,7 +12,9 @@ public interface IFirstAidKitRepository
     Task<IEnumerable<FirstAidKit>> GetFilteredKitsAsync(
         string? searchTerm,
         Guid? responsibleUserId,
-        Guid? departmentId
+        Guid? departmentId,
+        int? pageNumber = null,
+        int? pageSize = null
     );
     Task<FirstAidKit?> GetKitByRoomIdAsync (Guid roomId);
     Task AddKitAsync(FirstAidKit kit);

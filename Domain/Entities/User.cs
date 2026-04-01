@@ -17,6 +17,6 @@ public class User : BaseEntity, IMustHaveTenant
 
     public FirstAidKit? ResponsibleKit { get; set; }
     public ICollection<Journal> Journals { get; set; } = new List<Journal>();
+    public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
     public string? AvatarUrl { get; set; }
-    
 }

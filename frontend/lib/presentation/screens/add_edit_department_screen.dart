@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/data/dtos/department_create_dto.dart';
 import 'package:frontend/domain/repositories/department_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 
 class AddEditDepartmentScreen extends StatefulWidget {
   final String? departmentId;
@@ -23,9 +23,6 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
   final TextEditingController _nameController = TextEditingController();
   final DepartmentRepository _departmentRepository = DepartmentRepository();
   bool _isLoading = false;
-
-  static const _primaryColor = Color(0xFF8F58E1);
-  static const _primaryColorDark = Color(0xFF7B44CD);
 
   bool get isEditing => widget.departmentId != null;
 
@@ -63,7 +60,7 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
           SnackBar(
             content: Text(
               isEditing ? l10n.departmentUpdatedSuccess : l10n.departmentAddedSuccess,
-              style: GoogleFonts.notoSans(fontWeight: FontWeight.w600),
+              style: TextStyle(fontWeight: FontWeight.w600),
             ),
             backgroundColor: Colors.green.shade600,
             behavior: SnackBarBehavior.floating,
@@ -97,7 +94,7 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
       appBar: AppBar(
         title: Text(
           isEditing ? l10n.editDepartment : l10n.addDepartment,
-          style: GoogleFonts.notoSans(
+          style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
             color: Colors.black87,
@@ -134,13 +131,13 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
                       height: 120,
                       width: 120,
                       decoration: BoxDecoration(
-                        color: _primaryColor.withValues(alpha: 0.08),
+                        color: AppTheme.primary.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
                       ),
                       child: Icon(
                         Icons.business_rounded,
                         size: 60,
-                        color: _primaryColor.withValues(alpha: 0.5),
+                        color: AppTheme.primary.withValues(alpha: 0.5),
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -158,7 +155,7 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
                         children: [
                           Text(
                             l10n.departmentName,
-                            style: GoogleFonts.notoSans(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Colors.grey.shade700,
@@ -167,11 +164,11 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
                           const SizedBox(height: 10),
                           TextFormField(
                             controller: _nameController,
-                            style: GoogleFonts.notoSans(fontSize: 16, color: Colors.black87),
+                            style: TextStyle(fontSize: 16, color: Colors.black87),
                             decoration: InputDecoration(
                               hintText: l10n.enterDepartmentNameHint,
                               hintStyle: TextStyle(color: Colors.grey.shade400),
-                              prefixIcon: const Icon(Icons.edit_note_rounded, color: _primaryColor),
+                              prefixIcon: Icon(Icons.edit_note_rounded, color: AppTheme.primary),
                               filled: true,
                               fillColor: Colors.grey.shade50,
                               border: OutlineInputBorder(
@@ -180,7 +177,7 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: const BorderSide(color: _primaryColor, width: 1.5),
+                                borderSide: BorderSide(color: AppTheme.primary, width: 1.5),
                               ),
                               errorBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
@@ -205,14 +202,14 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
                           height: 56,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [_primaryColor, _primaryColorDark],
+                              colors: [AppTheme.primary, AppTheme.primaryDark],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: _primaryColor.withValues(alpha: 0.35),
+                                color: AppTheme.primary.withValues(alpha: 0.35),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -231,7 +228,7 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
                                     const SizedBox(width: 8),
                                     Text(
                                       isEditing ? l10n.saveChanges : l10n.addDepartment,
-                                      style: GoogleFonts.notoSans(
+                                      style: TextStyle(
                                         fontSize: 16,
                                         color: Colors.white,
                                         fontWeight: FontWeight.bold,

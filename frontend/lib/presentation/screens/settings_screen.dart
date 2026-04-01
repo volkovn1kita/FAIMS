@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/providers/locale_provider.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -31,7 +31,7 @@ class SettingsScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(24.0, 0, 24.0, 24.0),
             child: Text(
               l10n.settings,
-              style: GoogleFonts.notoSans(
+              style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w800,
                 color: Colors.black87,
@@ -55,7 +55,7 @@ class SettingsScreen extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 4.0, bottom: 12.0),
                     child: Text(
                       'Language / Мова',
-                      style: GoogleFonts.notoSans(
+                      style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Colors.grey.shade500,
@@ -130,15 +130,15 @@ class SettingsScreen extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: GoogleFonts.notoSans(
+                style: TextStyle(
                   fontSize: 16,
                   fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
-                  color: isSelected ? const Color.fromARGB(255, 143, 88, 225) : Colors.black87,
+                  color: isSelected ? AppTheme.primary : Colors.black87,
                 ),
               ),
             ),
             if (isSelected)
-              const Icon(Icons.check_circle_rounded, color: Color.fromARGB(255, 143, 88, 225), size: 24),
+              const Icon(Icons.check_circle_rounded, color: AppTheme.primary, size: 24),
           ],
         ),
       ),

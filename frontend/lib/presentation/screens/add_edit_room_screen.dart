@@ -3,7 +3,7 @@ import 'package:frontend/data/dtos/department_dto.dart';
 import 'package:frontend/data/dtos/room_create_dto.dart';
 import 'package:frontend/data/dtos/room_update_dto.dart';
 import 'package:frontend/domain/repositories/department_repository.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 
 class AddEditRoomScreen extends StatefulWidget {
@@ -29,8 +29,6 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
   final TextEditingController _nameController = TextEditingController();
   final DepartmentRepository _departmentRepository = DepartmentRepository();
   
-  static const _primaryColor = Color(0xFF8F58E1);
-  static const _primaryColorDark = Color(0xFF7B44CD);
 
   bool _isLoading = false;
   String _errorMessage = '';
@@ -106,7 +104,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.selectDepartment, style: GoogleFonts.notoSans()),
+            content: Text(l10n.selectDepartment, style: TextStyle()),
             backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
           ),
@@ -141,7 +139,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           SnackBar(
             content: Text(
               isEditing ? l10n.roomUpdatedSuccessfully : l10n.roomAddedSuccessfully,
-              style: GoogleFonts.notoSans(),
+              style: TextStyle(),
             ),
             backgroundColor: Colors.green.shade600,
             behavior: SnackBarBehavior.floating,
@@ -175,7 +173,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
       appBar: AppBar(
         title: Text(
           isEditing ? l10n.editRoom : l10n.addRoom,
-          style: GoogleFonts.notoSans(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
         ),
         backgroundColor: Colors.white,
         elevation: 0,
@@ -216,7 +214,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
                                 Expanded(
                                   child: Text(
                                     _errorMessage,
-                                    style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w500),
+                                    style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w500),
                                   ),
                                 ),
                               ],
@@ -264,14 +262,14 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
                           height: 56,
                           decoration: BoxDecoration(
                             gradient: const LinearGradient(
-                              colors: [_primaryColor, _primaryColorDark],
+                              colors: [AppTheme.primary, AppTheme.primaryDark],
                               begin: Alignment.topLeft,
                               end: Alignment.bottomRight,
                             ),
                             borderRadius: BorderRadius.circular(16),
                             boxShadow: [
                               BoxShadow(
-                                color: _primaryColor.withValues(alpha: 0.35),
+                                color: AppTheme.primary.withValues(alpha: 0.35),
                                 blurRadius: 15,
                                 offset: const Offset(0, 8),
                               ),
@@ -296,7 +294,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
                                           const SizedBox(width: 8),
                                           Text(
                                             isEditing ? l10n.saveChanges : l10n.addRoom,
-                                            style: GoogleFonts.notoSans(
+                                            style: TextStyle(
                                               fontSize: 16, 
                                               color: Colors.white, 
                                               fontWeight: FontWeight.bold,
@@ -332,13 +330,13 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
           ),
         ),
         TextFormField(
           controller: controller,
           validator: validator,
-          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
             hintText: hintText,
             hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
@@ -356,7 +354,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -380,13 +378,13 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             l10n.department,
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
           ),
         ),
         DropdownButtonFormField<DepartmentDto>(
           initialValue: _selectedDepartment,
           icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
-          style: GoogleFonts.notoSans(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: Colors.black87),
           decoration: InputDecoration(
             prefixIcon: Icon(Icons.business_rounded, color: Colors.grey.shade500),
             filled: true,
@@ -402,7 +400,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide: const BorderSide(color: _primaryColor, width: 1.5),
+              borderSide: const BorderSide(color: AppTheme.primary, width: 1.5),
             ),
           ),
           items: _departments.map((department) {
@@ -410,7 +408,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
               value: department,
               child: Text(
                 department.name,
-                style: GoogleFonts.notoSans(),
+                style: TextStyle(),
                 overflow: TextOverflow.ellipsis,
               ),
             );

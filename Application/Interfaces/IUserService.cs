@@ -19,5 +19,6 @@ namespace Application.Interfaces
         Task<AuthResultDto> RegisterOrganizationAsync(RegisterOrganizationDto dto);
         Task UpdateFcmTokenAsync(Guid userId, string token);
         Task<string?> GetUserFcmTokenAsync(Guid userId);
+        Task<AuthResultDto?> RefreshTokenAsync(string refreshToken);
     }
 }

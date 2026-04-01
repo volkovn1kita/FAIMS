@@ -4,10 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/providers/locale_provider.dart';
-import 'package:frontend/presentation/screens/home_screen.dart';
-import 'package:frontend/presentation/screens/user_home_screen.dart';
-import 'package:frontend/presentation/screens/login_screen.dart';
 import 'package:frontend/data/services/notification_service.dart';
+import 'package:frontend/core/firebase_config.dart';
+import 'package:frontend/core/router.dart';
+import 'package:frontend/core/app_theme.dart';
 import 'package:flutter/foundation.dart';
 
 void main() async {
@@ -15,17 +15,7 @@ void main() async {
 
   if (Firebase.apps.isEmpty) {
     if (kIsWeb) {
-      await Firebase.initializeApp(
-        options: const FirebaseOptions(
-          apiKey: "AIzaSyBmiUMf6xBzbnDwhYfTPXQvl2QKccXA_No",
-          authDomain: "faims-baaab.firebaseapp.com",
-          projectId: "faims-baaab",
-          storageBucket: "faims-baaab.firebasestorage.app",
-          messagingSenderId: "352090524800",
-          appId: "1:352090524800:web:e0074b8fbb1e0d14052a65",
-          measurementId: "G-4SMTN95PYJ",
-        ),
-      );
+      await Firebase.initializeApp(options: FirebaseConfig.webOptions);
     } else {
       await Firebase.initializeApp();
     }
@@ -54,9 +44,10 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final localeProvider = Provider.of<LocaleProvider>(context);
 
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'First Aid Kit Management',
+      theme: AppTheme.themeData,
       locale: localeProvider.locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,
@@ -68,17 +59,7 @@ class MyApp extends StatelessWidget {
         Locale('en', ''),
         Locale('uk', ''),
       ],
-      initialRoute: '/login',
-      routes: {
-        '/login': (context) => const LoginScreen(),
-        '/home': (context) => const HomeScreen(
-              userName: 'Demo User',
-              userRole: 'Admin',
-            ),
-        '/userHome': (context) => const UserHomeScreen(
-              userName: 'Demo User',
-            ),
-      },
+      routerConfig: appRouter,
     );
   }
 }

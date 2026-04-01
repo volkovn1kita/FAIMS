@@ -17,6 +17,7 @@ namespace Application.Services
         private readonly IFirstAidKitRepository _kitRepository;
         private readonly IHostEnvironment _hostEnvironment;
         private readonly IOrganizationRepository _organizationRepository;
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
 
         public UserService(
             IUserRepository userRepository,
@@ -25,7 +26,8 @@ namespace Application.Services
             IOrganizationRepository organizationRepository,
             ICurrentUserService currentUserService,
             IFirstAidKitRepository kitRepository,
-            IHostEnvironment hostEnvironment)
+            IHostEnvironment hostEnvironment,
+            IRefreshTokenRepository refreshTokenRepository)
         {
             _tokenService = tokenService;
             _userRepository = userRepository;
@@ -34,6 +36,7 @@ namespace Application.Services
             _kitRepository = kitRepository;
             _hostEnvironment = hostEnvironment;
             _organizationRepository = organizationRepository;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public async Task<IEnumerable<UserDto>> GetAllUsersAsync(UserFilterAndPaginationDto filterDto)
@@ -191,8 +194,19 @@ namespace Application.Services
             }
             var token = await _tokenService.GenerateTokenAsync(user.Id, user.Email, user.Role, user.OrganizationId);
 
+            var refreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64)),
+                ExpiresAt = DateTime.UtcNow.AddDays(30),
+                UserId = user.Id,
+                IsRevoked = false
+            };
+            await _refreshTokenRepository.AddAsync(refreshToken);
+            await _refreshTokenRepository.SaveChangesAsync();
+
             return new AuthResultDto(
                 Token: token,
+                RefreshToken: refreshToken.Token,
                 Email: user.Email,
                 Role: user.Role.ToString(),
                 Name: user.FirstName ?? user.Email.Split('@')[0]
@@ -343,8 +357,9 @@ namespace Application.Services
             }
 
             user.FcmToken = token;
+            user.UpdatedDate = DateTime.UtcNow;
 
-            await _userRepository.SaveChangesAsync(); 
+            await _userRepository.SaveChangesAsync();
         }
 
         public async Task<string?> GetUserFcmTokenAsync(Guid userId)
@@ -392,11 +407,53 @@ namespace Application.Services
 
             var token = await _tokenService.GenerateTokenAsync(adminUser.Id, adminUser.Email, adminUser.Role, adminUser.OrganizationId);
 
+            var refreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64)),
+                ExpiresAt = DateTime.UtcNow.AddDays(30),
+                UserId = adminUser.Id,
+                IsRevoked = false
+            };
+            await _refreshTokenRepository.AddAsync(refreshToken);
+            await _refreshTokenRepository.SaveChangesAsync();
+
             return new AuthResultDto(
                 Token: token,
+                RefreshToken: refreshToken.Token,
                 Email: adminUser.Email,
                 Role: adminUser.Role.ToString(),
                 Name: adminUser.FirstName ?? adminUser.Email.Split('@')[0]
+            );
+        }
+
+        public async Task<AuthResultDto?> RefreshTokenAsync(string refreshToken)
+        {
+            var tokenEntity = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
+            if (tokenEntity == null)
+                return null;
+
+            // Rotate: revoke old token
+            tokenEntity.IsRevoked = true;
+
+            var newRefreshToken = new RefreshToken
+            {
+                Token = Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(64)),
+                ExpiresAt = DateTime.UtcNow.AddDays(30),
+                UserId = tokenEntity.UserId,
+                IsRevoked = false
+            };
+            await _refreshTokenRepository.AddAsync(newRefreshToken);
+            await _refreshTokenRepository.SaveChangesAsync();
+
+            var user = tokenEntity.User;
+            var jwt = await _tokenService.GenerateTokenAsync(user.Id, user.Email, user.Role, user.OrganizationId);
+
+            return new AuthResultDto(
+                Token: jwt,
+                RefreshToken: newRefreshToken.Token,
+                Email: user.Email,
+                Role: user.Role.ToString(),
+                Name: user.FirstName ?? user.Email.Split('@')[0]
             );
         }
 

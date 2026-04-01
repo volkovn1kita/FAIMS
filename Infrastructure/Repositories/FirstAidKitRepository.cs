@@ -27,7 +27,9 @@ public class FirstAidKitRepository : IFirstAidKitRepository
     public async Task<IEnumerable<FirstAidKit>> GetFilteredKitsAsync(
         string? searchTerm,
         Guid? responsibleUserId,
-        Guid? departmentId)
+        Guid? departmentId,
+        int? pageNumber = null,
+        int? pageSize = null)
     {
         var query = _dbContext.FirstAidKits
             .Include(k => k.Room)
@@ -53,6 +55,9 @@ public class FirstAidKitRepository : IFirstAidKitRepository
         {
             query = query.Where(k => k.Room != null && k.Room.DepartmentId == departmentId.Value);
         }
+
+        if (pageNumber.HasValue && pageSize.HasValue)
+            query = query.Skip((pageNumber.Value - 1) * pageSize.Value).Take(pageSize.Value);
 
         return await query.ToListAsync();
     }

@@ -14,11 +14,14 @@ faims-*.json
 google-services.json
 GoogleService-Info.plist
 
-# Налаштування бекенду
-appsettings.json
+# Налаштування бекенду — ігноруємо файли з реальними секретами
 appsettings.*.json
-# Дозволяємо лише приклад налаштувань, якщо він у тебе є
+# Дозволяємо лише base appsettings (тільки placeholder-значення) та Example
+!appsettings.json
 !appsettings.Example.json
+
+# Логи Serilog
+logs/
 
 # --- Flutter / Dart ---
 .dart_tool/

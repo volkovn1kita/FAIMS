@@ -41,6 +41,17 @@ namespace Backend.Controllers
             return Ok(authResult);
         }
 
+        [HttpPost("refresh-token")]
+        [EnableRateLimiting("AuthPolicy")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequestDto dto)
+        {
+            var result = await _userService.RefreshTokenAsync(dto.RefreshToken);
+            if (result == null)
+                return Unauthorized(new { Message = "Invalid or expired refresh token." });
+            return Ok(result);
+        }
+
         [HttpPost("register-organization")]
         [EnableRateLimiting("AuthPolicy")]
         [AllowAnonymous]

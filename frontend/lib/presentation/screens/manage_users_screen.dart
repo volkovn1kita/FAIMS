@@ -6,7 +6,7 @@ import 'package:frontend/data/dtos/user_role_dto.dart';
 import 'package:frontend/domain/repositories/user_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
 import 'package:frontend/presentation/screens/add_edit_user_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 
 class ManageUsersScreen extends StatefulWidget {
   const ManageUsersScreen({super.key});
@@ -27,8 +27,6 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   UserRoleDto? _selectedRoleFilter;
   List<UserRoleDto> _availableRoles = [];
   bool _sortAscending = true;
-
-  static const _primaryColor = Color.fromARGB(255, 143, 88, 225);
 
   @override
   void initState() {
@@ -180,7 +178,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       appBar: AppBar(
         title: Text(
           l10n.manageUsers,
-          style: GoogleFonts.notoSans(fontWeight: FontWeight.w700, fontSize: 20, color: Colors.black87),
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: Colors.black87),
         ),
         centerTitle: false,
         titleSpacing: 0,
@@ -262,7 +260,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         ? Center(
                             child: Text(
                               l10n.noUsersFoundMatchingYourCriteria,
-                              style: GoogleFonts.notoSans(fontSize: 15, color: Colors.grey.shade500),
+                              style: TextStyle(fontSize: 15, color: Colors.grey.shade500),
                             ),
                           )
                         : ListView.builder(
@@ -297,7 +295,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () => _navigateToAddEditUser(),
-        backgroundColor: _primaryColor,
+        backgroundColor: AppTheme.primary,
         elevation: 4,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -307,7 +305,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
 
   Widget _buildUserCard(UserDto user) {
     final isAdmin = user.role == 'Administrator';
-    final roleColor = isAdmin ? _primaryColor : Colors.blue.shade600;
+    final roleColor = isAdmin ? AppTheme.primary : Colors.blue.shade600;
 
     return Container(
       decoration: BoxDecoration(
@@ -335,7 +333,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                   child: user.avatarUrl == null
                       ? Text(
                           user.firstName[0].toUpperCase(),
-                          style: GoogleFonts.notoSans(color: roleColor, fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(color: roleColor, fontWeight: FontWeight.bold, fontSize: 18),
                         )
                       : null,
                 ),
@@ -347,13 +345,13 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                     children: [
                       Text(
                         user.fullName,
-                        style: GoogleFonts.notoSans(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(
                         user.email,
-                        style: GoogleFonts.notoSans(color: Colors.grey.shade500, fontSize: 13),
+                        style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -370,7 +368,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                   ),
                   child: Text(
                     user.role,
-                    style: GoogleFonts.notoSans(fontSize: 12, color: roleColor, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 12, color: roleColor, fontWeight: FontWeight.w700),
                   ),
                 ),
               ],
@@ -389,9 +387,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
       constraints: const BoxConstraints(maxWidth: 140),
       padding: const EdgeInsets.symmetric(horizontal: 12),
       decoration: BoxDecoration(
-        color: isActive ? _primaryColor.withValues(alpha: 0.1) : Colors.grey.shade50,
+        color: isActive ? AppTheme.primary.withValues(alpha: 0.1) : Colors.grey.shade50,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isActive ? _primaryColor : Colors.grey.shade200),
+        border: Border.all(color: isActive ? AppTheme.primary : Colors.grey.shade200),
       ),
       child: DropdownButtonHideUnderline(
         child: DropdownButton<UserRoleDto?>(
@@ -401,18 +399,18 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             padding: EdgeInsets.only(left: 4.0),
             child: Icon(Icons.keyboard_arrow_down_rounded, size: 18),
           ),
-          iconEnabledColor: isActive ? _primaryColor : Colors.grey.shade600,
+          iconEnabledColor: isActive ? AppTheme.primary : Colors.grey.shade600,
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(16),
           hint: Text(
             l10n.filterByRole, 
-            style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
             overflow: TextOverflow.ellipsis,
           ),
-          style: GoogleFonts.notoSans(
+          style: TextStyle(
             fontSize: 14, 
             fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-            color: isActive ? _primaryColor : Colors.black87,
+            color: isActive ? AppTheme.primary : Colors.black87,
           ),
           items: [
             const DropdownMenuItem<UserRoleDto?>(
@@ -454,7 +452,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
             const SizedBox(width: 6),
             Text(
               label,
-              style: GoogleFonts.notoSans(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
             ),
           ],
         ),

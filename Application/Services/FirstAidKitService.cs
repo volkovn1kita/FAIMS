@@ -64,7 +64,18 @@ public class FirstAidKitService : IFirstAidKitService
         };
 
         await _kitRepository.AddKitAsync(newKit);
-        await _kitRepository.SaveChangesAsync();
+        try
+        {
+            await _kitRepository.SaveChangesAsync();
+        }
+        catch (Exception ex) when (
+            ex.GetType().Name == "DbUpdateException" &&
+            (ex.InnerException?.Message.Contains("unique") == true ||
+             ex.InnerException?.Message.Contains("duplicate") == true ||
+             ex.InnerException?.Message.Contains("23505") == true))
+        {
+            throw new ConflictException($"A kit with unique number '{dto.UniqueNumber}' already exists.");
+        }
 
         return newKit.Id;
     }
@@ -108,9 +119,11 @@ public class FirstAidKitService : IFirstAidKitService
         string? searchTerm,
         string? statusFilter,
         Guid? responsibleUserId,
-        Guid? departmentId)
+        Guid? departmentId,
+        int pageNumber = 1,
+        int pageSize = 20)
     {
-        var kits = await _kitRepository.GetFilteredKitsAsync(searchTerm, responsibleUserId, departmentId);
+        var kits = await _kitRepository.GetFilteredKitsAsync(searchTerm, responsibleUserId, departmentId, pageNumber, pageSize);
         var result = new List<FirstAidKitListDto>();
 
         foreach (var kit in kits)

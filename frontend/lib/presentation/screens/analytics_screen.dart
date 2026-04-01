@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/data/dtos/analytics_dtos.dart';
 import 'package:frontend/domain/repositories/analytics_repository.dart';
 import 'package:frontend/l10n/app_localizations.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:frontend/core/app_theme.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -50,7 +50,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
       appBar: AppBar(
         title: Text(
           l10n.globalAnalytics,
-          style: GoogleFonts.notoSans(
+          style: TextStyle(
             fontSize: 22,
             color: Colors.black87, 
             fontWeight: FontWeight.w700,
@@ -88,7 +88,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           ),
                           child: Text(
                             _errorMessage,
-                            style: GoogleFonts.notoSans(color: Colors.red.shade700, fontWeight: FontWeight.w500),
+                            style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.w500),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -101,15 +101,15 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                             _buildSectionHeader(
                               title: l10n.mostUsedMedications,
                               icon: Icons.trending_up_rounded,
-                              color: const Color.fromARGB(255, 143, 88, 225),
+                              color: AppTheme.primary,
                             ),
                             const SizedBox(height: 16),
                             _buildChartCard(
                               data: _stats!.topUsedMedications,
-                              baseColor: const Color.fromARGB(255, 143, 88, 225),
+                              baseColor: AppTheme.primary,
                               gradientColors: [
-                                const Color.fromARGB(255, 163, 108, 245),
-                                const Color.fromARGB(255, 123, 68, 205),
+                                AppTheme.primaryLight,
+                                AppTheme.primaryDark,
                               ],
                             ),
                             
@@ -153,7 +153,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         Expanded(
           child: Text(
             title,
-            style: GoogleFonts.notoSans(
+            style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
@@ -191,7 +191,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             const SizedBox(height: 12),
             Text(
               l10n.noDataAvailableYet,
-              style: GoogleFonts.notoSans(color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+              style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -228,11 +228,11 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                   final item = data[group.x.toInt()];
                   return BarTooltipItem(
                     '${item.medicationName}\n',
-                    GoogleFonts.notoSans(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                     children: <TextSpan>[
                       TextSpan(
                         text: '${item.totalQuantity} ${item.unit}',
-                        style: GoogleFonts.notoSans(
+                        style: TextStyle(
                           color: Colors.white70,
                           fontWeight: FontWeight.w600,
                           fontSize: 12,
@@ -260,7 +260,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           padding: const EdgeInsets.only(top: 10.0),
                           child: Text(
                             name,
-                            style: GoogleFonts.notoSans(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                            style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
                           ),
                         ),
                       );
@@ -279,7 +279,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       axisSide: meta.axisSide,
                       child: Text(
                         value.toInt().toString(),
-                        style: GoogleFonts.notoSans(fontSize: 11, color: Colors.grey.shade400, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 11, color: Colors.grey.shade400, fontWeight: FontWeight.w600),
                       ),
                     );
                   },
