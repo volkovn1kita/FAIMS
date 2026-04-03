@@ -22,11 +22,15 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = true;
   String _errorMessage = '';
   bool _isPasswordVisible = false;
+  double _contentOpacity = 0.0;
 
   @override
   void initState() {
     super.initState();
     _checkAutoLogin();
+    Future.delayed(const Duration(milliseconds: 50), () {
+      if (mounted) setState(() => _contentOpacity = 1.0);
+    });
   }
 
   Map<String, dynamic> _decodeJwt(String token) {
@@ -149,7 +153,10 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
-            child: Column(
+            child: AnimatedOpacity(
+              opacity: _contentOpacity,
+              duration: const Duration(milliseconds: 400),
+              child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -295,6 +302,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ],
+            ),
             ),
           ),
         ),

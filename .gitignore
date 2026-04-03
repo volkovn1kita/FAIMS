@@ -8,6 +8,7 @@
 *.tmp
 
 # --- Secrets (Ключі та налаштування) ---
+.env
 # Ігноруємо абсолютно всі JSON файли ключі Firebase
 *-firebase-adminsdk-*.json
 faims-*.json

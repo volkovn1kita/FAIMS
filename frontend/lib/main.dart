@@ -7,7 +7,6 @@ import 'package:frontend/presentation/providers/locale_provider.dart';
 import 'package:frontend/data/services/notification_service.dart';
 import 'package:frontend/core/firebase_config.dart';
 import 'package:frontend/core/router.dart';
-import 'package:frontend/core/app_theme.dart';
 import 'package:flutter/foundation.dart';
 
 void main() async {
@@ -47,7 +46,6 @@ class MyApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'First Aid Kit Management',
-      theme: AppTheme.themeData,
       locale: localeProvider.locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,

@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   postgres_db:
     image: postgres:15-alpine
@@ -13,6 +11,36 @@ services:
       - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U faims_admin -d faims_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: .
+      dockerfile: Backend/Dockerfile
+    container_name: faims_backend
+    restart: always
+    ports:
+      - "5076:5076"
+    environment:
+      ConnectionStrings__PostgreSqlConnection: "Host=postgres_db;Port=5432;Database=faims_db;Username=faims_admin;Password=faims_password;"
+      JwtSettings__SecurityKey: "${JWT_SECRET_KEY}"
+      JwtSettings__Issuer: "FirstAidKit.API"
+      JwtSettings__Audience: "FirstAidKit.Client"
+      JwtSettings__ExpiryMinutes: "60"
+      ASPNETCORE_ENVIRONMENT: "Production"
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    volumes:
+      - ./Backend/faims-baaab-firebase-adminsdk-fbsvc-4a8578170b.json:/app/faims-baaab-firebase-adminsdk-fbsvc-4a8578170b.json:ro
+      - backend_logs:/app/logs
+      - backend_avatars:/app/wwwroot/avatars
 
 volumes:
   pgdata:
+  backend_logs:
+  backend_avatars:

@@ -11,6 +11,7 @@ import 'package:frontend/presentation/screens/my_profile_screen.dart';
 import 'package:frontend/presentation/screens/settings_screen.dart';
 import 'package:frontend/presentation/screens/reports_screen.dart';
 import 'package:frontend/core/app_theme.dart';
+import 'package:frontend/presentation/widgets/skeleton_loader.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -316,60 +317,83 @@ class _HomeScreenState extends State<HomeScreen> {
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
           ),
           const SizedBox(height: 16),
-          _isOverviewLoading
-              ? const Center(child: Padding(padding: EdgeInsets.all(40.0), child: CircularProgressIndicator()))
-              : _overviewError.isNotEmpty
-                  ? Center(child: Text(_overviewError, style: const TextStyle(color: Colors.red)))
-                  : GridView.count(
+          AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: _isOverviewLoading
+                  ? GridView.count(
+                      key: const ValueKey('skeleton'),
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
                       crossAxisCount: isWeb ? 4 : 2,
                       crossAxisSpacing: 16,
                       mainAxisSpacing: 16,
                       childAspectRatio: isWeb ? 1.0 : 0.85,
-                      children: [
-                        _buildDashboardCard(
-                          title: l10n.manageKits,
-                          value: _overviewData!.totalKits.toString(),
-                          icon: Icons.inventory_2_outlined,
-                          color: AppTheme.primary,
-                          onTap: () async {
-                            await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageKitsScreen()));
-                            _loadOverviewData();
-                          },
+                      children: List.generate(
+                        4,
+                        (_) => SkeletonLoader(
+                          width: double.infinity,
+                          height: double.infinity,
+                          borderRadius: 24,
                         ),
-                        _buildDashboardCard(
-                          title: l10n.attention,
-                          value: _overviewData!.kitsNeedingAttention.toString(),
-                          icon: Icons.warning_amber_rounded,
-                          color: Colors.orangeAccent,
-                          onTap: () async {
-                            await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageKitsScreen(initialStatusFilter: 'Needs Attention')));
-                            _loadOverviewData();
-                          },
+                      ),
+                    )
+                  : _overviewError.isNotEmpty
+                      ? Center(
+                          key: const ValueKey('error'),
+                          child: Text(_overviewError, style: const TextStyle(color: Colors.red)),
+                        )
+                      : GridView.count(
+                          key: const ValueKey('grid'),
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisCount: isWeb ? 4 : 2,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                          childAspectRatio: isWeb ? 1.0 : 0.85,
+                          children: [
+                            _buildDashboardCard(
+                              title: l10n.manageKits,
+                              value: _overviewData!.totalKits.toString(),
+                              icon: Icons.inventory_2_outlined,
+                              color: AppTheme.primary,
+                              onTap: () async {
+                                await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageKitsScreen()));
+                                _loadOverviewData();
+                              },
+                            ),
+                            _buildDashboardCard(
+                              title: l10n.attention,
+                              value: _overviewData!.kitsNeedingAttention.toString(),
+                              icon: Icons.warning_amber_rounded,
+                              color: Colors.orangeAccent,
+                              onTap: () async {
+                                await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageKitsScreen(initialStatusFilter: 'Needs Attention')));
+                                _loadOverviewData();
+                              },
+                            ),
+                            _buildDashboardCard(
+                              title: l10n.manageUsers,
+                              value: _overviewData!.totalUsers.toString(),
+                              icon: Icons.group_outlined,
+                              color: Colors.blue.shade400,
+                              onTap: () async {
+                                await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageUsersScreen()));
+                                _loadOverviewData();
+                              },
+                            ),
+                            _buildDashboardCard(
+                              title: l10n.departments,
+                              value: _overviewData!.totalDepartments.toString(),
+                              icon: Icons.domain_rounded,
+                              color: Colors.teal.shade400,
+                              onTap: () async {
+                                await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageDepartmentsScreen()));
+                                _loadOverviewData();
+                              },
+                            ),
+                          ],
                         ),
-                        _buildDashboardCard(
-                          title: l10n.manageUsers,
-                          value: _overviewData!.totalUsers.toString(),
-                          icon: Icons.group_outlined,
-                          color: Colors.blue.shade400,
-                          onTap: () async {
-                            await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageUsersScreen()));
-                            _loadOverviewData();
-                          },
-                        ),
-                        _buildDashboardCard(
-                          title: l10n.departments,
-                          value: _overviewData!.totalDepartments.toString(),
-                          icon: Icons.domain_rounded,
-                          color: Colors.teal.shade400,
-                          onTap: () async {
-                            await Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ManageDepartmentsScreen()));
-                            _loadOverviewData();
-                          },
-                        ),
-                      ],
-                    ),
+            ),
         ],
       ),
     );
@@ -420,44 +444,83 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color color,
     required VoidCallback onTap,
   }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [
-          BoxShadow(color: color.withValues(alpha: 0.08), blurRadius: 15, offset: const Offset(0, 8)),
+    return _HoverDashboardCard(
+      color: color,
+      onTap: onTap,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: color.withValues(alpha: 0.12), shape: BoxShape.circle),
+            child: Icon(icon, color: color, size: 30),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            value,
+            style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Colors.black87, height: 1.0),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade600, height: 1.2),
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onTap,
+    );
+  }
+}
+
+class _HoverDashboardCard extends StatefulWidget {
+  final Color color;
+  final VoidCallback onTap;
+  final Widget child;
+
+  const _HoverDashboardCard({
+    required this.color,
+    required this.onTap,
+    required this.child,
+  });
+
+  @override
+  State<_HoverDashboardCard> createState() => _HoverDashboardCardState();
+}
+
+class _HoverDashboardCardState extends State<_HoverDashboardCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        decoration: BoxDecoration(
+          color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(14),
-                  decoration: BoxDecoration(color: color.withValues(alpha: 0.12), shape: BoxShape.circle),
-                  child: Icon(icon, color: color, size: 30),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  value,
-                  style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Colors.black87, height: 1.0),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  title,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade600, height: 1.2),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+          boxShadow: [
+            BoxShadow(
+              color: widget.color.withValues(alpha: _isHovered ? 0.18 : 0.08),
+              blurRadius: _isHovered ? 24 : 15,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: widget.onTap,
+            borderRadius: BorderRadius.circular(24),
+            splashColor: AppTheme.primary.withValues(alpha: 0.08),
+            highlightColor: AppTheme.primary.withValues(alpha: 0.08),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: widget.child,
             ),
           ),
         ),

@@ -31,7 +31,25 @@
       "Bash(xargs kill:*)",
       "Bash(/dev/null cd:*)",
       "Bash(taskkill //F //IM dotnet.exe)",
-      "Bash(docker exec:*)"
+      "Bash(docker exec:*)",
+      "Bash(find E:/Diploma/App/frontend/test -name *.dart)",
+      "Bash(find E:/Diploma/App -name *_test.dart)",
+      "Bash(python3 -c \"from PIL import Image, ImageDraw, ImageFilter; print\\(''PIL available''\\)\")",
+      "Bash(python -c \"from PIL import Image, ImageDraw; print\\(''PIL available''\\)\")",
+      "Bash(python3 /tmp/generate_icon.py)",
+      "Bash(dart run:*)",
+      "Bash(flutter test:*)",
+      "Bash(grep -l \"SkeletonLoader\\\\|AnimatedSwitcher\\\\|AnimatedOpacity\" E:/Diploma/App/frontend/lib/presentation/screens/*.dart)",
+      "Bash(dotnet sln:*)",
+      "Bash(dotnet new:*)",
+      "Bash(dotnet add:*)",
+      "Bash(sed -n '59,95p' E:/Diploma/App/Application/Services/UserService.cs)",
+      "Bash(sed -n '216,295p' E:/Diploma/App/Application/Services/UserService.cs)",
+      "Bash(dotnet test:*)",
+      "Bash(head -5 grep -n \"CFBundleName\\\\|CFBundleDisplayName\" E:/Diploma/App/frontend/ios/Runner/Info.plist)",
+      "Bash(head -5 grep -n \"<title>\" E:/Diploma/App/frontend/web/index.html)",
+      "Bash(head -3 grep -n \"FAIMS\\\\|frontend\\\\|First Aid\" E:/Diploma/App/frontend/windows/runner/main.cpp)",
+      "Bash(python3:*)"
     ]
   }
 }
