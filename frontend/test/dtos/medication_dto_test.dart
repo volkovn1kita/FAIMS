@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/data/dtos/medication_dto.dart';
-import 'package:frontend/data/dtos/expiration_status.dart';
-import 'package:frontend/data/dtos/measurement_unit.dart';
+import 'package:faims/data/dtos/medication_dto.dart';
+import 'package:faims/data/dtos/expiration_status.dart';
+import 'package:faims/data/dtos/measurement_unit.dart';
 
 void main() {
   Map<String, dynamic> validJson() => {

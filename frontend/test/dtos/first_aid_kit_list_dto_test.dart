@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/data/dtos/first_aid_kit_list_dto.dart';
+import 'package:faims/data/dtos/first_aid_kit_list_dto.dart';
 
 void main() {
   Map<String, dynamic> validJson() => {

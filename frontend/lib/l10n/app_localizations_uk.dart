@@ -62,13 +62,13 @@ class AppLocalizationsUk extends AppLocalizations {
   String get searchMedicationHint => 'Пошук за назвою...';
 
   @override
-  String get expired => 'Expired';
+  String get expired => 'Протерм.';
 
   @override
-  String get critical => 'Critical';
+  String get critical => 'Критичне';
 
   @override
-  String get lowStock => 'Low';
+  String get lowStock => 'Мало';
 
   @override
   String get noMedicationsYet => 'Медикаментів ще немає';
@@ -649,8 +649,7 @@ class AppLocalizationsUk extends AppLocalizations {
   }
 
   @override
-  String get firstAidKitDeletedSuccessfully =>
-      'First aid kit deleted successfully!';
+  String get firstAidKitDeletedSuccessfully => 'Аптечку успішно видалено!';
 
   @override
   String firstAidKitDeleteAlert(String medicationName) {
@@ -827,4 +826,55 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get camera => 'Камера';
+
+  @override
+  String get unitPieces => 'Штуки';
+
+  @override
+  String get unitMilliliters => 'Мілілітри';
+
+  @override
+  String get unitGrams => 'Грами';
+
+  @override
+  String get unitTablets => 'Таблетки';
+
+  @override
+  String get unitAmpoules => 'Ампули';
+
+  @override
+  String get unitPacks => 'Упаковки';
+
+  @override
+  String get languageLabel => 'Мова';
+
+  @override
+  String get all => 'Всі';
+
+  @override
+  String get good => 'Добре';
+
+  @override
+  String get darkMode => 'Темний режим';
+
+  @override
+  String get appearance => 'Зовнішній вигляд';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Профіль успішно оновлено!';
+
+  @override
+  String get avatarUploadedSuccessfully => 'Аватар успішно завантажено!';
+
+  @override
+  String get avatarDeletedSuccessfully => 'Аватар успішно видалено!';
+
+  @override
+  String get userCreatedSuccessfully => 'Користувача успішно створено!';
+
+  @override
+  String get userUpdatedSuccessfully => 'Користувача успішно оновлено!';
+
+  @override
+  String get userDeletedSuccessfully => 'Користувача успішно видалено!';
 }

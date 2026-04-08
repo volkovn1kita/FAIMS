@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/presentation/screens/add_edit_kit_screen.dart';
-import 'package:frontend/core/app_theme.dart';
-import 'package:frontend/data/dtos/first_aid_kit_list_dto.dart';
-import 'package:frontend/data/dtos/medication_dto.dart';
-import 'package:frontend/domain/repositories/first_aid_kit_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/presentation/screens/add_edit_kit_screen.dart';
+import 'package:faims/core/app_theme.dart';
+import 'package:faims/data/dtos/first_aid_kit_list_dto.dart';
+import 'package:faims/data/dtos/medication_dto.dart';
+import 'package:faims/domain/repositories/first_aid_kit_repository.dart';
 import 'package:intl/intl.dart';
-import 'package:frontend/data/dtos/expiration_status.dart';
-import 'package:frontend/presentation/screens/add_edit_medication_screen.dart';
-import 'package:frontend/core/extensions.dart';
-import 'package:frontend/data/dtos/medication_refill_dto.dart';
+import 'package:faims/data/dtos/expiration_status.dart';
+import 'package:faims/data/dtos/measurement_unit.dart';
+import 'package:faims/presentation/screens/add_edit_medication_screen.dart';
+import 'package:faims/data/dtos/medication_refill_dto.dart';
 
 class KitContentsScreen extends StatefulWidget {
   final String kitId;
@@ -121,7 +121,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.cancel, style: TextStyle(color: Colors.grey)),
+              child: Text(l10n.cancel, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -181,7 +181,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text(l10n.cancel, style: TextStyle(color: Colors.grey)),
+              child: Text(l10n.cancel, style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
@@ -258,19 +258,24 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       );
 
-  Widget _sheetHandle() => Center(
+  Widget _sheetHandle() {
+    final theme = Theme.of(context);
+    return Center(
         child: Container(
           width: 44,
           height: 4,
           margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
+            color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(10),
           ),
         ),
       );
+  }
 
-  Widget _sheetTitle(String text, IconData icon, Color color) => Row(
+  Widget _sheetTitle(String text, IconData icon, Color color) {
+    final theme = Theme.of(context);
+    return Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
@@ -287,12 +292,13 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
-                color: Colors.black87,
+                color: theme.colorScheme.onSurface,
               ),
             ),
           ),
         ],
       );
+  }
 
   Widget _infoRow(IconData icon, String text, Color color) => Container(
         padding:
@@ -365,7 +371,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
           onPressed: () => Navigator.pop(ctx),
           child: Text(
             label,
-            style: const TextStyle(color: Colors.grey, fontSize: 15),
+            style: TextStyle(color: Theme.of(ctx).colorScheme.onSurfaceVariant, fontSize: 15),
           ),
         ),
       );
@@ -385,10 +391,10 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
           padding: EdgeInsets.only(
               bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: Theme.of(ctx).cardColor,
               borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(28)),
+                  const BorderRadius.vertical(top: Radius.circular(28)),
             ),
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
             child: SingleChildScrollView(
@@ -406,7 +412,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                   const SizedBox(height: 20),
                   _infoRow(
                     Icons.info_outline_rounded,
-                    '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
+                    '${l10n.available}: ${medication.quantity} ${medication.unit.localizedName(context)}',
                     AppTheme.primary,
                   ),
                   const SizedBox(height: 20),
@@ -417,7 +423,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                         fontWeight: FontWeight.w600, fontSize: 15),
                     decoration: _inputStyle(
                       l10n.quantity,
-                      medication.unit.name.capitalize(),
+                      medication.unit.localizedName(context),
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -431,9 +437,8 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                             .add(const Duration(days: 3650)),
                         builder: (context, child) => Theme(
                           data: Theme.of(context).copyWith(
-                            colorScheme: const ColorScheme.light(
+                            colorScheme: Theme.of(context).colorScheme.copyWith(
                               primary: AppTheme.primary,
-                              onSurface: Colors.black87,
                             ),
                           ),
                           child: child!,
@@ -471,7 +476,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                                  color: Theme.of(ctx).colorScheme.onSurface,
                                 ),
                               ),
                             ],
@@ -525,25 +530,24 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100, 
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
           _kitDetails?.name ?? l10n.kitsContent,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
           overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(true),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit_outlined, color: Colors.black87),
+            icon: Icon(Icons.edit_outlined, color: theme.colorScheme.onSurface),
             onPressed: _isLoading ? null : _navigateToEditKit,
           ),
           IconButton(
@@ -573,17 +577,17 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                                   children: [
                                     Text(
                                       l10n.medication,
-                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                                     ),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
-                                        color: Colors.grey.shade200,
+                                        color: theme.colorScheme.surfaceContainerHighest,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
                                         '${_medications.length}',
-                                        style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black54),
+                                        style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
                                       ),
                                     )
                                   ],
@@ -599,7 +603,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                             child: Center(
                               child: Text(
                                 l10n.noMedicationsFoundInThisKit,
-                                style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
+                                style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurfaceVariant),
                                 textAlign: TextAlign.center,
                               ),
                             ),
@@ -627,13 +631,14 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
   }
 
   Widget _buildKitInfoCard(AppLocalizations l10n) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -656,12 +661,12 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                   children: [
                     Text(
                       _kitDetails!.name,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       'ID: ${_kitDetails!.uniqueNumber}',
-                      style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                      style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
                     ),
                   ],
                 ),
@@ -683,14 +688,15 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
   }
 
   Widget _buildInfoPill(IconData icon, String text) {
+    final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(icon, size: 18, color: Colors.grey.shade600),
+        Icon(icon, size: 18, color: theme.colorScheme.onSurfaceVariant),
         const SizedBox(width: 10),
         Expanded(
           child: Text(
             text,
-            style: TextStyle(fontSize: 14, color: Colors.black87, fontWeight: FontWeight.w500),
+            style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurface, fontWeight: FontWeight.w500),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -700,6 +706,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
 
   Widget _buildMedicationListItem(MedicationDto medication) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     Color statusColor;
     String statusText;
 
@@ -752,10 +759,10 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         secondaryBackground: _buildSwipeBackground(Icons.delete_outline, Colors.redAccent, Alignment.centerRight),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
-              BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
+              BoxShadow(color: theme.shadowColor.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
             ],
             border: Border(left: BorderSide(color: statusColor, width: 4)),
           ),
@@ -773,7 +780,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                       Expanded(
                         child: Text(
                           medication.name,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -793,14 +800,14 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                   const SizedBox(height: 12),
                   Row(
                     children: [
-                      Icon(Icons.inventory_2_outlined, size: 16, color: isLowQuantity ? Colors.red : Colors.grey.shade500),
+                      Icon(Icons.inventory_2_outlined, size: 16, color: isLowQuantity ? Colors.red : theme.colorScheme.onSurfaceVariant),
                       const SizedBox(width: 6),
                       Text(
-                        '${medication.quantity} ${medication.unit.name.capitalize()}',
+                        '${medication.quantity} ${medication.unit.localizedName(context)}',
                         style: TextStyle(
-                          fontSize: 14, 
-                          fontWeight: FontWeight.w600, 
-                          color: isLowQuantity ? Colors.red : Colors.black87
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: isLowQuantity ? Colors.red : theme.colorScheme.onSurface
                         ),
                       ),
                       if (isLowQuantity) ...[
@@ -808,11 +815,11 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                         Icon(Icons.error_outline, size: 14, color: Colors.red.shade400),
                       ],
                       const Spacer(),
-                      Icon(Icons.calendar_today_outlined, size: 16, color: Colors.grey.shade500),
+                      Icon(Icons.calendar_today_outlined, size: 16, color: theme.colorScheme.onSurfaceVariant),
                       const SizedBox(width: 6),
                       Text(
                         DateFormat('dd.MM.yyyy').format(medication.expirationDate),
-                        style: TextStyle(fontSize: 14, color: Colors.grey.shade700, fontWeight: FontWeight.w500),
+                        style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),

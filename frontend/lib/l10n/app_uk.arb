@@ -27,9 +27,9 @@
   "items": "одиниць",
   "add": "Додати",
   "searchMedicationHint": "Пошук за назвою...",
-  "expired": "Expired",
-  "critical": "Critical",
-  "lowStock": "Low",
+  "expired": "Протерм.",
+  "critical": "Критичне",
+  "lowStock": "Мало",
   "noMedicationsYet": "Медикаментів ще немає",
   "tapToAddMedication": "Натисніть 'Додати', щоб додати перший медикамент",
   "noMedicationsFound": "Медикаментів не знайдено",
@@ -285,7 +285,7 @@
       }
     }
   },
-  "firstAidKitDeletedSuccessfully": "First aid kit deleted successfully!",
+  "firstAidKitDeletedSuccessfully": "Аптечку успішно видалено!",
   "firstAidKitDeleteAlert": "Ви впевнені, що хочете видалити? \"{medicationName}\"? Цю дію неможливо скасувати.",
   "@firstAidKitDeleteAlert": {
     "placeholders": {
@@ -372,5 +372,22 @@
   "register": "Зареєструватися",
   "newOrg": "Нова організація?",
   "enterEmailAndPassword": "Будь ласка, введіть email та пароль",
-  "processing": "Обробка..."
+  "processing": "Обробка...",
+  "unitPieces": "Штуки",
+  "unitMilliliters": "Мілілітри",
+  "unitGrams": "Грами",
+  "unitTablets": "Таблетки",
+  "unitAmpoules": "Ампули",
+  "unitPacks": "Упаковки",
+  "languageLabel": "Мова",
+  "all": "Всі",
+  "good": "Добре",
+  "darkMode": "Темний режим",
+  "appearance": "Зовнішній вигляд",
+  "profileUpdatedSuccessfully": "Профіль успішно оновлено!",
+  "avatarUploadedSuccessfully": "Аватар успішно завантажено!",
+  "avatarDeletedSuccessfully": "Аватар успішно видалено!",
+  "userCreatedSuccessfully": "Користувача успішно створено!",
+  "userUpdatedSuccessfully": "Користувача успішно оновлено!",
+  "userDeletedSuccessfully": "Користувача успішно видалено!"
 }

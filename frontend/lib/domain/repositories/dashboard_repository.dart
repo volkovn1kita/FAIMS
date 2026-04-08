@@ -1,6 +1,6 @@
 import 'dart:convert';
-import 'package:frontend/core/constants.dart';
-import 'package:frontend/data/dtos/dashboard_overview.dart';
+import 'package:faims/core/constants.dart';
+import 'package:faims/data/dtos/dashboard_overview.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 

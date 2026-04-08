@@ -1,17 +1,17 @@
 // lib/domain/repositories/first_aid_kit_repository.dart
-import 'package:frontend/data/dtos/create_kit_dto.dart';
-import 'package:frontend/data/dtos/department_dto.dart';
-import 'package:frontend/data/dtos/first_aid_kit_list_dto.dart';
-import 'package:frontend/data/dtos/medication_dto.dart';
-import 'package:frontend/data/dtos/medication_quantity_update_dto.dart';
-import 'package:frontend/data/dtos/medication_refill_dto.dart';
-import 'package:frontend/data/dtos/medication_write_off_dto.dart';
-import 'package:frontend/data/dtos/room_dto.dart';
-import 'package:frontend/data/dtos/update_kit_dto.dart';
-import 'package:frontend/data/dtos/user_dto.dart';
-import 'package:frontend/data/dtos/medication_create_dto.dart'; // <<<--- НОВИЙ ІМПОРТ
-import 'package:frontend/data/dtos/medication_update_dto.dart'; // <<<--- НОВИЙ ІМПОРТ
-import 'package:frontend/data/services/first_aid_kit_api_service.dart';
+import 'package:faims/data/dtos/create_kit_dto.dart';
+import 'package:faims/data/dtos/department_dto.dart';
+import 'package:faims/data/dtos/first_aid_kit_list_dto.dart';
+import 'package:faims/data/dtos/medication_dto.dart';
+import 'package:faims/data/dtos/medication_quantity_update_dto.dart';
+import 'package:faims/data/dtos/medication_refill_dto.dart';
+import 'package:faims/data/dtos/medication_write_off_dto.dart';
+import 'package:faims/data/dtos/room_dto.dart';
+import 'package:faims/data/dtos/update_kit_dto.dart';
+import 'package:faims/data/dtos/user_dto.dart';
+import 'package:faims/data/dtos/medication_create_dto.dart'; // <<<--- НОВИЙ ІМПОРТ
+import 'package:faims/data/dtos/medication_update_dto.dart'; // <<<--- НОВИЙ ІМПОРТ
+import 'package:faims/data/services/first_aid_kit_api_service.dart';
 
 class FirstAidKitRepository {
   final FirstAidKitApiService _apiService = FirstAidKitApiService();

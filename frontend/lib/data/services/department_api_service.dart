@@ -2,14 +2,14 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/core/constants.dart';
-import 'package:frontend/data/dtos/department_dto.dart';
-import 'package:frontend/data/dtos/department_create_dto.dart';
-import 'package:frontend/data/dtos/department_detail_dto.dart';
-import 'package:frontend/data/dtos/room_list_dto.dart'; // Використовуємо RoomListDto для деталей департаменту
-import 'package:frontend/data/dtos/room_create_dto.dart';
-import 'package:frontend/data/dtos/room_update_dto.dart';
-import 'package:frontend/data/dtos/room_list_all_dto.dart'; // Для getAllRooms, якщо потрібно
+import 'package:faims/core/constants.dart';
+import 'package:faims/data/dtos/department_dto.dart';
+import 'package:faims/data/dtos/department_create_dto.dart';
+import 'package:faims/data/dtos/department_detail_dto.dart';
+import 'package:faims/data/dtos/room_list_dto.dart'; // Використовуємо RoomListDto для деталей департаменту
+import 'package:faims/data/dtos/room_create_dto.dart';
+import 'package:faims/data/dtos/room_update_dto.dart';
+import 'package:faims/data/dtos/room_list_all_dto.dart'; // Для getAllRooms, якщо потрібно
 
 class DepartmentApiService {
   final String _baseUrl = Constants.baseUrl;

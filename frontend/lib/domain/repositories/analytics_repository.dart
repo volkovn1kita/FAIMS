@@ -1,5 +1,5 @@
-import 'package:frontend/data/dtos/analytics_dtos.dart';
-import 'package:frontend/data/services/analytics_api_service.dart';
+import 'package:faims/data/dtos/analytics_dtos.dart';
+import 'package:faims/data/services/analytics_api_service.dart';
 
 class AnalyticsRepository {
   final AnalyticsApiService _apiService = AnalyticsApiService();

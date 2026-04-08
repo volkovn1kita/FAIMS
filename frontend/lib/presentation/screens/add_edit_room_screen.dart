@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/department_dto.dart';
-import 'package:frontend/data/dtos/room_create_dto.dart';
-import 'package:frontend/data/dtos/room_update_dto.dart';
-import 'package:frontend/domain/repositories/department_repository.dart';
-import 'package:frontend/core/app_theme.dart';
-import 'package:frontend/l10n/app_localizations.dart';
+import 'package:faims/data/dtos/department_dto.dart';
+import 'package:faims/data/dtos/room_create_dto.dart';
+import 'package:faims/data/dtos/room_update_dto.dart';
+import 'package:faims/domain/repositories/department_repository.dart';
+import 'package:faims/core/app_theme.dart';
+import 'package:faims/l10n/app_localizations.dart';
 
 class AddEditRoomScreen extends StatefulWidget {
   final String? roomId; 
@@ -167,19 +167,18 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           isEditing ? l10n.editRoom : l10n.addRoom,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface, letterSpacing: -0.3),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -188,7 +187,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: theme.shadowColor.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -223,10 +222,10 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
                           
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
+                              BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
                             ],
                           ),
                           padding: const EdgeInsets.all(24),
@@ -323,6 +322,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
     required IconData icon,
     String? Function(String?)? validator,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -330,19 +330,19 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         TextFormField(
           controller: controller,
           validator: validator,
-          style: TextStyle(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
-            prefixIcon: Icon(icon, color: Colors.grey.shade500),
+            hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontSize: 15),
+            prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -371,6 +371,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
   }
 
   Widget _buildDropdown(AppLocalizations l10n) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -378,17 +379,17 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             l10n.department,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         DropdownButtonFormField<DepartmentDto>(
           initialValue: _selectedDepartment,
-          icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
-          style: TextStyle(fontSize: 15, color: Colors.black87),
+          icon: Icon(Icons.expand_more_rounded, color: theme.colorScheme.onSurfaceVariant),
+          style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.business_rounded, color: Colors.grey.shade500),
+            prefixIcon: Icon(Icons.business_rounded, color: theme.colorScheme.onSurfaceVariant),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),

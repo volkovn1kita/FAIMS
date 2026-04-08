@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/core/app_theme.dart';
 
 void main() {
   testWidgets('AppTheme applies correct primary color to MaterialApp', (tester) async {

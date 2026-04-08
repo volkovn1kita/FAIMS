@@ -1,9 +1,9 @@
 import 'dart:io';
-import 'package:frontend/data/dtos/user_dto.dart';
-import 'package:frontend/data/dtos/create_user_request_dto.dart';
-import 'package:frontend/data/dtos/user_role_dto.dart';
-import 'package:frontend/data/dtos/update_user_request_dto.dart';
-import 'package:frontend/data/services/user_api_service.dart';
+import 'package:faims/data/dtos/user_dto.dart';
+import 'package:faims/data/dtos/create_user_request_dto.dart';
+import 'package:faims/data/dtos/user_role_dto.dart';
+import 'package:faims/data/dtos/update_user_request_dto.dart';
+import 'package:faims/data/services/user_api_service.dart';
 
 class UserRepository {
   final UserApiService _userApiService = UserApiService();

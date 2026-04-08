@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/department_create_dto.dart';
-import 'package:frontend/domain/repositories/department_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/data/dtos/department_create_dto.dart';
+import 'package:faims/domain/repositories/department_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/core/app_theme.dart';
 
 class AddEditDepartmentScreen extends StatefulWidget {
   final String? departmentId;
@@ -88,24 +88,23 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           isEditing ? l10n.editDepartment : l10n.addDepartment,
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.w700,
-            color: Colors.black87,
+            color: theme.colorScheme.onSurface,
             letterSpacing: -0.3,
           ),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -115,7 +114,7 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
             height: 1,
             decoration: BoxDecoration(
               boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))
+                BoxShadow(color: theme.shadowColor.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))
               ],
             ),
           ),
@@ -144,10 +143,10 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
                     Container(
                       padding: const EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(24),
                         boxShadow: [
-                          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
+                          BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
                         ],
                       ),
                       child: Column(
@@ -158,19 +157,19 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
                             style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
-                              color: Colors.grey.shade700,
+                              color: theme.colorScheme.onSurfaceVariant,
                             ),
                           ),
                           const SizedBox(height: 10),
                           TextFormField(
                             controller: _nameController,
-                            style: TextStyle(fontSize: 16, color: Colors.black87),
+                            style: TextStyle(fontSize: 16, color: theme.colorScheme.onSurface),
                             decoration: InputDecoration(
                               hintText: l10n.enterDepartmentNameHint,
-                              hintStyle: TextStyle(color: Colors.grey.shade400),
+                              hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
                               prefixIcon: Icon(Icons.edit_note_rounded, color: AppTheme.primary),
                               filled: true,
-                              fillColor: Colors.grey.shade50,
+                              fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide: BorderSide.none,

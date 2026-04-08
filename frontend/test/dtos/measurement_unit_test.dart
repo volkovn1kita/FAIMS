@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/data/dtos/measurement_unit.dart';
+import 'package:faims/data/dtos/measurement_unit.dart';
 
 void main() {
   group('MeasurementUnit', () {

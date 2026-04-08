@@ -2,11 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/presentation/providers/locale_provider.dart';
-import 'package:frontend/data/services/notification_service.dart';
-import 'package:frontend/core/firebase_config.dart';
-import 'package:frontend/core/router.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/presentation/providers/locale_provider.dart';
+import 'package:faims/presentation/providers/theme_provider.dart';
+import 'package:faims/data/services/notification_service.dart';
+import 'package:faims/core/firebase_config.dart';
+import 'package:faims/core/router.dart';
+import 'package:faims/core/app_theme.dart';
 import 'package:flutter/foundation.dart';
 
 void main() async {
@@ -29,8 +31,11 @@ void main() async {
   }
 
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => LocaleProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
       child: const MyApp(),
     ),
   );
@@ -42,10 +47,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localeProvider = Provider.of<LocaleProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'First Aid Kit Management',
+      title: 'FAIMS',
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeProvider.themeMode,
       locale: localeProvider.locale,
       localizationsDelegates: const [
         AppLocalizations.delegate,

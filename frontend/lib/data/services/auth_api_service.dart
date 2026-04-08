@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
-import 'package:frontend/core/constants.dart';
+import 'package:faims/core/constants.dart';
 import 'package:http/http.dart' as http;
 import '../models/auth_result.dart';
 import '../dtos/login_dto.dart';

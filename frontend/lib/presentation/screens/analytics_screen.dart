@@ -1,9 +1,9 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/analytics_dtos.dart';
-import 'package:frontend/domain/repositories/analytics_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/data/dtos/analytics_dtos.dart';
+import 'package:faims/domain/repositories/analytics_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/core/app_theme.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -44,24 +44,24 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100, 
       appBar: AppBar(
         title: Text(
           l10n.globalAnalytics,
           style: TextStyle(
             fontSize: 22,
-            color: Colors.black87, 
+            color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w700,
             letterSpacing: -0.3,
           ),
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -70,7 +70,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: theme.shadowColor.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -112,9 +112,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                                 AppTheme.primaryDark,
                               ],
                             ),
-                            
+
                             const SizedBox(height: 32),
-                            
+
                             _buildSectionHeader(
                               title: l10n.mostExpiredORwrittenOff,
                               icon: Icons.delete_outline_rounded,
@@ -139,6 +139,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
   }
 
   Widget _buildSectionHeader({required String title, required IconData icon, required Color color}) {
+    final theme = Theme.of(context);
     return Row(
       children: [
         Container(
@@ -156,7 +157,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
-              color: Colors.black87,
+              color: theme.colorScheme.onSurface,
             ),
           ),
         ),
@@ -170,28 +171,29 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     required List<Color> gradientColors,
   }) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final theme = Theme.of(context);
+
     if (data.isEmpty) {
       return Container(
         height: 220,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: Colors.grey.shade200, width: 1.5),
+          border: Border.all(color: theme.dividerColor, width: 1.5),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.grey.shade50, shape: BoxShape.circle),
-              child: Icon(Icons.bar_chart_rounded, size: 40, color: Colors.grey.shade300),
+              decoration: BoxDecoration(color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3), shape: BoxShape.circle),
+              child: Icon(Icons.bar_chart_rounded, size: 40, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.3)),
             ),
             const SizedBox(height: 12),
             Text(
               l10n.noDataAvailableYet,
-              style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+              style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
             ),
           ],
         ),
@@ -202,14 +204,14 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
     for (var item in data) {
       if (item.totalQuantity > maxY) maxY = item.totalQuantity.toDouble();
     }
-    maxY = maxY == 0 ? 10 : maxY * 1.3; 
+    maxY = maxY == 0 ? 10 : maxY * 1.3;
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
+          BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
         ],
       ),
       padding: const EdgeInsets.fromLTRB(16, 32, 24, 20),
@@ -260,7 +262,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                           padding: const EdgeInsets.only(top: 10.0),
                           child: Text(
                             name,
-                            style: TextStyle(fontSize: 10, color: Colors.grey.shade600, fontWeight: FontWeight.w500),
+                            style: TextStyle(fontSize: 10, color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
                           ),
                         ),
                       );
@@ -279,7 +281,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                       axisSide: meta.axisSide,
                       child: Text(
                         value.toInt().toString(),
-                        style: TextStyle(fontSize: 11, color: Colors.grey.shade400, fontWeight: FontWeight.w600),
+                        style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6), fontWeight: FontWeight.w600),
                       ),
                     );
                   },
@@ -293,9 +295,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
               show: true,
               drawVerticalLine: false,
               getDrawingHorizontalLine: (value) => FlLine(
-                color: Colors.grey.shade100,
+                color: theme.dividerColor.withValues(alpha: 0.3),
                 strokeWidth: 1.5,
-                dashArray: [5, 5], 
+                dashArray: [5, 5],
               ),
             ),
             barGroups: data.asMap().entries.map((entry) {
@@ -314,7 +316,7 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                     backDrawRodData: BackgroundBarChartRodData(
                       show: true,
                       toY: maxY,
-                      color: Colors.grey.shade50,
+                      color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
                     ),
                   ),
                 ],

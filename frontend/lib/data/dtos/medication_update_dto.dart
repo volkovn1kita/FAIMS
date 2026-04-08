@@ -1,6 +1,6 @@
 // lib/data/dtos/medication_update_dto.dart
 import 'package:json_annotation/json_annotation.dart';
-import 'package:frontend/data/dtos/measurement_unit.dart'; // Переконайтеся, що імпортуєте MeasurementUnit
+import 'package:faims/data/dtos/measurement_unit.dart'; // Переконайтеся, що імпортуєте MeasurementUnit
 
 part 'medication_update_dto.g.dart'; 
 

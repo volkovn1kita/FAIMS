@@ -1,15 +1,15 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/create_kit_dto.dart';
-import 'package:frontend/data/services/first_aid_kit_api_service.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/data/dtos/create_kit_dto.dart';
+import 'package:faims/data/services/first_aid_kit_api_service.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/core/app_theme.dart';
 import 'package:uuid/uuid.dart';
-import 'package:frontend/data/dtos/user_dto.dart';
-import 'package:frontend/data/dtos/department_dto.dart';
-import 'package:frontend/data/dtos/room_dto.dart';
-import 'package:frontend/data/dtos/update_kit_dto.dart';
-import 'package:frontend/domain/repositories/first_aid_kit_repository.dart';
+import 'package:faims/data/dtos/user_dto.dart';
+import 'package:faims/data/dtos/department_dto.dart';
+import 'package:faims/data/dtos/room_dto.dart';
+import 'package:faims/data/dtos/update_kit_dto.dart';
+import 'package:faims/domain/repositories/first_aid_kit_repository.dart';
 
 class AddEditKitScreen extends StatefulWidget {
   final String? kitId;
@@ -199,19 +199,18 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           widget.kitId == null ? l10n.addKitTitle : l10n.editKitTitle,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface, letterSpacing: -0.3),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -219,7 +218,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
-                Container(height: 1, decoration: BoxDecoration(boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))])),
+                Container(height: 1, decoration: BoxDecoration(boxShadow: [BoxShadow(color: theme.shadowColor.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))])),
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(20.0),
@@ -309,7 +308,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
                   style: ElevatedButton.styleFrom(backgroundColor: Colors.transparent, shadowColor: Colors.transparent, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))),
                   child: _isSaving
                       ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                      : Text(widget.kitId == null ? l10n.save : l10n.update, style: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
+                      : Text(widget.kitId == null ? l10n.save : l10n.update, style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold, letterSpacing: 1.1)),
                 ),
               ),
             ),
@@ -320,34 +319,37 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   }
 
   Widget _buildSectionTitle(String title) {
+    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 12),
-      child: Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: Colors.grey.shade500, letterSpacing: 0.5)),
+      child: Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurfaceVariant, letterSpacing: 0.5)),
     );
   }
 
   Widget _buildCard(List<Widget> children) {
+    final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8))]),
+      decoration: BoxDecoration(color: theme.cardColor, borderRadius: BorderRadius.circular(24), boxShadow: [BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8))]),
       child: Column(children: children),
     );
   }
 
   Widget _buildTextField({required TextEditingController controller, required String label, required String hint, required IconData icon, String? Function(String?)? validator}) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant)),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: Icon(icon, color: Colors.grey.shade400, size: 22),
+            prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant, size: 22),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
             focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppTheme.primary, width: 1.5)),
           ),
@@ -357,19 +359,20 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   }
 
   Widget _buildUniqueField(AppLocalizations l10n) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(l10n.uniqueNumber, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text(l10n.uniqueNumber, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant)),
         const SizedBox(height: 8),
         TextFormField(
           controller: _uniqueNumberController,
           readOnly: true,
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.fingerprint_rounded, color: Colors.grey.shade400, size: 22),
+            prefixIcon: Icon(Icons.fingerprint_rounded, color: theme.colorScheme.onSurfaceVariant, size: 22),
             suffixIcon: widget.kitId == null ? IconButton(icon: const Icon(Icons.refresh_rounded, color: AppTheme.primary), onPressed: _generateUniqueNumber) : null,
             filled: true,
-            fillColor: Colors.deepPurple.withValues(alpha: 0.03),
+            fillColor: AppTheme.primary.withValues(alpha: 0.05),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
           style: TextStyle(fontWeight: FontWeight.bold, color: AppTheme.primary),
@@ -379,10 +382,11 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   }
 
   Widget _buildDropdown<T>({required String label, required T? value, required List<DropdownMenuItem<T>> items, required IconData icon, required void Function(T?)? onChanged, bool isLoading = false}) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700)),
+        Text(label, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant)),
         const SizedBox(height: 8),
         DropdownButtonFormField<T>(
           initialValue: value,
@@ -390,9 +394,9 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
           onChanged: onChanged,
           icon: isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.expand_more_rounded),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: Colors.grey.shade400, size: 22),
+            prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant, size: 22),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
           ),
         ),

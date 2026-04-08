@@ -2,13 +2,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:frontend/core/constants.dart';
-import 'package:frontend/data/dtos/user_dto.dart';
-import 'package:frontend/data/dtos/create_user_request_dto.dart';
-import 'package:frontend/data/dtos/user_role_dto.dart';
-import 'package:frontend/data/dtos/update_user_request_dto.dart'; // <--- НОВИЙ DTO
+import 'package:faims/core/constants.dart';
+import 'package:faims/data/dtos/user_dto.dart';
+import 'package:faims/data/dtos/create_user_request_dto.dart';
+import 'package:faims/data/dtos/user_role_dto.dart';
+import 'package:faims/data/dtos/update_user_request_dto.dart'; // <--- НОВИЙ DTO
 import 'package:http/http.dart' as http;
-import 'package:frontend/utils/token_storage_service.dart';
+import 'package:faims/utils/token_storage_service.dart';
 
 class UserApiService {
   final String _baseUrl = Constants.baseUrl;

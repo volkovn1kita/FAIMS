@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/app_theme.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/presentation/screens/register_organization_screen.dart';
+import 'package:faims/core/app_theme.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/presentation/screens/register_organization_screen.dart';
 import 'package:go_router/go_router.dart';
 import '../../data/dtos/login_dto.dart';
 import '../../domain/repositories/auth_repository.dart';
@@ -138,17 +138,19 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    final theme = Theme.of(context);
+
     if (_isLoading && _errorMessage.isEmpty) {
-      return const Scaffold(
-        backgroundColor: Colors.white,
-        body: Center(
+      return Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: const Center(
           child: CircularProgressIndicator(color: AppTheme.primary),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -185,10 +187,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 40),
                 Text(
                   l10n.welcomeBack,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -196,7 +198,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   l10n.signInLabel,
                   style: TextStyle(
                     fontSize: 15,
-                    color: Colors.grey.shade500,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -272,7 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Text(
                       l10n.newClinicQuestion,
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: theme.colorScheme.onSurfaceVariant,
                         fontSize: 14,
                       ),
                     ),
@@ -290,9 +292,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: const Text(
-                        'Register',
-                        style: TextStyle(
+                      child: Text(
+                        l10n.register,
+                        style: const TextStyle(
                           color: AppTheme.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -318,6 +320,7 @@ class _LoginScreenState extends State<LoginScreen> {
     bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -325,30 +328,30 @@ class _LoginScreenState extends State<LoginScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         TextField(
           controller: controller,
           obscureText: isPassword && !_isPasswordVisible,
           keyboardType: keyboardType,
-          style: const TextStyle(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
-            prefixIcon: Icon(icon, color: Colors.grey.shade500),
+            hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontSize: 15),
+            prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
                       _isPasswordVisible ? Icons.visibility_rounded : Icons.visibility_off_rounded,
-                      color: Colors.grey.shade500,
+                      color: theme.colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                     onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
                   )
                 : null,
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),

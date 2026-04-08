@@ -1,21 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/first_aid_kit_list_dto.dart';
-import 'package:frontend/data/dtos/medication_dto.dart';
-import 'package:frontend/data/dtos/medication_create_dto.dart';
-import 'package:frontend/data/dtos/medication_quantity_update_dto.dart';
-import 'package:frontend/data/dtos/medication_write_off_dto.dart';
-import 'package:frontend/data/dtos/medication_refill_dto.dart';
-import 'package:frontend/domain/repositories/first_aid_kit_repository.dart';
-import 'package:frontend/domain/repositories/auth_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/presentation/screens/my_profile_screen.dart';
-import 'package:frontend/presentation/screens/settings_screen.dart';
-import 'package:frontend/core/extensions.dart';
+import 'package:faims/data/dtos/first_aid_kit_list_dto.dart';
+import 'package:faims/data/dtos/medication_dto.dart';
+import 'package:faims/data/dtos/medication_create_dto.dart';
+import 'package:faims/data/dtos/medication_quantity_update_dto.dart';
+import 'package:faims/data/dtos/medication_write_off_dto.dart';
+import 'package:faims/data/dtos/medication_refill_dto.dart';
+import 'package:faims/domain/repositories/first_aid_kit_repository.dart';
+import 'package:faims/domain/repositories/auth_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/presentation/screens/my_profile_screen.dart';
+import 'package:faims/presentation/screens/settings_screen.dart';
 import 'package:go_router/go_router.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/core/app_theme.dart';
 import 'package:intl/intl.dart';
-import 'package:frontend/data/dtos/expiration_status.dart';
-import 'package:frontend/data/dtos/measurement_unit.dart';
+import 'package:faims/data/dtos/expiration_status.dart';
+import 'package:faims/data/dtos/measurement_unit.dart';
 
 class UserHomeScreen extends StatefulWidget {
   final String userName;
@@ -130,28 +129,46 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
-  InputDecoration _inputStyle(String label, String? suffix) =>
-      InputDecoration(
-        labelText: label,
-        suffixText: suffix,
-        filled: true,
-        fillColor: AppTheme.primaryContainer,
-        labelStyle: const TextStyle(color: AppTheme.primaryLabel, fontSize: 14),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: BorderSide.none,
+  InputDecoration _inputStyle(String label, String? suffix) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    return InputDecoration(
+      labelText: label,
+      suffixText: suffix,
+      filled: true,
+      fillColor: isDark
+          ? theme.colorScheme.surfaceContainerHigh
+          : AppTheme.primaryContainer,
+      labelStyle: TextStyle(
+        color: isDark ? theme.colorScheme.onSurfaceVariant : AppTheme.primaryLabel,
+        fontSize: 14,
+      ),
+      suffixStyle: TextStyle(
+        color: theme.colorScheme.onSurfaceVariant,
+        fontSize: 14,
+      ),
+      floatingLabelStyle: TextStyle(
+        color: isDark ? theme.colorScheme.primary : AppTheme.primary,
+        fontWeight: FontWeight.w600,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide.none,
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(
+          color: isDark ? theme.colorScheme.outline.withValues(alpha: 0.3) : AppTheme.primaryBorder,
+          width: 1,
         ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.primaryBorder, width: 1.5),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(14),
-          borderSide: const BorderSide(color: AppTheme.primary, width: 2),
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      );
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(14),
+        borderSide: BorderSide(color: theme.colorScheme.primary, width: 2),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
 
   Widget _sheetHandle() => Center(
         child: Container(
@@ -159,7 +176,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           height: 4,
           margin: const EdgeInsets.only(bottom: 8),
           decoration: BoxDecoration(
-            color: Colors.grey.shade300,
+            color: Theme.of(context).colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(10),
           ),
         ),
@@ -182,7 +199,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w800,
-                color: Colors.black87,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
           ),
@@ -213,45 +230,27 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       );
 
   Widget _buildActionBtn(
-          String label, Color color, VoidCallback onPressed) =>
-      SizedBox(
-        width: double.infinity,
-        height: 54,
-        child: DecoratedBox(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [color, color.withValues(alpha: 0.78)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-            borderRadius: BorderRadius.circular(14),
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.35),
-                blurRadius: 14,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: ElevatedButton(
-            onPressed: onPressed,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.transparent,
-              shadowColor: Colors.transparent,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14)),
-            ),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          String label, Color color, VoidCallback onPressed) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: ElevatedButton(
+        onPressed: onPressed,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: color,
+          foregroundColor: Colors.white,
+          elevation: isDark ? 0 : 3,
+          shadowColor: isDark ? Colors.transparent : color.withValues(alpha: 0.4),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
         ),
-      );
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        ),
+      ),
+    );
+  }
 
   Widget _cancelBtn(BuildContext ctx, String label) => SizedBox(
         width: double.infinity,
@@ -260,7 +259,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           onPressed: () => Navigator.pop(ctx),
           child: Text(
             label,
-            style: const TextStyle(color: Colors.grey, fontSize: 15),
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 15),
           ),
         ),
       );
@@ -278,10 +277,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         padding:
             EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: Theme.of(ctx).colorScheme.surface,
             borderRadius:
-                BorderRadius.vertical(top: Radius.circular(28)),
+                const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
           child: Column(
@@ -298,7 +297,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               const SizedBox(height: 20),
               _infoRow(
                 Icons.inventory_2_outlined,
-                '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
+                '${l10n.available}: ${medication.quantity} ${medication.unit.localizedName(context)}',
                 AppTheme.primary,
               ),
               const SizedBox(height: 20),
@@ -309,7 +308,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     fontWeight: FontWeight.w600, fontSize: 15),
                 decoration: _inputStyle(
                   l10n.quantityToUse,
-                  medication.unit.name.capitalize(),
+                  medication.unit.localizedName(context),
                 ),
               ),
               const SizedBox(height: 28),
@@ -352,10 +351,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           padding: EdgeInsets.only(
               bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: Theme.of(ctx).colorScheme.surface,
               borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(28)),
+                  const BorderRadius.vertical(top: Radius.circular(28)),
             ),
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
             child: SingleChildScrollView(
@@ -373,7 +372,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   const SizedBox(height: 20),
                   _infoRow(
                     Icons.info_outline_rounded,
-                    '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
+                    '${l10n.available}: ${medication.quantity} ${medication.unit.localizedName(context)}',
                     AppTheme.primary,
                   ),
                   const SizedBox(height: 20),
@@ -384,7 +383,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                         fontWeight: FontWeight.w600, fontSize: 15),
                     decoration: _inputStyle(
                       l10n.quantity,
-                      medication.unit.name.capitalize(),
+                      medication.unit.localizedName(context),
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -398,9 +397,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .add(const Duration(days: 3650)),
                         builder: (context, child) => Theme(
                           data: Theme.of(context).copyWith(
-                            colorScheme: const ColorScheme.light(
-                              primary: AppTheme.primary,
-                              onSurface: Colors.black87,
+                            colorScheme: ColorScheme.fromSeed(
+                              seedColor: AppTheme.primary,
+                              brightness: Theme.of(context).brightness,
                             ),
                           ),
                           child: child!,
@@ -412,14 +411,21 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryContainer,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).colorScheme.surfaceContainerHigh
+                            : AppTheme.primaryContainer,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                            color: AppTheme.primaryBorder, width: 1.5),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)
+                                : AppTheme.primaryBorder,
+                            width: 1),
                       ),
                       child: Row(children: [
-                        const Icon(Icons.calendar_today_rounded,
-                            size: 18, color: AppTheme.primaryLabel),
+                        Icon(Icons.calendar_today_rounded,
+                            size: 18, color: Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).colorScheme.onSurfaceVariant
+                                : AppTheme.primaryLabel),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
@@ -428,9 +434,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             children: [
                               Text(
                                 l10n.newExpirationDate,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 11,
-                                    color: AppTheme.primaryLabel,
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? Theme.of(context).colorScheme.onSurfaceVariant
+                                        : AppTheme.primaryLabel,
                                     fontWeight: FontWeight.w500),
                               ),
                               Text(
@@ -438,14 +446,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.chevron_right_rounded,
-                            color: AppTheme.primaryLabel),
+                        Icon(Icons.chevron_right_rounded,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).colorScheme.onSurfaceVariant
+                                : AppTheme.primaryLabel),
                       ]),
                     ),
                   ),
@@ -492,10 +502,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         padding:
             EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
         child: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
+          decoration: BoxDecoration(
+            color: Theme.of(ctx).colorScheme.surface,
             borderRadius:
-                BorderRadius.vertical(top: Radius.circular(28)),
+                const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
           child: Column(
@@ -512,7 +522,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               const SizedBox(height: 20),
               _infoRow(
                 Icons.warning_amber_rounded,
-                '${l10n.available}: ${medication.quantity} ${medication.unit.name.capitalize()}',
+                '${l10n.available}: ${medication.quantity} ${medication.unit.localizedName(context)}',
                 Colors.red.shade700,
               ),
               const SizedBox(height: 20),
@@ -523,7 +533,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     fontWeight: FontWeight.w600, fontSize: 15),
                 decoration: _inputStyle(
                   l10n.quantityToWriteOff,
-                  medication.unit.name.capitalize(),
+                  medication.unit.localizedName(context),
                 ),
               ),
               const SizedBox(height: 14),
@@ -580,10 +590,10 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           padding: EdgeInsets.only(
               bottom: MediaQuery.of(ctx).viewInsets.bottom),
           child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
+            decoration: BoxDecoration(
+              color: Theme.of(ctx).colorScheme.surface,
               borderRadius:
-                  BorderRadius.vertical(top: Radius.circular(28)),
+                  const BorderRadius.vertical(top: Radius.circular(28)),
             ),
             padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
             child: SingleChildScrollView(
@@ -632,15 +642,19 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                   DropdownButtonFormField<MeasurementUnit>(
                     initialValue: unit,
                     decoration: _inputStyle(l10n.unit, null),
+                    dropdownColor: Theme.of(ctx).brightness == Brightness.dark
+                        ? Theme.of(ctx).colorScheme.surfaceContainerHigh
+                        : null,
                     borderRadius: BorderRadius.circular(16),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w500,
+                      fontSize: 15,
+                      color: Theme.of(ctx).colorScheme.onSurface,
+                    ),
                     items: MeasurementUnit.values
                         .map((u) => DropdownMenuItem(
                               value: u,
-                              child: Text(
-                                u.name.capitalize(),
-                                style: TextStyle(
-                                    fontWeight: FontWeight.w500),
-                              ),
+                              child: Text(u.localizedName(context)),
                             ))
                         .toList(),
                     onChanged: (v) => setS(() => unit = v!),
@@ -656,9 +670,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             .add(const Duration(days: 3650)),
                         builder: (context, child) => Theme(
                           data: Theme.of(context).copyWith(
-                            colorScheme: const ColorScheme.light(
-                              primary: AppTheme.primary,
-                              onSurface: Colors.black87,
+                            colorScheme: ColorScheme.fromSeed(
+                              seedColor: AppTheme.primary,
+                              brightness: Theme.of(context).brightness,
                             ),
                           ),
                           child: child!,
@@ -670,10 +684,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 14),
                       decoration: BoxDecoration(
-                        color: AppTheme.primaryContainer,
+                        color: Theme.of(context).brightness == Brightness.dark
+                            ? Theme.of(context).colorScheme.surfaceContainerHigh
+                            : AppTheme.primaryContainer,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                            color: AppTheme.primaryBorder, width: 1.5),
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).colorScheme.outline.withValues(alpha: 0.3)
+                                : AppTheme.primaryBorder,
+                            width: 1),
                       ),
                       child: Row(children: [
                         const Icon(Icons.calendar_today_rounded,
@@ -686,9 +705,11 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                             children: [
                               Text(
                                 l10n.expirationDate,
-                                style: const TextStyle(
+                                style: TextStyle(
                                     fontSize: 11,
-                                    color: AppTheme.primaryLabel,
+                                    color: Theme.of(context).brightness == Brightness.dark
+                                        ? Theme.of(context).colorScheme.onSurfaceVariant
+                                        : AppTheme.primaryLabel,
                                     fontWeight: FontWeight.w500),
                               ),
                               Text(
@@ -696,14 +717,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                                  color: Theme.of(context).colorScheme.onSurface,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        const Icon(Icons.chevron_right_rounded,
-                            color: AppTheme.primaryLabel),
+                        Icon(Icons.chevron_right_rounded,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Theme.of(context).colorScheme.onSurfaceVariant
+                                : AppTheme.primaryLabel),
                       ]),
                     ),
                   ),
@@ -759,10 +782,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: theme.brightness == Brightness.light
+          ? const Color(0xFFF5F3FF)
+          : theme.colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.cardColor,
         elevation: 0,
         centerTitle: true,
         title: Text('FAIMS',
@@ -780,8 +806,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             }),
         actions: [
           IconButton(
-              icon: const Icon(Icons.settings_outlined,
-                  color: Colors.black87),
+              icon: Icon(Icons.settings_outlined,
+                  color: theme.colorScheme.onSurface),
               onPressed: () => Navigator.of(context).push(
                   MaterialPageRoute(
                       builder: (c) => const SettingsScreen()))),
@@ -825,14 +851,14 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                               child: Column(
                                 children: [
                                   Icon(Icons.inventory_2_outlined,
-                                      size: 64, color: Colors.grey.shade300),
+                                      size: 64, color: theme.colorScheme.onSurfaceVariant),
                                   const SizedBox(height: 16),
                                   Text(
                                     l10n.notAssignedToKit,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontSize: 16,
-                                      color: Colors.grey.shade600,
+                                      color: theme.colorScheme.onSurfaceVariant,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -855,7 +881,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
+                  color: Theme.of(context).colorScheme.onSurface,
                   letterSpacing: -0.5)),
           const SizedBox(height: 8),
           Container(
@@ -988,7 +1014,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black87)),
+                color: Theme.of(context).colorScheme.onSurface)),
         TextButton.icon(
           onPressed: () => _showAddMedicationDialog(l10n),
           icon: const Icon(Icons.add_rounded, size: 20),
@@ -1001,14 +1027,16 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
         ),
       ]);
 
-  Widget _buildFilterSection(AppLocalizations l10n) => Column(children: [
+  Widget _buildFilterSection(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    return Column(children: [
         Container(
           decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.cardColor,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
+                    color: theme.shadowColor.withValues(alpha: 0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 4))
               ]),
@@ -1017,7 +1045,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               decoration: InputDecoration(
                   hintText: l10n.searchMedicationHint,
                   prefixIcon:
-                      const Icon(Icons.search_rounded, color: Colors.grey),
+                      Icon(Icons.search_rounded, color: theme.colorScheme.onSurfaceVariant),
                   border: InputBorder.none,
                   contentPadding:
                       const EdgeInsets.symmetric(vertical: 15))),
@@ -1041,12 +1069,13 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       }),
                   selectedColor: Colors.amber.shade100,
                   checkmarkColor: Colors.amber.shade900,
-                  backgroundColor: Colors.white,
-                  shape: const StadiumBorder(
-                      side: BorderSide(color: Color(0xFFEEEEEE)))),
+                  backgroundColor: theme.cardColor,
+                  shape: StadiumBorder(
+                      side: BorderSide(color: theme.dividerColor))),
             ])),
         const SizedBox(height: 16),
       ]);
+  }
 
   Widget _buildFilterChip(
       String label, ExpirationStatus status, Color color) {
@@ -1062,9 +1091,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
             }),
         selectedColor: color.withValues(alpha: 0.1),
         checkmarkColor: color,
-        backgroundColor: Colors.white,
-        shape: const StadiumBorder(
-            side: BorderSide(color: Color(0xFFEEEEEE))));
+        backgroundColor: Theme.of(context).cardColor,
+        shape: StadiumBorder(
+            side: BorderSide(color: Theme.of(context).dividerColor)));
   }
 
   Widget _buildMedicationList(AppLocalizations l10n) {
@@ -1073,7 +1102,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           child: Padding(
               padding: const EdgeInsets.all(40),
               child: Text(l10n.noMedicationsFound,
-                  style: const TextStyle(color: Colors.grey))));
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant))));
     }
     return ListView.builder(
         shrinkWrap: true,
@@ -1086,14 +1115,15 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   Widget _buildMedicationCard(MedicationDto med, AppLocalizations l10n) {
     Color sColor = _getStatusColor(med.status);
     bool isLow = med.quantity < med.minimumQuantity;
+    final theme = Theme.of(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-          color: Colors.white,
+          color: theme.cardColor,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.02),
+                color: theme.shadowColor.withValues(alpha: 0.02),
                 blurRadius: 10,
                 offset: const Offset(0, 4))
           ]),
@@ -1117,18 +1147,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                 Text(
                     '${l10n.expires}: ${DateFormat('dd.MM.yyyy').format(med.expirationDate)}',
                     style:
-                        const TextStyle(fontSize: 12, color: Colors.grey)),
+                        TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
               ])),
           _buildStatusTag(med.status, l10n),
         ]),
         const SizedBox(height: 16),
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           _buildStatItem(l10n.quantity,
-              '${med.quantity} ${med.unit.name.capitalize()}',
-              isLow ? Colors.red : Colors.black87),
+              '${med.quantity} ${med.unit.localizedName(context)}',
+              isLow ? Colors.red : theme.colorScheme.onSurface),
           _buildStatItem(l10n.minRequired,
-              '${med.minimumQuantity} ${med.unit.name.capitalize()}',
-              Colors.grey),
+              '${med.minimumQuantity} ${med.unit.localizedName(context)}',
+              theme.colorScheme.onSurfaceVariant),
         ]),
         const SizedBox(height: 16),
         if (med.quantity > 0)
@@ -1182,9 +1212,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   Widget _buildStatItem(String label, String value, Color valueColor) =>
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(label,
-            style: const TextStyle(
+            style: TextStyle(
                 fontSize: 11,
-                color: Colors.grey,
+                color: Theme.of(context).colorScheme.onSurfaceVariant,
                 fontWeight: FontWeight.w600)),
         Text(value,
             style: TextStyle(
@@ -1236,16 +1266,18 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
-  Widget _buildBottomNav(AppLocalizations l10n) => Container(
+  Widget _buildBottomNav(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    return Container(
         decoration: BoxDecoration(boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.05),
+              color: theme.shadowColor.withValues(alpha: 0.05),
               blurRadius: 20,
               offset: const Offset(0, -5))
         ]),
         child: BottomNavigationBar(
           elevation: 0,
-          backgroundColor: Colors.white,
+          backgroundColor: theme.cardColor,
           currentIndex: _selectedIndex,
           selectedItemColor: AppTheme.primary,
           onTap: _onItemTapped,
@@ -1258,4 +1290,5 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           ],
         ),
       );
+  }
 }

@@ -1,12 +1,12 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
-import 'package:frontend/core/constants.dart';
-import 'package:frontend/data/dtos/user_dto.dart';
-import 'package:frontend/data/dtos/user_role_dto.dart';
-import 'package:frontend/domain/repositories/user_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/presentation/screens/add_edit_user_screen.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/core/constants.dart';
+import 'package:faims/data/dtos/user_dto.dart';
+import 'package:faims/data/dtos/user_role_dto.dart';
+import 'package:faims/domain/repositories/user_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/presentation/screens/add_edit_user_screen.dart';
+import 'package:faims/core/app_theme.dart';
 
 class ManageUsersScreen extends StatefulWidget {
   const ManageUsersScreen({super.key});
@@ -148,7 +148,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         await _userRepository.deleteUser(userId); 
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User deleted successfully!')),
+          SnackBar(content: Text(l10n.userDeletedSuccessfully)),
         );
         _loadData(); 
       } catch (e) {
@@ -172,27 +172,26 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100, 
       appBar: AppBar(
         title: Text(
           l10n.manageUsers,
-          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: Colors.black87),
+          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: theme.colorScheme.onSurface),
         ),
         centerTitle: false,
         titleSpacing: 0,
-        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: Column(
         children: [
           Container(
-            color: Colors.white,
+            color: theme.colorScheme.surface,
             padding: const EdgeInsets.only(bottom: 12),
             child: Column(
               children: [
@@ -202,14 +201,16 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: l10n.searchByNameOrEmail,
-                      hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
-                      prefixIcon: Icon(Icons.search, color: Colors.grey.shade500),
+                      hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 15),
+                      prefixIcon: Icon(Icons.search, color: theme.colorScheme.onSurfaceVariant),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide.none,
                       ),
                       filled: true,
-                      fillColor: Colors.grey.shade50, 
+                      fillColor: theme.brightness == Brightness.light
+                          ? Colors.grey.shade100
+                          : theme.colorScheme.surfaceContainerHighest,
                       contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                     ),
                     onChanged: (value) => _applyFiltersAndSort(),
@@ -242,7 +243,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: theme.shadowColor.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
 
@@ -260,7 +261,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                         ? Center(
                             child: Text(
                               l10n.noUsersFoundMatchingYourCriteria,
-                              style: TextStyle(fontSize: 15, color: Colors.grey.shade500),
+                              style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurfaceVariant),
                             ),
                           )
                         : ListView.builder(
@@ -270,22 +271,25 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                               final user = _filteredUsers[index];
                               return Padding(
                                 padding: const EdgeInsets.only(bottom: 12.0),
-                                child: Dismissible(
-                                  key: Key(user.id),
-                                  direction: DismissDirection.horizontal,
-                                  background: _buildSwipeBackground(Icons.edit_outlined, Colors.blue.shade400, Alignment.centerLeft),
-                                  secondaryBackground: _buildSwipeBackground(Icons.delete_outline, Colors.redAccent, Alignment.centerRight),
-                                  confirmDismiss: (direction) async {
-                                    if (direction == DismissDirection.endToStart) {
-                                      await _deleteUser(user.id);
-                                      return false; 
-                                    } else if (direction == DismissDirection.startToEnd) {
-                                      await _navigateToAddEditUser(userId: user.id);
-                                      return false; 
-                                    }
-                                    return false;
-                                  },
-                                  child: _buildUserCard(user),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Dismissible(
+                                    key: Key(user.id),
+                                    direction: DismissDirection.horizontal,
+                                    background: _buildSwipeBackground(Icons.edit_outlined, Colors.blue.shade400, Alignment.centerLeft),
+                                    secondaryBackground: _buildSwipeBackground(Icons.delete_outline, Colors.redAccent, Alignment.centerRight),
+                                    confirmDismiss: (direction) async {
+                                      if (direction == DismissDirection.endToStart) {
+                                        await _deleteUser(user.id);
+                                        return false;
+                                      } else if (direction == DismissDirection.startToEnd) {
+                                        await _navigateToAddEditUser(userId: user.id);
+                                        return false;
+                                      }
+                                      return false;
+                                    },
+                                    child: _buildUserCard(user),
+                                  ),
                                 ),
                               );
                             },
@@ -309,17 +313,12 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
-        ],
+        color: Theme.of(context).cardColor,
       ),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _navigateToAddEditUser(userId: user.id), 
-          borderRadius: BorderRadius.circular(16),
+          onTap: () => _navigateToAddEditUser(userId: user.id),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -345,13 +344,13 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
                     children: [
                       Text(
                         user.fullName,
-                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Theme.of(context).colorScheme.onSurface),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(
                         user.email,
-                        style: TextStyle(color: Colors.grey.shade500, fontSize: 13),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant, fontSize: 13),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -384,38 +383,48 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
     
     return Container(
       height: 38,
-      constraints: const BoxConstraints(maxWidth: 140),
-      padding: const EdgeInsets.symmetric(horizontal: 12),
+      constraints: const BoxConstraints(maxWidth: 170),
+      padding: const EdgeInsets.only(left: 10, right: 4),
       decoration: BoxDecoration(
-        color: isActive ? AppTheme.primary.withValues(alpha: 0.1) : Colors.grey.shade50,
+        color: isActive ? AppTheme.primary.withValues(alpha: 0.1) : Theme.of(context).colorScheme.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: isActive ? AppTheme.primary : Colors.grey.shade200),
+        border: Border.all(color: isActive ? AppTheme.primary : Theme.of(context).dividerColor),
       ),
-      child: DropdownButtonHideUnderline(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            Icons.badge_outlined,
+            size: 16,
+            color: isActive ? AppTheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: DropdownButtonHideUnderline(
         child: DropdownButton<UserRoleDto?>(
           isExpanded: true,
           value: _selectedRoleFilter,
           icon: const Padding(
-            padding: EdgeInsets.only(left: 4.0),
+            padding: EdgeInsets.only(left: 2.0),
             child: Icon(Icons.keyboard_arrow_down_rounded, size: 18),
           ),
-          iconEnabledColor: isActive ? AppTheme.primary : Colors.grey.shade600,
-          dropdownColor: Colors.white,
+          iconEnabledColor: isActive ? AppTheme.primary : Theme.of(context).colorScheme.onSurfaceVariant,
+          dropdownColor: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           hint: Text(
-            l10n.filterByRole, 
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Colors.grey.shade700),
+            l10n.filterByRole,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.onSurfaceVariant),
             overflow: TextOverflow.ellipsis,
           ),
           style: TextStyle(
             fontSize: 14, 
             fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-            color: isActive ? AppTheme.primary : Colors.black87,
+            color: isActive ? AppTheme.primary : Theme.of(context).colorScheme.onSurface,
           ),
           items: [
-            const DropdownMenuItem<UserRoleDto?>(
+            DropdownMenuItem<UserRoleDto?>(
               value: null,
-              child: Text("All Roles", overflow: TextOverflow.ellipsis),
+              child: Text(l10n.any, overflow: TextOverflow.ellipsis),
             ),
             ..._availableRoles.map((role) {
               return DropdownMenuItem<UserRoleDto>(
@@ -430,6 +439,9 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
           },
         ),
       ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -441,18 +453,18 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         height: 38,
         padding: const EdgeInsets.symmetric(horizontal: 14),
         decoration: BoxDecoration(
-          color: isActive ? Colors.grey.shade100 : Colors.white,
+          color: isActive ? Theme.of(context).colorScheme.surfaceContainerHighest : Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(color: Theme.of(context).dividerColor),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, size: 18, color: Colors.black87),
+            Icon(icon, size: 18, color: Theme.of(context).colorScheme.onSurface),
             const SizedBox(width: 6),
             Text(
               label,
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface),
             ),
           ],
         ),
@@ -462,10 +474,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
 
   Widget _buildSwipeBackground(IconData icon, Color color, Alignment alignment) {
     return Container(
-      decoration: BoxDecoration(
-        color: color,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      color: color,
       child: Align(
         alignment: alignment,
         child: Padding(

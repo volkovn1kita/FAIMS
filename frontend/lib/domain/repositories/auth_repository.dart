@@ -1,10 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:frontend/data/dtos/login_dto.dart';
-import 'package:frontend/data/models/auth_result.dart';
-import 'package:frontend/data/services/auth_api_service.dart';
-import 'package:frontend/utils/token_storage_service.dart';
-import 'package:frontend/data/dtos/register_organization_dto.dart';
+import 'package:faims/data/dtos/login_dto.dart';
+import 'package:faims/data/models/auth_result.dart';
+import 'package:faims/data/services/auth_api_service.dart';
+import 'package:faims/utils/token_storage_service.dart';
+import 'package:faims/data/dtos/register_organization_dto.dart';
 
 class AuthRepository {
   final AuthApiService _apiService = AuthApiService();

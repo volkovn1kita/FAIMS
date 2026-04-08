@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/dashboard_overview.dart';
-import 'package:frontend/domain/repositories/dashboard_repository.dart';
-import 'package:frontend/domain/repositories/auth_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/presentation/screens/analytics_screen.dart';
-import 'package:frontend/presentation/screens/manage_departments_screen.dart';
-import 'package:frontend/presentation/screens/manage_users_screen.dart';
-import 'package:frontend/presentation/screens/manage_kits_screen.dart';
-import 'package:frontend/presentation/screens/my_profile_screen.dart';
-import 'package:frontend/presentation/screens/settings_screen.dart';
-import 'package:frontend/presentation/screens/reports_screen.dart';
-import 'package:frontend/core/app_theme.dart';
-import 'package:frontend/presentation/widgets/skeleton_loader.dart';
+import 'package:faims/data/dtos/dashboard_overview.dart';
+import 'package:faims/domain/repositories/dashboard_repository.dart';
+import 'package:faims/domain/repositories/auth_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/presentation/screens/analytics_screen.dart';
+import 'package:faims/presentation/screens/manage_departments_screen.dart';
+import 'package:faims/presentation/screens/manage_users_screen.dart';
+import 'package:faims/presentation/screens/manage_kits_screen.dart';
+import 'package:faims/presentation/screens/my_profile_screen.dart';
+import 'package:faims/presentation/screens/settings_screen.dart';
+import 'package:faims/presentation/screens/reports_screen.dart';
+import 'package:faims/core/app_theme.dart';
+import 'package:faims/presentation/widgets/skeleton_loader.dart';
 import 'package:go_router/go_router.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -102,17 +102,18 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final bool isWeb = MediaQuery.of(context).size.width >= 800;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.appBarTheme.backgroundColor,
         elevation: 0,
         leading: isWeb
             ? const SizedBox.shrink()
             : Builder(
                 builder: (context) => IconButton(
-                  icon: const Icon(Icons.menu_rounded, color: Colors.black87),
+                  icon: Icon(Icons.menu_rounded, color: theme.colorScheme.onSurface),
                   onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
               ),
@@ -126,12 +127,8 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
         centerTitle: true,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none_rounded, color: Colors.black87),
-            onPressed: () {},
-          ),
-          const SizedBox(width: 8),
+        actions: const [
+          SizedBox(width: 8),
         ],
       ),
       drawer: isWeb ? null : Drawer(child: _buildSideMenu(l10n, isWeb)),
@@ -142,9 +139,9 @@ class _HomeScreenState extends State<HomeScreen> {
             Container(
               width: 280,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: theme.colorScheme.surface,
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(2, 0))
+                  BoxShadow(color: theme.shadowColor.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(2, 0))
                 ],
               ),
               child: _buildSideMenu(l10n, isWeb),
@@ -159,12 +156,12 @@ class _HomeScreenState extends State<HomeScreen> {
           : Container(
               decoration: BoxDecoration(
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -5)),
+                  BoxShadow(color: theme.shadowColor.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -5)),
                 ],
               ),
               child: BottomNavigationBar(
                 elevation: 0,
-                backgroundColor: Colors.white,
+                backgroundColor: theme.bottomNavigationBarTheme.backgroundColor,
                 items: <BottomNavigationBarItem>[
                   BottomNavigationBarItem(
                     icon: const Padding(padding: EdgeInsets.only(bottom: 4.0), child: Icon(Icons.home_rounded, size: 26)),
@@ -177,7 +174,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
                 currentIndex: 0,
                 selectedItemColor: AppTheme.primary,
-                unselectedItemColor: Colors.grey.shade400,
+                unselectedItemColor: theme.colorScheme.onSurfaceVariant,
                 selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                 unselectedLabelStyle: TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
                 type: BottomNavigationBarType.fixed,
@@ -257,7 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Divider(color: Colors.grey.shade200, thickness: 1.5),
+                child: Divider(color: Theme.of(context).dividerColor, thickness: 1.5),
               ),
               _buildDrawerItem(
                 icon: Icons.logout_rounded,
@@ -285,7 +282,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           Text(
             l10n.welcomeUser(_userName),
-            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87, letterSpacing: -0.5),
+            style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface, letterSpacing: -0.5),
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 8),
@@ -314,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 40),
           Text(
             l10n.overview,
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(height: 16),
           AnimatedSwitcher(
@@ -403,8 +400,8 @@ class _HomeScreenState extends State<HomeScreen> {
     required IconData icon,
     required String title,
     required VoidCallback onTap,
-    Color textColor = Colors.black87,
-    Color iconColor = Colors.black54,
+    Color? textColor,
+    Color? iconColor,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
@@ -413,18 +410,18 @@ class _HomeScreenState extends State<HomeScreen> {
         child: InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          splashColor: Colors.grey.shade100,
-          highlightColor: Colors.grey.shade50,
+          splashColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+          highlightColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 14.0, horizontal: 16.0),
             child: Row(
               children: [
-                Icon(icon, color: iconColor, size: 24),
+                Icon(icon, color: iconColor ?? Theme.of(context).colorScheme.onSurface, size: 24),
                 const SizedBox(width: 16),
                 Text(
                   title,
                   style: TextStyle(
-                    color: textColor,
+                    color: textColor ?? Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -459,13 +456,13 @@ class _HomeScreenState extends State<HomeScreen> {
           const SizedBox(height: 16),
           Text(
             value,
-            style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Colors.black87, height: 1.0),
+            style: TextStyle(fontSize: 34, fontWeight: FontWeight.w800, color: Theme.of(context).colorScheme.onSurface, height: 1.0),
           ),
           const SizedBox(height: 8),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade600, height: 1.2),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurfaceVariant, height: 1.2),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
@@ -501,7 +498,7 @@ class _HoverDashboardCardState extends State<_HoverDashboardCard> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(

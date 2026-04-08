@@ -1,6 +1,6 @@
 
 import 'package:json_annotation/json_annotation.dart';
-import 'package:frontend/data/dtos/measurement_unit.dart';
+import 'package:faims/data/dtos/measurement_unit.dart';
 
 part 'medication_create_dto.g.dart';
 

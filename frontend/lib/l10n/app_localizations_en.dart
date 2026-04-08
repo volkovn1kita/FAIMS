@@ -824,4 +824,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get camera => 'Camera';
+
+  @override
+  String get unitPieces => 'Pieces';
+
+  @override
+  String get unitMilliliters => 'Milliliters';
+
+  @override
+  String get unitGrams => 'Grams';
+
+  @override
+  String get unitTablets => 'Tablets';
+
+  @override
+  String get unitAmpoules => 'Ampoules';
+
+  @override
+  String get unitPacks => 'Packs';
+
+  @override
+  String get languageLabel => 'Language';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get good => 'Good';
+
+  @override
+  String get darkMode => 'Dark Mode';
+
+  @override
+  String get appearance => 'Appearance';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profile updated successfully!';
+
+  @override
+  String get avatarUploadedSuccessfully => 'Avatar uploaded successfully!';
+
+  @override
+  String get avatarDeletedSuccessfully => 'Avatar deleted successfully!';
+
+  @override
+  String get userCreatedSuccessfully => 'User created successfully!';
+
+  @override
+  String get userUpdatedSuccessfully => 'User updated successfully!';
+
+  @override
+  String get userDeletedSuccessfully => 'User deleted successfully!';
 }

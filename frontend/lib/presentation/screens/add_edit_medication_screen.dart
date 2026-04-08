@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/core/app_theme.dart';
 import 'package:intl/intl.dart';
-import 'package:frontend/data/dtos/medication_create_dto.dart';
-import 'package:frontend/data/dtos/medication_update_dto.dart';
-import 'package:frontend/data/dtos/measurement_unit.dart';
-import 'package:frontend/domain/repositories/first_aid_kit_repository.dart';
-import 'package:frontend/core/extensions.dart';
+import 'package:faims/data/dtos/medication_create_dto.dart';
+import 'package:faims/data/dtos/medication_update_dto.dart';
+import 'package:faims/data/dtos/measurement_unit.dart';
+import 'package:faims/domain/repositories/first_aid_kit_repository.dart';
 
 class AddEditMedicationScreen extends StatefulWidget {
   final String kitId;
@@ -105,15 +104,14 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
       lastDate: DateTime(2101),
       builder: (context, child) {
         return Theme(
-          data: ThemeData.light().copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: AppTheme.primary, 
-              onPrimary: Colors.white, 
-              onSurface: Colors.black87, 
+          data: Theme.of(context).copyWith(
+            colorScheme: Theme.of(context).colorScheme.copyWith(
+              primary: AppTheme.primary,
+              onPrimary: Colors.white,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
-                foregroundColor: AppTheme.primary, 
+                foregroundColor: AppTheme.primary,
               ),
             ),
           ),
@@ -203,19 +201,18 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.white,
         elevation: 0,
         title: Text(
           _isEditing ? l10n.editMedication : l10n.addMedication,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface, letterSpacing: -0.3),
         ),
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(false),
         ),
       ),
@@ -224,11 +221,11 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: theme.shadowColor.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
-            child: _isLoading && _isEditing 
+            child: _isLoading && _isEditing
                 ? const Center(child: CircularProgressIndicator())
                 : SingleChildScrollView(
                     padding: const EdgeInsets.all(20.0).copyWith(bottom: 40),
@@ -256,13 +253,13 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
                               ],
                             ),
                           ),
-                          
+
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
+                              BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
                             ],
                           ),
                           padding: const EdgeInsets.all(24),
@@ -385,9 +382,9 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
                                           const SizedBox(width: 8),
                                           Text(
                                             _isEditing ? l10n.saveChanges : l10n.addMedication,
-                                            style: TextStyle(
-                                              fontSize: 16, 
-                                              color: Colors.white, 
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.white,
                                               fontWeight: FontWeight.bold,
                                               letterSpacing: 1.1,
                                             ),
@@ -417,6 +414,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
     VoidCallback? onTap,
     String? Function(String?)? validator,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -424,7 +422,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         TextFormField(
@@ -433,13 +431,12 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           readOnly: readOnly,
           onTap: onTap,
           validator: validator,
-          style: TextStyle(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
-            prefixIcon: Icon(icon, color: Colors.grey.shade500),
+            prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -468,6 +465,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
   }
 
   Widget _buildDropdown(AppLocalizations l10n) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -475,17 +473,17 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             l10n.unit,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         DropdownButtonFormField<MeasurementUnit>(
           initialValue: _selectedUnit,
-          icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
-          style: TextStyle(fontSize: 15, color: Colors.black87),
+          icon: Icon(Icons.expand_more_rounded, color: theme.colorScheme.onSurfaceVariant),
+          style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.science_outlined, color: Colors.grey.shade500),
+            prefixIcon: Icon(Icons.science_outlined, color: theme.colorScheme.onSurfaceVariant),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -503,7 +501,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
           items: MeasurementUnit.values.map((unit) {
             return DropdownMenuItem(
               value: unit,
-              child: Text(unit.name.capitalize(), style: TextStyle()),
+              child: Text(unit.localizedName(context), style: TextStyle()),
             );
           }).toList(),
           onChanged: (MeasurementUnit? newValue) {

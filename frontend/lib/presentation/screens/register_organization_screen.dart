@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/l10n/app_localizations.dart';
+import 'package:faims/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/core/app_theme.dart';
 import '../../data/dtos/register_organization_dto.dart';
 import '../../domain/repositories/auth_repository.dart';
 
@@ -19,7 +19,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  
+
   final AuthRepository _authRepository = AuthRepository();
 
   bool _isLoading = false;
@@ -93,14 +93,14 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_rounded, color: Colors.black87),
+          icon: Icon(Icons.arrow_back_rounded, color: theme.colorScheme.onSurface),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -116,7 +116,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                   style: TextStyle(
                     fontSize: 26,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: theme.colorScheme.onSurface,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -125,12 +125,12 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                   l10n.registerClinicSubtitle,
                   style: TextStyle(
                     fontSize: 15,
-                    color: Colors.grey.shade500,
+                    color: theme.colorScheme.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
-                
+
                 Text(
                   l10n.organizationDataLabel,
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary),
@@ -149,9 +149,9 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                   hintText: l10n.addressHint,
                   icon: Icons.location_on_outlined,
                 ),
-                
+
                 const SizedBox(height: 32),
-                
+
                 Text(
                   l10n.adminDataLabel,
                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.primary),
@@ -194,9 +194,9 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                   icon: Icons.lock_outline_rounded,
                   isPassword: true,
                 ),
-                
+
                 const SizedBox(height: 40),
-                
+
                 SizedBox(
                   height: 56,
                   child: ElevatedButton(
@@ -218,7 +218,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                           ),
                   ),
                 ),
-                
+
                 if (_errorMessage.isNotEmpty)
                   Padding(
                     padding: const EdgeInsets.only(top: 24),
@@ -262,6 +262,7 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
     bool isPassword = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -269,30 +270,30 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         TextField(
           controller: controller,
           obscureText: isPassword && !_isPasswordVisible,
           keyboardType: keyboardType,
-          style: TextStyle(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
             hintText: hintText,
-            hintStyle: TextStyle(color: Colors.grey.shade400, fontSize: 15),
-            prefixIcon: Icon(icon, color: Colors.grey.shade500),
+            hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5), fontSize: 15),
+            prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
                       _isPasswordVisible ? Icons.visibility_rounded : Icons.visibility_off_rounded,
-                      color: Colors.grey.shade500,
+                      color: theme.colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                     onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
                   )
                 : null,
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),

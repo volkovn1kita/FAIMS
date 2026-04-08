@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/department_detail_dto.dart';
-import 'package:frontend/data/dtos/room_list_dto.dart';
-import 'package:frontend/domain/repositories/department_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/presentation/screens/add_edit_room_screen.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/data/dtos/department_detail_dto.dart';
+import 'package:faims/data/dtos/room_list_dto.dart';
+import 'package:faims/domain/repositories/department_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/presentation/screens/add_edit_room_screen.dart';
+import 'package:faims/core/app_theme.dart';
 
 class DepartmentDetailScreen extends StatefulWidget {
   final String departmentId;
@@ -95,6 +95,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
   }
 
   Future<void> _deleteRoom(String roomId) async {
+    final theme = Theme.of(context);
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -106,7 +107,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: TextStyle(color: Colors.grey)),
+            child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -160,18 +161,18 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           l10n.departmentRooms(widget.departmentName),
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -188,7 +189,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
                   ? Center(
                       child: Text(
                         l10n.noRoomsFound,
-                        style: TextStyle(fontSize: 15, color: Colors.grey.shade500),
+                        style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurfaceVariant),
                         textAlign: TextAlign.center,
                       ),
                     )
@@ -230,12 +231,13 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
   }
 
   Widget _buildRoomCard(RoomListDto room) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(color: theme.shadowColor.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
       child: Material(
@@ -259,11 +261,11 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
                 Expanded(
                   child: Text(
                     room.name,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 28),
+                Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant, size: 28),
               ],
             ),
           ),

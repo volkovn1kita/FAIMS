@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/core/app_theme.dart';
 import 'package:intl/intl.dart';
-import 'package:frontend/data/dtos/report_item_dto.dart';
-import 'package:frontend/domain/repositories/reports_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/utils/pdf_generator.dart';
+import 'package:faims/data/dtos/report_item_dto.dart';
+import 'package:faims/domain/repositories/reports_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/utils/pdf_generator.dart';
 import 'package:printing/printing.dart';
 
 class ReportsScreen extends StatefulWidget {
@@ -17,7 +17,7 @@ class ReportsScreen extends StatefulWidget {
 class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
   final ReportsRepository _repository = ReportsRepository();
-  
+
   bool _isLoading = true;
   String _errorMessage = '';
 
@@ -31,7 +31,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
-    
+
     _endDate = DateTime.now();
     _startDate = _endDate.subtract(const Duration(days: 30));
 
@@ -73,6 +73,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
   }
 
   Future<void> _selectDateRange() async {
+    final theme = Theme.of(context);
     final DateTimeRange? picked = await showDateRangePicker(
       context: context,
       firstDate: DateTime(2020),
@@ -80,11 +81,9 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
       initialDateRange: DateTimeRange(start: _startDate, end: _endDate),
       builder: (context, child) {
         return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+          data: theme.copyWith(
+            colorScheme: theme.colorScheme.copyWith(
               primary: AppTheme.primary,
-              onPrimary: Colors.white,
-              onSurface: Colors.black87,
             ),
           ),
           child: child!,
@@ -125,7 +124,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
 
     try {
       final headers = [l10n.columnName, l10n.columnQuantity, l10n.columnUnit, l10n.columnReason];
-      
+
       final tableData = items.map((item) {
         return [
           item.medicationName,
@@ -142,7 +141,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
         startDate: _startDate,
         endDate: _endDate,
       );
-      
+
       final filename = '${isPurchaseTab ? "purchase" : "disposal"}_report.pdf';
       await Printing.sharePdf(bytes: pdfBytes, filename: filename);
     } catch (e) {
@@ -157,15 +156,15 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final dateformat = DateFormat('dd.MM.yyyy');
+    final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -173,13 +172,13 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
           style: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
-            color: Colors.black87,
+            color: theme.colorScheme.onSurface,
           ),
         ),
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppTheme.primary,
-          unselectedLabelColor: Colors.grey.shade500,
+          unselectedLabelColor: theme.colorScheme.onSurfaceVariant,
           indicatorColor: AppTheme.primary,
           indicatorWeight: 3,
           labelStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
@@ -193,7 +192,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
       body: Column(
         children: [
           Container(
-            color: Colors.white,
+            color: theme.scaffoldBackgroundColor,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: InkWell(
               onTap: _selectDateRange,
@@ -253,11 +252,12 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
   }
 
   Widget _buildReportList(List<ReportItemDto> items, IconData icon, Color iconColor, AppLocalizations l10n) {
+    final theme = Theme.of(context);
     if (items.isEmpty) {
       return Center(
         child: Text(
           l10n.listIsEmpty,
-          style: TextStyle(color: Colors.grey, fontSize: 16),
+          style: TextStyle(color: theme.colorScheme.onSurfaceVariant, fontSize: 16),
         ),
       );
     }
@@ -273,11 +273,11 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
           margin: const EdgeInsets.only(bottom: 12),
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: theme.cardColor,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.03),
+                color: theme.shadowColor.withValues(alpha: 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -303,7 +303,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -311,7 +311,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                       translatedReason,
                       style: TextStyle(
                         fontSize: 13,
-                        color: Colors.grey.shade500,
+                        color: theme.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],
@@ -325,7 +325,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w900,
-                      color: Colors.black87,
+                      color: theme.colorScheme.onSurface,
                     ),
                   ),
                   Text(
@@ -333,7 +333,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade500,
+                      color: theme.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],

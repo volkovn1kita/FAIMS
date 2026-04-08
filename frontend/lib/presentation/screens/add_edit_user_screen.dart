@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/create_user_request_dto.dart';
-import 'package:frontend/data/dtos/update_user_request_dto.dart';
-import 'package:frontend/data/dtos/user_role_dto.dart';
-import 'package:frontend/domain/repositories/user_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/data/dtos/create_user_request_dto.dart';
+import 'package:faims/data/dtos/update_user_request_dto.dart';
+import 'package:faims/data/dtos/user_role_dto.dart';
+import 'package:faims/domain/repositories/user_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/core/app_theme.dart';
 
 class AddEditUserScreen extends StatefulWidget {
   final String? userId; 
@@ -100,16 +100,17 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
       return;
     }
 
+    final l10n = AppLocalizations.of(context)!;
     if (!_isEditing && _passwordController.text != _confirmPasswordController.text) {
       setState(() {
-        _errorMessage = 'Password and Confirm Password do not match.';
+        _errorMessage = l10n.passwordDoNotMatch;
       });
       return;
     }
-    
+
     if (_isEditing && _passwordController.text.isNotEmpty && _passwordController.text != _confirmPasswordController.text) {
        setState(() {
-        _errorMessage = 'New Password and Confirm New Password do not match.';
+        _errorMessage = l10n.passwordDoNotMatch;
       });
       return;
     }
@@ -130,26 +131,28 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
         );
         await _userRepository.createUser(newUser);
         if (!mounted) return;
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('User created successfully!'),
+            content: Text(l10n.userCreatedSuccessfully),
             backgroundColor: Colors.green.shade600,
             behavior: SnackBarBehavior.floating,
           ),
         );
       } else {
-        final updatedUser = UpdateUserRequestDto( 
+        final updatedUser = UpdateUserRequestDto(
           firstName: _firstNameController.text,
           lastName: _lastNameController.text,
           email: _emailController.text,
           role: _selectedRole!.name,
-          password: _passwordController.text.isNotEmpty ? _passwordController.text : null, 
+          password: _passwordController.text.isNotEmpty ? _passwordController.text : null,
         );
-        await _userRepository.updateUser(widget.userId!, updatedUser); 
+        await _userRepository.updateUser(widget.userId!, updatedUser);
         if (!mounted) return;
+        final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('User updated successfully!'), 
+            content: Text(l10n.userUpdatedSuccessfully),
             backgroundColor: Colors.green.shade600,
             behavior: SnackBarBehavior.floating,
           ),
@@ -177,19 +180,18 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           _isEditing ? l10n.editUser : l10n.addNewUser,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.black87, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface, letterSpacing: -0.3),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -198,7 +200,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: theme.shadowColor.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -230,13 +232,13 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                               ],
                             ),
                           ),
-                          
+
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(24),
                             boxShadow: [
-                              BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
+                              BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 8)),
                             ],
                           ),
                           padding: const EdgeInsets.all(24),
@@ -277,12 +279,12 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                                 _buildDropdown(l10n),
                                 const SizedBox(height: 32),
                                 
-                                const Divider(height: 1, thickness: 1, color: Color(0xFFEEEEEE)),
+                                Divider(height: 1, thickness: 1, color: theme.dividerColor),
                                 const SizedBox(height: 24),
-                                
+
                                 Text(
                                   _isEditing ? l10n.changePassword : l10n.password,
-                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: Colors.black87),
+                                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
                                 ),
                                 const SizedBox(height: 16),
                                 
@@ -353,9 +355,9 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
                                       )
                                     : Text(
                                         _isEditing ? l10n.saveChanges : l10n.createUser,
-                                        style: TextStyle(
-                                          fontSize: 16, 
-                                          color: Colors.white, 
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: 1.1,
                                         ),
@@ -383,6 +385,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -390,7 +393,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         TextFormField(
@@ -398,21 +401,21 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           obscureText: isPassword && !isPasswordVisible,
           keyboardType: keyboardType,
           validator: validator,
-          style: TextStyle(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: Colors.grey.shade500),
+            prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
                       isPasswordVisible ? Icons.visibility_rounded : Icons.visibility_off_rounded,
-                      color: Colors.grey.shade500,
+                      color: theme.colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                     onPressed: onVisibilityToggle,
                   )
                 : null,
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -441,6 +444,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
   }
 
   Widget _buildDropdown(AppLocalizations l10n) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -448,17 +452,17 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             l10n.role,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         DropdownButtonFormField<UserRoleDto>(
           initialValue: _selectedRole,
-          icon: Icon(Icons.expand_more_rounded, color: Colors.grey.shade600),
-          style: TextStyle(fontSize: 15, color: Colors.black87),
+          icon: Icon(Icons.expand_more_rounded, color: theme.colorScheme.onSurfaceVariant),
+          style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
-            prefixIcon: Icon(Icons.badge_outlined, color: Colors.grey.shade500),
+            prefixIcon: Icon(Icons.badge_outlined, color: theme.colorScheme.onSurfaceVariant),
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),

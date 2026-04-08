@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:frontend/data/dtos/department_dto.dart';
-import 'package:frontend/domain/repositories/department_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/presentation/screens/add_edit_department_screen.dart';
-import 'package:frontend/presentation/screens/department_detail_screen.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/data/dtos/department_dto.dart';
+import 'package:faims/domain/repositories/department_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/presentation/screens/add_edit_department_screen.dart';
+import 'package:faims/presentation/screens/department_detail_screen.dart';
+import 'package:faims/core/app_theme.dart';
 
 class ManageDepartmentsScreen extends StatefulWidget {
   const ManageDepartmentsScreen({super.key});
@@ -86,6 +86,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
 
   Future<void> _deleteDepartment(String departmentId) async {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     setState(() {
       _isLoading = true;
       _errorMessage = '';
@@ -126,9 +127,9 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
         });
       }
     }
-    
+
     if (!mounted) return;
-    
+
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -140,7 +141,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text(l10n.cancel, style: TextStyle(color: Colors.grey)),
+            child: Text(l10n.cancel, style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
@@ -194,18 +195,18 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           l10n.manageDepartments,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -222,7 +223,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
                   ? Center(
                       child: Text(
                         l10n.noDepartmentsFound,
-                        style: TextStyle(fontSize: 15, color: Colors.grey.shade500),
+                        style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurfaceVariant),
                         textAlign: TextAlign.center,
                       ),
                     )
@@ -264,12 +265,13 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
   }
 
   Widget _buildDepartmentCard(DepartmentDto department) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(color: theme.shadowColor.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
         ],
       ),
       child: Material(
@@ -305,11 +307,11 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
                 Expanded(
                   child: Text(
                     department.name,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 28),
+                Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant, size: 28),
               ],
             ),
           ),

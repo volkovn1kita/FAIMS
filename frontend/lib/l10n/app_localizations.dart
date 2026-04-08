@@ -1630,6 +1630,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Camera'**
   String get camera;
+
+  /// No description provided for @unitPieces.
+  ///
+  /// In en, this message translates to:
+  /// **'Pieces'**
+  String get unitPieces;
+
+  /// No description provided for @unitMilliliters.
+  ///
+  /// In en, this message translates to:
+  /// **'Milliliters'**
+  String get unitMilliliters;
+
+  /// No description provided for @unitGrams.
+  ///
+  /// In en, this message translates to:
+  /// **'Grams'**
+  String get unitGrams;
+
+  /// No description provided for @unitTablets.
+  ///
+  /// In en, this message translates to:
+  /// **'Tablets'**
+  String get unitTablets;
+
+  /// No description provided for @unitAmpoules.
+  ///
+  /// In en, this message translates to:
+  /// **'Ampoules'**
+  String get unitAmpoules;
+
+  /// No description provided for @unitPacks.
+  ///
+  /// In en, this message translates to:
+  /// **'Packs'**
+  String get unitPacks;
+
+  /// No description provided for @languageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get languageLabel;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @good.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get good;
+
+  /// No description provided for @darkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get darkMode;
+
+  /// No description provided for @appearance.
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get appearance;
+
+  /// No description provided for @profileUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully!'**
+  String get profileUpdatedSuccessfully;
+
+  /// No description provided for @avatarUploadedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar uploaded successfully!'**
+  String get avatarUploadedSuccessfully;
+
+  /// No description provided for @avatarDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar deleted successfully!'**
+  String get avatarDeletedSuccessfully;
+
+  /// No description provided for @userCreatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'User created successfully!'**
+  String get userCreatedSuccessfully;
+
+  /// No description provided for @userUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'User updated successfully!'**
+  String get userUpdatedSuccessfully;
+
+  /// No description provided for @userDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'User deleted successfully!'**
+  String get userDeletedSuccessfully;
 }
 
 class _AppLocalizationsDelegate

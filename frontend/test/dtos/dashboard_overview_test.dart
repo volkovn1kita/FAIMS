@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/data/dtos/dashboard_overview.dart';
+import 'package:faims/data/dtos/dashboard_overview.dart';
 
 void main() {
   group('DashboardOverview.fromJson', () {

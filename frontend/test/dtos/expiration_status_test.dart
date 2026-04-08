@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/data/dtos/expiration_status.dart';
+import 'package:faims/data/dtos/expiration_status.dart';
 
 void main() {
   group('ExpirationStatus', () {

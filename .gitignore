@@ -1,4 +1,4 @@
-# --- .NET / C# (усі папки проекту) ---
+# --- .NET / C# ---
 **/[Bb]in/
 **/[Oo]bj/
 .vs/
@@ -7,21 +7,19 @@
 *.pdb
 *.tmp
 
-# --- Secrets (Ключі та налаштування) ---
+# --- Secrets ---
 .env
-# Ігноруємо абсолютно всі JSON файли ключі Firebase
 *-firebase-adminsdk-*.json
 faims-*.json
 google-services.json
 GoogleService-Info.plist
 
-# Налаштування бекенду — ігноруємо файли з реальними секретами
+# Бекенд — файли з реальними секретами
 appsettings.*.json
-# Дозволяємо лише base appsettings (тільки placeholder-значення) та Example
 !appsettings.json
 !appsettings.Example.json
 
-# Логи Serilog
+# Логи
 logs/
 
 # --- Flutter / Dart ---
@@ -37,6 +35,9 @@ build/
 **/android/app/release/
 **/ios/Pods/
 **/ios/.symlinks/
+
+# --- Claude Code ---
+.claude/
 
 # --- IDEs & OS ---
 .idea/

@@ -1,12 +1,12 @@
 // lib/domain/repositories/department_repository.dart
-import 'package:frontend/data/dtos/department_create_dto.dart';
-import 'package:frontend/data/dtos/department_dto.dart'; // Звичайний список департаментів
-import 'package:frontend/data/dtos/department_detail_dto.dart'; // Деталі департаменту з кімнатами
-import 'package:frontend/data/dtos/room_create_dto.dart';
-import 'package:frontend/data/dtos/room_list_dto.dart'; // Список кімнат для деталей
-import 'package:frontend/data/dtos/room_update_dto.dart';
-import 'package:frontend/data/dtos/room_list_all_dto.dart'; // Можливо, для глобального списку кімнат
-import 'package:frontend/data/services/department_api_service.dart';
+import 'package:faims/data/dtos/department_create_dto.dart';
+import 'package:faims/data/dtos/department_dto.dart'; // Звичайний список департаментів
+import 'package:faims/data/dtos/department_detail_dto.dart'; // Деталі департаменту з кімнатами
+import 'package:faims/data/dtos/room_create_dto.dart';
+import 'package:faims/data/dtos/room_list_dto.dart'; // Список кімнат для деталей
+import 'package:faims/data/dtos/room_update_dto.dart';
+import 'package:faims/data/dtos/room_list_all_dto.dart'; // Можливо, для глобального списку кімнат
+import 'package:faims/data/services/department_api_service.dart';
 
 class DepartmentRepository {
   final DepartmentApiService _apiService = DepartmentApiService();

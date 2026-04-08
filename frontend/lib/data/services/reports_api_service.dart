@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:frontend/core/constants.dart';
-import 'package:frontend/data/dtos/report_item_dto.dart';
+import 'package:faims/core/constants.dart';
+import 'package:faims/data/dtos/report_item_dto.dart';
 
 class ReportsApiService {
   final String _baseUrl = Constants.baseUrl;

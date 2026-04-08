@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:frontend/data/dtos/login_dto.dart';
+import 'package:faims/data/dtos/login_dto.dart';
 
 void main() {
   group('LoginDto', () {

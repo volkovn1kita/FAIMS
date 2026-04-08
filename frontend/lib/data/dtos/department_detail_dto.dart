@@ -1,5 +1,5 @@
 import 'package:json_annotation/json_annotation.dart';
-import 'package:frontend/data/dtos/room_list_dto.dart'; // Важливо імпортувати
+import 'package:faims/data/dtos/room_list_dto.dart'; // Важливо імпортувати
 
 part 'department_detail_dto.g.dart';
 

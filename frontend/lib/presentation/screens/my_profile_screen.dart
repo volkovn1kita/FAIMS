@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:frontend/core/constants.dart';
-import 'package:frontend/data/dtos/user_dto.dart';
-import 'package:frontend/domain/repositories/user_repository.dart';
-import 'package:frontend/l10n/app_localizations.dart';
-import 'package:frontend/core/app_theme.dart';
+import 'package:faims/core/constants.dart';
+import 'package:faims/data/dtos/user_dto.dart';
+import 'package:faims/domain/repositories/user_repository.dart';
+import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/core/app_theme.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MyProfileScreen extends StatefulWidget {
@@ -127,7 +127,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile updated successfully!')),
+        SnackBar(content: Text(l10n.profileUpdatedSuccessfully)),
       );
 
       Navigator.of(context).pop(_firstNameController.text);
@@ -164,7 +164,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           _isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Avatar uploaded successfully!')),
+          SnackBar(content: Text(l10n.avatarUploadedSuccessfully)),
         );
       } catch (e) {
         if (!mounted) return;
@@ -179,6 +179,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   Future<void> _deleteAvatar() async {
+    final l10n = AppLocalizations.of(context)!;
     if (!mounted) return;
     setState(() {
       _isLoading = true;
@@ -196,7 +197,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         _isLoading = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Avatar deleted successfully!')),
+        SnackBar(content: Text(l10n.avatarDeletedSuccessfully)),
       );
     } catch (e) {
       if (!mounted) return;
@@ -223,7 +224,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             child: Wrap(
               children: <Widget>[
                 ListTile(
-                  leading: const Icon(Icons.photo_library_outlined, color: Colors.black87),
+                  leading: Icon(Icons.photo_library_outlined, color: Theme.of(context).colorScheme.onSurface),
                   title: Text(l10n.photoLibrary, style: TextStyle(fontWeight: FontWeight.w500)),
                   onTap: () {
                     _pickImage(ImageSource.gallery);
@@ -231,7 +232,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                   },
                 ),
                 ListTile(
-                  leading: const Icon(Icons.photo_camera_outlined, color: Colors.black87),
+                  leading: Icon(Icons.photo_camera_outlined, color: Theme.of(context).colorScheme.onSurface),
                   title: Text(l10n.camera, style: TextStyle(fontWeight: FontWeight.w500)),
                   onTap: () {
                     _pickImage(ImageSource.camera);
@@ -258,19 +259,18 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    
+    final theme = Theme.of(context);
+
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: Text(
           l10n.myProfile,
-          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.black87),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
         ),
         centerTitle: true,
-        backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black87, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
@@ -278,7 +278,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             IconButton(
               icon: Icon(
                 _isEditing ? Icons.close_rounded : Icons.edit_outlined,
-                color: Colors.black87,
+                color: theme.colorScheme.onSurface,
                 size: 24,
               ),
               onPressed: () {
@@ -296,7 +296,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         children: [
           Container(
             width: double.infinity,
-            color: Colors.white,
+            color: theme.colorScheme.surface,
             padding: const EdgeInsets.only(bottom: 24.0, top: 16.0),
             child: Center(
               child: GestureDetector(
@@ -310,12 +310,12 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                       ),
                       child: CircleAvatar(
                         radius: 56,
-                        backgroundColor: Colors.grey.shade100,
+                        backgroundColor: theme.colorScheme.surfaceContainerHighest,
                         backgroundImage: _userProfile?.avatarUrl != null
                             ? NetworkImage('$_baseUrl${_userProfile!.avatarUrl!}') as ImageProvider<Object>?
                             : null,
                         child: _userProfile?.avatarUrl == null
-                            ? Icon(Icons.person_rounded, size: 56, color: Colors.grey.shade400)
+                            ? Icon(Icons.person_rounded, size: 56, color: theme.colorScheme.onSurfaceVariant)
                             : null,
                       ),
                     ),
@@ -341,7 +341,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           Container(
             height: 1,
             decoration: BoxDecoration(
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
+              boxShadow: [BoxShadow(color: theme.shadowColor.withValues(alpha: 0.04), blurRadius: 4, offset: const Offset(0, 2))],
             ),
           ),
           Expanded(
@@ -384,12 +384,13 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   Widget _buildProfileDetails(AppLocalizations l10n) {
+    final theme = Theme.of(context);
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.cardColor,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+          BoxShadow(color: theme.shadowColor.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
         ],
       ),
       padding: const EdgeInsets.all(20),
@@ -414,16 +415,17 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
   }
 
   Widget _buildProfileInfoRow({required String label, required String value, required IconData icon, bool isRole = false}) {
+    final theme = Theme.of(context);
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.grey.shade50,
+            color: theme.colorScheme.surfaceContainerHighest,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: Colors.grey.shade600, size: 22),
+          child: Icon(icon, color: theme.colorScheme.onSurfaceVariant, size: 22),
         ),
         const SizedBox(width: 16),
         Expanded(
@@ -432,7 +434,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
             children: [
               Text(
                 label,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade500, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 4),
               isRole
@@ -449,7 +451,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                     )
                   : Text(
                       value,
-                      style: TextStyle(fontSize: 16, color: Colors.black87, fontWeight: FontWeight.w600),
+                      style: TextStyle(fontSize: 16, color: theme.colorScheme.onSurface, fontWeight: FontWeight.w600),
                     ),
             ],
           ),
@@ -465,10 +467,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
         children: [
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                BoxShadow(color: Theme.of(context).shadowColor.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
               ],
             ),
             padding: const EdgeInsets.all(20),
@@ -506,10 +508,10 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           const SizedBox(height: 24),
           Container(
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
-                BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                BoxShadow(color: Theme.of(context).shadowColor.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
               ],
             ),
             padding: const EdgeInsets.all(20),
@@ -518,11 +520,11 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.lock_outline, color: Colors.black87, size: 20),
+                    Icon(Icons.lock_outline, color: Theme.of(context).colorScheme.onSurface, size: 20),
                     const SizedBox(width: 8),
                     Text(
                       l10n.changePassword,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
                     ),
                   ],
                 ),
@@ -591,7 +593,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                 borderRadius: BorderRadius.circular(16),
                 child: Center(
                   child: Text(
-                    'Save Changes', 
+                    l10n.saveChanges,
                     style: TextStyle(
                       fontSize: 16, 
                       color: Colors.white, 
@@ -616,6 +618,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     TextInputType keyboardType = TextInputType.text,
     String? Function(String?)? validator,
   }) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -623,7 +626,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           padding: const EdgeInsets.only(left: 4.0, bottom: 8.0),
           child: Text(
             label,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurfaceVariant),
           ),
         ),
         TextFormField(
@@ -631,21 +634,21 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           obscureText: isPassword && !_isPasswordVisible,
           keyboardType: keyboardType,
           validator: validator,
-          style: TextStyle(fontSize: 15, color: Colors.black87),
+          style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(
-            prefixIcon: Icon(icon, color: Colors.grey.shade500),
+            prefixIcon: Icon(icon, color: theme.colorScheme.onSurfaceVariant),
             suffixIcon: isPassword
                 ? IconButton(
                     icon: Icon(
                       _isPasswordVisible ? Icons.visibility_rounded : Icons.visibility_off_rounded,
-                      color: Colors.grey.shade500,
+                      color: theme.colorScheme.onSurfaceVariant,
                       size: 20,
                     ),
                     onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
                   )
                 : null,
             filled: true,
-            fillColor: Colors.grey.shade50,
+            fillColor: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
             contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
