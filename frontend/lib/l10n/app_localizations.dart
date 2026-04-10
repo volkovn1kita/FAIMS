@@ -1732,6 +1732,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'User deleted successfully!'**
   String get userDeletedSuccessfully;
+
+  /// No description provided for @batchesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} batch} other{{count} batches}}'**
+  String batchesCount(int count);
+
+  /// No description provided for @batchExpires.
+  ///
+  /// In en, this message translates to:
+  /// **'Expires {date}'**
+  String batchExpires(String date);
+
+  /// No description provided for @tapToShowBatches.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to view batches'**
+  String get tapToShowBatches;
+
+  /// No description provided for @earliestExpiration.
+  ///
+  /// In en, this message translates to:
+  /// **'Earliest expiration'**
+  String get earliestExpiration;
+
+  /// No description provided for @pdfSystemReport.
+  ///
+  /// In en, this message translates to:
+  /// **'FAIMS System Report'**
+  String get pdfSystemReport;
+
+  /// No description provided for @pdfReportPeriod.
+  ///
+  /// In en, this message translates to:
+  /// **'Report period'**
+  String get pdfReportPeriod;
+
+  /// No description provided for @pdfTotalRecords.
+  ///
+  /// In en, this message translates to:
+  /// **'Total records'**
+  String get pdfTotalRecords;
+
+  /// No description provided for @pdfTotalQuantity.
+  ///
+  /// In en, this message translates to:
+  /// **'Total quantity'**
+  String get pdfTotalQuantity;
+
+  /// No description provided for @pdfGeneratedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated on'**
+  String get pdfGeneratedOn;
+
+  /// No description provided for @pdfPageOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Page {current} of {total}'**
+  String pdfPageOf(int current, int total);
+
+  /// No description provided for @pdfNoData.
+  ///
+  /// In en, this message translates to:
+  /// **'No records for the selected period'**
+  String get pdfNoData;
+
+  /// No description provided for @pdfConfidential.
+  ///
+  /// In en, this message translates to:
+  /// **'Internal document — for organization use only'**
+  String get pdfConfidential;
 }
 
 class _AppLocalizationsDelegate

@@ -21,6 +21,12 @@ enum MeasurementUnit {
 extension MeasurementUnitExtension on MeasurementUnit {
   String localizedName(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    return localizedNameFor(l10n);
+  }
+
+  /// Same as [localizedName] but takes [AppLocalizations] directly. Useful
+  /// outside of widget trees (e.g. PDF generation, isolates).
+  String localizedNameFor(AppLocalizations l10n) {
     switch (this) {
       case MeasurementUnit.pieces:
         return l10n.unitPieces;
@@ -35,5 +41,34 @@ extension MeasurementUnitExtension on MeasurementUnit {
       case MeasurementUnit.packs:
         return l10n.unitPacks;
     }
+  }
+}
+
+/// Parses a backend unit string (e.g. "Tablets", "Milliliters") into a
+/// localized name. Falls back to the raw string if no match — that way an
+/// unknown unit at least renders something instead of crashing.
+String localizeUnitString(String? raw, AppLocalizations l10n) {
+  if (raw == null || raw.isEmpty) return '';
+  final unit = parseMeasurementUnit(raw);
+  return unit?.localizedNameFor(l10n) ?? raw;
+}
+
+MeasurementUnit? parseMeasurementUnit(String? raw) {
+  if (raw == null) return null;
+  switch (raw.toLowerCase()) {
+    case 'pieces':
+      return MeasurementUnit.pieces;
+    case 'milliliters':
+      return MeasurementUnit.milliliters;
+    case 'grams':
+      return MeasurementUnit.grams;
+    case 'tablets':
+      return MeasurementUnit.tablets;
+    case 'ampoules':
+      return MeasurementUnit.ampoules;
+    case 'packs':
+      return MeasurementUnit.packs;
+    default:
+      return null;
   }
 }

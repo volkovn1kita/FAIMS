@@ -457,6 +457,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
         ),
         DropdownButtonFormField<UserRoleDto>(
           initialValue: _selectedRole,
+          isExpanded: true,
           icon: Icon(Icons.expand_more_rounded, color: theme.colorScheme.onSurfaceVariant),
           style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(

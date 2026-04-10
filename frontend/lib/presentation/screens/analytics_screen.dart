@@ -4,6 +4,7 @@ import 'package:faims/data/dtos/analytics_dtos.dart';
 import 'package:faims/domain/repositories/analytics_repository.dart';
 import 'package:faims/l10n/app_localizations.dart';
 import 'package:faims/core/app_theme.dart';
+import 'package:faims/data/dtos/measurement_unit.dart';
 
 class AnalyticsScreen extends StatefulWidget {
   const AnalyticsScreen({super.key});
@@ -228,12 +229,13 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
                 tooltipMargin: 8,
                 getTooltipItem: (group, groupIndex, rod, rodIndex) {
                   final item = data[group.x.toInt()];
+                  final l10n = AppLocalizations.of(context)!;
                   return BarTooltipItem(
                     '${item.medicationName}\n',
                     TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                     children: <TextSpan>[
                       TextSpan(
-                        text: '${item.totalQuantity} ${item.unit}',
+                        text: '${item.totalQuantity} ${localizeUnitString(item.unit, l10n)}',
                         style: TextStyle(
                           color: Colors.white70,
                           fontWeight: FontWeight.w600,

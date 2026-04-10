@@ -389,5 +389,17 @@
   "avatarDeletedSuccessfully": "Аватар успішно видалено!",
   "userCreatedSuccessfully": "Користувача успішно створено!",
   "userUpdatedSuccessfully": "Користувача успішно оновлено!",
-  "userDeletedSuccessfully": "Користувача успішно видалено!"
+  "userDeletedSuccessfully": "Користувача успішно видалено!",
+  "batchesCount": "{count, plural, one{{count} партія} few{{count} партії} many{{count} партій} other{{count} партій}}",
+  "batchExpires": "Термін до {date}",
+  "tapToShowBatches": "Натисніть, щоб переглянути партії",
+  "earliestExpiration": "Найближчий термін",
+  "pdfSystemReport": "Звіт системи FAIMS",
+  "pdfReportPeriod": "Період звіту",
+  "pdfTotalRecords": "Всього записів",
+  "pdfTotalQuantity": "Загальна кількість",
+  "pdfGeneratedOn": "Сформовано",
+  "pdfPageOf": "Сторінка {current} з {total}",
+  "pdfNoData": "Записів за обраний період немає",
+  "pdfConfidential": "Внутрішній документ — для використання в межах організації"
 }

@@ -877,4 +877,55 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get userDeletedSuccessfully => 'Користувача успішно видалено!';
+
+  @override
+  String batchesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count партій',
+      many: '$count партій',
+      few: '$count партії',
+      one: '$count партія',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String batchExpires(String date) {
+    return 'Термін до $date';
+  }
+
+  @override
+  String get tapToShowBatches => 'Натисніть, щоб переглянути партії';
+
+  @override
+  String get earliestExpiration => 'Найближчий термін';
+
+  @override
+  String get pdfSystemReport => 'Звіт системи FAIMS';
+
+  @override
+  String get pdfReportPeriod => 'Період звіту';
+
+  @override
+  String get pdfTotalRecords => 'Всього записів';
+
+  @override
+  String get pdfTotalQuantity => 'Загальна кількість';
+
+  @override
+  String get pdfGeneratedOn => 'Сформовано';
+
+  @override
+  String pdfPageOf(int current, int total) {
+    return 'Сторінка $current з $total';
+  }
+
+  @override
+  String get pdfNoData => 'Записів за обраний період немає';
+
+  @override
+  String get pdfConfidential =>
+      'Внутрішній документ — для використання в межах організації';
 }

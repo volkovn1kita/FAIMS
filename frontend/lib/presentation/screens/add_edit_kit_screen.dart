@@ -390,6 +390,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
         const SizedBox(height: 8),
         DropdownButtonFormField<T>(
           initialValue: value,
+          isExpanded: true,
           items: items,
           onChanged: onChanged,
           icon: isLoading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)) : const Icon(Icons.expand_more_rounded),

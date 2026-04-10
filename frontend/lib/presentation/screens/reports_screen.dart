@@ -5,6 +5,7 @@ import 'package:faims/data/dtos/report_item_dto.dart';
 import 'package:faims/domain/repositories/reports_repository.dart';
 import 'package:faims/l10n/app_localizations.dart';
 import 'package:faims/utils/pdf_generator.dart';
+import 'package:faims/data/dtos/measurement_unit.dart';
 import 'package:printing/printing.dart';
 
 class ReportsScreen extends StatefulWidget {
@@ -129,17 +130,19 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
         return [
           item.medicationName,
           '+${item.quantity}',
-          item.unit,
+          localizeUnitString(item.unit, l10n),
           _translateReason(item.reason, l10n),
         ];
       }).toList();
 
       final pdfBytes = await PdfGenerator.generateReport(
         title: title,
+        subtitle: isPurchaseTab ? l10n.forPurchase : l10n.forDisposal,
         tableData: tableData,
         headers: headers,
         startDate: _startDate,
         endDate: _endDate,
+        l10n: l10n,
       );
 
       final filename = '${isPurchaseTab ? "purchase" : "disposal"}_report.pdf';
@@ -329,7 +332,7 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
                     ),
                   ),
                   Text(
-                    item.unit,
+                    localizeUnitString(item.unit, l10n),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

@@ -645,5 +645,40 @@
   "userUpdatedSuccessfully": "User updated successfully!",
   "@userUpdatedSuccessfully": {},
   "userDeletedSuccessfully": "User deleted successfully!",
-  "@userDeletedSuccessfully": {}
+  "@userDeletedSuccessfully": {},
+  "batchesCount": "{count, plural, one{{count} batch} other{{count} batches}}",
+  "@batchesCount": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
+  "batchExpires": "Expires {date}",
+  "@batchExpires": {
+    "placeholders": {
+      "date": { "type": "String" }
+    }
+  },
+  "tapToShowBatches": "Tap to view batches",
+  "@tapToShowBatches": {},
+  "earliestExpiration": "Earliest expiration",
+  "pdfSystemReport": "FAIMS System Report",
+  "@pdfSystemReport": {},
+  "pdfReportPeriod": "Report period",
+  "@pdfReportPeriod": {},
+  "pdfTotalRecords": "Total records",
+  "@pdfTotalRecords": {},
+  "pdfTotalQuantity": "Total quantity",
+  "@pdfTotalQuantity": {},
+  "pdfGeneratedOn": "Generated on",
+  "@pdfGeneratedOn": {},
+  "pdfPageOf": "Page {current} of {total}",
+  "@pdfPageOf": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "pdfNoData": "No records for the selected period",
+  "@pdfNoData": {},
+  "pdfConfidential": "Internal document — for organization use only"
 }

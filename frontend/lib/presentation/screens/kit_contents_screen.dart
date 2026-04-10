@@ -26,6 +26,10 @@ class KitContentsScreen extends StatefulWidget {
 class _KitContentsScreenState extends State<KitContentsScreen> {
   FirstAidKitListDto? _kitDetails;
   List<MedicationDto> _medications = [];
+  List<_MedicationGroup> _groupedMedications = [];
+  final Set<String> _expandedGroups = {};
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
   bool _isLoading = true;
   String _errorMessage = '';
   String _kitName = '';
@@ -35,7 +39,28 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
   @override
   void initState() {
     super.initState();
+    _searchController.addListener(_onSearchChanged);
     _loadKitDetailsAndContents();
+  }
+
+  @override
+  void dispose() {
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    setState(() {
+      _searchQuery = _searchController.text;
+      _groupedMedications = _buildGroups(_filteredMedications());
+    });
+  }
+
+  List<MedicationDto> _filteredMedications() {
+    if (_searchQuery.isEmpty) return _medications;
+    final q = _searchQuery.toLowerCase();
+    return _medications.where((m) => m.name.toLowerCase().contains(q)).toList();
   }
 
   Future<void> _loadKitDetailsAndContents() async {
@@ -54,6 +79,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         _kitDetails = loadedKit;
         _medications = loadedMedications;
         _medications.sort((a, b) => a.expirationDate.compareTo(b.expirationDate));
+        _groupedMedications = _buildGroups(_filteredMedications());
       });
     } catch (e) {
       if (!mounted) return;
@@ -69,6 +95,33 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         });
       }
     }
+  }
+
+  /// Groups medications by (name, unit). Within a group, batches with
+  /// quantity == 0 are hidden when at least one non-zero batch exists,
+  /// so a stale empty record stops triggering false "out of stock"
+  /// warnings the moment a fresh batch is added.
+  List<_MedicationGroup> _buildGroups(List<MedicationDto> meds) {
+    final Map<String, List<MedicationDto>> byKey = {};
+    for (final m in meds) {
+      final key = '${m.name.trim().toLowerCase()}|${m.unit.name}';
+      byKey.putIfAbsent(key, () => []).add(m);
+    }
+
+    final groups = <_MedicationGroup>[];
+    byKey.forEach((_, batches) {
+      final nonZero = batches.where((m) => m.quantity > 0).toList();
+      final visible = nonZero.isNotEmpty ? nonZero : batches;
+      visible.sort((a, b) => a.expirationDate.compareTo(b.expirationDate));
+      groups.add(_MedicationGroup(
+        name: batches.first.name,
+        visibleBatches: visible,
+        allBatches: batches,
+      ));
+    });
+
+    groups.sort((a, b) => a.earliestExpiration.compareTo(b.earliestExpiration));
+    return groups;
   }
 
   Future<void> _navigateToAddEditMedication({String? medicationId}) async {
@@ -586,18 +639,20 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
-                                        '${_medications.length}',
+                                        '${_groupedMedications.length}',
                                         style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurfaceVariant),
                                       ),
                                     )
                                   ],
                                 ),
                                 const SizedBox(height: 12),
+                                if (_medications.isNotEmpty) _buildSearchField(l10n),
+                                if (_medications.isNotEmpty) const SizedBox(height: 12),
                               ],
                             ),
                           ),
                         ),
-                        if (_medications.isEmpty)
+                        if (_groupedMedications.isEmpty)
                           SliverFillRemaining(
                             hasScrollBody: false,
                             child: Center(
@@ -613,8 +668,8 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 16.0).copyWith(bottom: 80),
                             sliver: SliverList(
                               delegate: SliverChildBuilderDelegate(
-                                (context, index) => _buildMedicationListItem(_medications[index]),
-                                childCount: _medications.length,
+                                (context, index) => _buildGroupItem(_groupedMedications[index]),
+                                childCount: _groupedMedications.length,
                               ),
                             ),
                           ),
@@ -707,145 +762,482 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
   Widget _buildMedicationListItem(MedicationDto medication) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    Color statusColor;
-    String statusText;
-
-    switch (medication.status) {
-      case ExpirationStatus.expired:
-        statusColor = Colors.redAccent;
-        statusText = l10n.expired;
-        break;
-      case ExpirationStatus.critical:
-        statusColor = Colors.orangeAccent;
-        statusText = l10n.critical;
-        break;
-      case ExpirationStatus.warning:
-        statusColor = Colors.amber.shade600;
-        statusText = l10n.statusWarning;
-        break;
-      case ExpirationStatus.good:
-        statusColor = Colors.green;
-        statusText = l10n.statusGood;
-        break;
-    }
-
-    bool isLowQuantity = medication.quantity < medication.minimumQuantity;
+    final sColor = _statusColor(medication.status);
+    final isLow = medication.quantity < medication.minimumQuantity;
 
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Dismissible(
-        key: Key(medication.id),
-        direction: DismissDirection.horizontal,
-        confirmDismiss: (direction) async {
-          if (direction == DismissDirection.endToStart) {
-            if (medication.quantity > 0) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.quantityIsGreaterThan0Erorr(medication.name)),
-                  backgroundColor: Colors.red,
-                ),
-              );
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Dismissible(
+          key: Key(medication.id),
+          direction: DismissDirection.horizontal,
+          confirmDismiss: (direction) async {
+            if (direction == DismissDirection.endToStart) {
+              if (medication.quantity > 0) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(l10n.quantityIsGreaterThan0Erorr(medication.name)),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+                return false;
+              }
+              await _confirmDeleteMedication(medication.id, medication.name);
+              return false;
+            } else if (direction == DismissDirection.startToEnd) {
+              await _navigateToAddEditMedication(medicationId: medication.id);
               return false;
             }
-            await _confirmDeleteMedication(medication.id, medication.name);
             return false;
-          } else if (direction == DismissDirection.startToEnd) {
-            await _navigateToAddEditMedication(medicationId: medication.id);
-            return false;
-          }
-          return false;
-        },
-        background: _buildSwipeBackground(Icons.edit_outlined, Colors.blue.shade400, Alignment.centerLeft),
-        secondaryBackground: _buildSwipeBackground(Icons.delete_outline, Colors.redAccent, Alignment.centerRight),
-        child: Container(
-          decoration: BoxDecoration(
+          },
+          background: _buildSwipeBackground(Icons.edit_outlined, Colors.blue.shade400, Alignment.centerLeft),
+          secondaryBackground: _buildSwipeBackground(Icons.delete_outline, Colors.redAccent, Alignment.centerRight),
+          child: Material(
             color: theme.cardColor,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(color: theme.shadowColor.withValues(alpha: 0.02), blurRadius: 8, offset: const Offset(0, 2)),
-            ],
-            border: Border(left: BorderSide(color: statusColor, width: 4)),
-          ),
-          child: InkWell(
-            onTap: () => _navigateToAddEditMedication(medicationId: medication.id),
-            borderRadius: BorderRadius.circular(16),
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          medication.name,
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: statusColor.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Text(
-                          statusText,
-                          style: TextStyle(fontSize: 12, color: statusColor, fontWeight: FontWeight.w700),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      Icon(Icons.inventory_2_outlined, size: 16, color: isLowQuantity ? Colors.red : theme.colorScheme.onSurfaceVariant),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${medication.quantity} ${medication.unit.localizedName(context)}',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isLowQuantity ? Colors.red : theme.colorScheme.onSurface
-                        ),
-                      ),
-                      if (isLowQuantity) ...[
-                        const SizedBox(width: 4),
-                        Icon(Icons.error_outline, size: 14, color: Colors.red.shade400),
-                      ],
-                      const Spacer(),
-                      Icon(Icons.calendar_today_outlined, size: 16, color: theme.colorScheme.onSurfaceVariant),
-                      const SizedBox(width: 6),
-                      Text(
-                        DateFormat('dd.MM.yyyy').format(medication.expirationDate),
-                        style: TextStyle(fontSize: 14, color: theme.colorScheme.onSurfaceVariant, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                  if (medication.quantity == 0) ...[
-                    const SizedBox(height: 16),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 44,
-                      child: OutlinedButton.icon(
-                        onPressed: () => _showRefillDialog(medication, l10n),
-                        icon: const Icon(Icons.add_shopping_cart_rounded, size: 18),
-                        label: Text(l10n.refill),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: AppTheme.primary,
-                          side: const BorderSide(color: AppTheme.primaryBorder),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
+            child: InkWell(
+              onTap: () => _navigateToAddEditMedication(medicationId: medication.id),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // Left status stripe
+                    Container(width: 4, color: sColor),
+                    // Content
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: BoxDecoration(
+                                    color: sColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(9),
+                                  ),
+                                  child: Icon(Icons.vaccines_rounded, color: sColor, size: 18),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    medication.name,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: theme.colorScheme.onSurface),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                _buildCompactStatusTag(medication.status, l10n),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                Icon(Icons.inventory_2_outlined,
+                                    size: 13,
+                                    color: isLow ? Colors.red : theme.colorScheme.onSurfaceVariant),
+                                const SizedBox(width: 5),
+                                Text(
+                                  '${medication.quantity} ${medication.unit.localizedName(context)}',
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: isLow ? Colors.red : theme.colorScheme.onSurface),
+                                ),
+                                const SizedBox(width: 12),
+                                Icon(Icons.calendar_today_outlined,
+                                    size: 12,
+                                    color: theme.colorScheme.onSurfaceVariant),
+                                const SizedBox(width: 5),
+                                Text(
+                                  DateFormat('dd.MM.yyyy').format(medication.expirationDate),
+                                  style: TextStyle(
+                                      fontSize: 12,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                              ],
+                            ),
+                            if (medication.quantity == 0) ...[
+                              const SizedBox(height: 10),
+                              SizedBox(
+                                width: double.infinity,
+                                height: 34,
+                                child: OutlinedButton.icon(
+                                  onPressed: () => _showRefillDialog(medication, l10n),
+                                  icon: const Icon(Icons.add_shopping_cart_rounded, size: 14),
+                                  label: Text(l10n.refill, style: const TextStyle(fontSize: 12)),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: AppTheme.primary,
+                                    padding: EdgeInsets.zero,
+                                    side: const BorderSide(color: AppTheme.primaryBorder),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
                         ),
                       ),
                     ),
                   ],
-                ],
+                ),
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCompactStatusTag(ExpirationStatus status, AppLocalizations l10n) {
+    final color = _statusColor(status);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Text(
+        _statusText(status, l10n),
+        style: TextStyle(fontSize: 10, color: color, fontWeight: FontWeight.w700),
+      ),
+    );
+  }
+
+  Widget _buildSearchField(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: theme.shadowColor.withValues(alpha: 0.03),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: _searchController,
+        decoration: InputDecoration(
+          hintText: l10n.searchMedicationHint,
+          hintStyle: TextStyle(
+              fontSize: 14, color: theme.colorScheme.onSurfaceVariant),
+          prefixIcon: Icon(Icons.search_rounded,
+              color: theme.colorScheme.onSurfaceVariant, size: 20),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: Icon(Icons.close_rounded,
+                      color: theme.colorScheme.onSurfaceVariant, size: 18),
+                  onPressed: () => _searchController.clear(),
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        ),
+      ),
+    );
+  }
+
+  Color _statusColor(ExpirationStatus status) {
+    switch (status) {
+      case ExpirationStatus.expired:
+        return Colors.redAccent;
+      case ExpirationStatus.critical:
+        return Colors.orangeAccent;
+      case ExpirationStatus.warning:
+        return Colors.amber.shade600;
+      case ExpirationStatus.good:
+        return Colors.green;
+    }
+  }
+
+  String _statusText(ExpirationStatus status, AppLocalizations l10n) {
+    switch (status) {
+      case ExpirationStatus.expired:
+        return l10n.expired;
+      case ExpirationStatus.critical:
+        return l10n.critical;
+      case ExpirationStatus.warning:
+        return l10n.statusWarning;
+      case ExpirationStatus.good:
+        return l10n.statusGood;
+    }
+  }
+
+  Widget _buildGroupItem(_MedicationGroup group) {
+    if (!group.hasMultipleBatches) {
+      return _buildMedicationListItem(group.visibleBatches.first);
+    }
+
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final sColor = _statusColor(group.worstStatus);
+    final isExpanded = _expandedGroups.contains(group.name);
+    final unitName = group.unit.localizedName(context);
+    final isLow = group.isLow;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(14),
+        child: Material(
+          color: theme.cardColor,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // ---- Compact header (tap to expand/collapse) ----
+              InkWell(
+                onTap: () => setState(() {
+                  if (isExpanded) {
+                    _expandedGroups.remove(group.name);
+                  } else {
+                    _expandedGroups.add(group.name);
+                  }
+                }),
+                child: IntrinsicHeight(
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Container(width: 4, color: sColor),
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Row(children: [
+                                Container(
+                                  padding: const EdgeInsets.all(7),
+                                  decoration: BoxDecoration(
+                                    color: sColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(9),
+                                  ),
+                                  child: Icon(Icons.vaccines_rounded, color: sColor, size: 18),
+                                ),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    group.name,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: theme.colorScheme.onSurface),
+                                    overflow: TextOverflow.ellipsis,
+                                    maxLines: 1,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                _buildCompactStatusTag(group.worstStatus, l10n),
+                              ]),
+                              const SizedBox(height: 10),
+                              Row(children: [
+                                Icon(Icons.inventory_2_outlined,
+                                    size: 13,
+                                    color: isLow ? Colors.red : theme.colorScheme.onSurfaceVariant),
+                                const SizedBox(width: 5),
+                                Text(
+                                  '${group.totalQuantity} $unitName',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: isLow ? Colors.red : theme.colorScheme.onSurface,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Icon(Icons.calendar_today_outlined,
+                                    size: 12, color: theme.colorScheme.onSurfaceVariant),
+                                const SizedBox(width: 5),
+                                Expanded(
+                                  child: Text(
+                                    DateFormat('dd.MM.yyyy').format(group.earliestExpiration),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: theme.colorScheme.onSurfaceVariant,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                                    borderRadius: BorderRadius.circular(7),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        isExpanded
+                                            ? Icons.expand_less_rounded
+                                            : Icons.expand_more_rounded,
+                                        size: 14,
+                                        color: theme.colorScheme.primary,
+                                      ),
+                                      const SizedBox(width: 3),
+                                      Text(
+                                        l10n.batchesCount(group.visibleBatches.length),
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.w700,
+                                          color: theme.colorScheme.primary,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ]),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // ---- Expanded list of individual batches ----
+              if (isExpanded) ...[
+                Divider(height: 1, color: theme.dividerColor.withValues(alpha: 0.3)),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(12, 6, 12, 12),
+                  child: Column(
+                    children: [
+                      for (int i = 0; i < group.visibleBatches.length; i++)
+                        _buildBatchTile(group.visibleBatches[i], i + 1),
+                    ],
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBatchTile(MedicationDto med, int index) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final sColor = _statusColor(med.status);
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(12),
+        border: Border(left: BorderSide(color: sColor, width: 3)),
+      ),
+      child: InkWell(
+        onTap: () => _navigateToAddEditMedication(medicationId: med.id),
+        borderRadius: BorderRadius.circular(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              Text('#$index',
+                  style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: theme.colorScheme.onSurfaceVariant)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.batchExpires(DateFormat('dd.MM.yyyy').format(med.expirationDate)),
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: sColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  _statusText(med.status, l10n),
+                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: sColor),
+                ),
+              ),
+            ]),
+            const SizedBox(height: 6),
+            Text(
+              '${med.quantity} ${med.unit.localizedName(context)}',
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: theme.colorScheme.onSurface),
+            ),
+            const SizedBox(height: 10),
+            Row(children: [
+              Expanded(
+                child: SizedBox(
+                  height: 36,
+                  child: OutlinedButton.icon(
+                    onPressed: () => _navigateToAddEditMedication(medicationId: med.id),
+                    icon: const Icon(Icons.edit_outlined, size: 14),
+                    label: Text(l10n.editMedication, style: const TextStyle(fontSize: 12), overflow: TextOverflow.ellipsis),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppTheme.primary,
+                      padding: EdgeInsets.zero,
+                      side: const BorderSide(color: AppTheme.primaryBorder),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SizedBox(
+                  height: 36,
+                  child: med.quantity == 0
+                      ? ElevatedButton.icon(
+                          onPressed: () => _showRefillDialog(med, l10n),
+                          icon: const Icon(Icons.add_shopping_cart_rounded, size: 14),
+                          label: Text(l10n.refill, style: const TextStyle(fontSize: 12)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.primaryContainer,
+                            foregroundColor: AppTheme.primary,
+                            padding: EdgeInsets.zero,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        )
+                      : OutlinedButton.icon(
+                          onPressed: med.quantity > 0
+                              ? () {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(l10n.quantityIsGreaterThan0Erorr(med.name)),
+                                      backgroundColor: Colors.red,
+                                    ),
+                                  );
+                                }
+                              : () => _confirmDeleteMedication(med.id, med.name),
+                          icon: const Icon(Icons.delete_outline, size: 14),
+                          label: Text(l10n.delete, style: const TextStyle(fontSize: 12)),
+                          style: OutlinedButton.styleFrom(
+                            foregroundColor: Colors.redAccent,
+                            padding: EdgeInsets.zero,
+                            side: BorderSide(color: Colors.red.shade200),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                          ),
+                        ),
+                ),
+              ),
+            ]),
+          ],
         ),
       ),
     );
@@ -865,5 +1257,49 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
         ),
       ),
     );
+  }
+}
+
+/// Aggregated view of all batches of a medication that share the same name
+/// AND unit. Batches with quantity == 0 are hidden when at least one
+/// non-zero batch exists, so an old empty record stops triggering false
+/// "out of stock" warnings the moment a fresh batch is added.
+class _MedicationGroup {
+  final String name;
+  final List<MedicationDto> visibleBatches;
+  final List<MedicationDto> allBatches;
+
+  _MedicationGroup({
+    required this.name,
+    required this.visibleBatches,
+    required this.allBatches,
+  });
+
+  bool get hasMultipleBatches => visibleBatches.length > 1;
+
+  int get totalQuantity =>
+      visibleBatches.fold<int>(0, (sum, m) => sum + m.quantity);
+
+  int get totalMinimum =>
+      visibleBatches.isEmpty ? 0 : visibleBatches.first.minimumQuantity;
+
+  bool get isLow => totalQuantity < totalMinimum;
+
+  MeasurementUnit get unit => visibleBatches.first.unit;
+
+  DateTime get earliestExpiration => visibleBatches
+      .map((m) => m.expirationDate)
+      .reduce((a, b) => a.isBefore(b) ? a : b);
+
+  ExpirationStatus get worstStatus {
+    const order = {
+      ExpirationStatus.expired: 4,
+      ExpirationStatus.critical: 3,
+      ExpirationStatus.warning: 2,
+      ExpirationStatus.good: 1,
+    };
+    return visibleBatches
+        .map((m) => m.status)
+        .reduce((a, b) => order[a]! >= order[b]! ? a : b);
   }
 }

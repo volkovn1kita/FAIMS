@@ -384,6 +384,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
         ),
         DropdownButtonFormField<DepartmentDto>(
           initialValue: _selectedDepartment,
+          isExpanded: true,
           icon: Icon(Icons.expand_more_rounded, color: theme.colorScheme.onSurfaceVariant),
           style: TextStyle(fontSize: 15, color: theme.colorScheme.onSurface),
           decoration: InputDecoration(

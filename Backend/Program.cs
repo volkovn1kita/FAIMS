@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Backend.Services;
+using Backend.Seeders;
 using Backend.Middleware;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
@@ -159,6 +160,16 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
 var app = builder.Build();
+
+if (args.Contains("--seed"))
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var hasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher<User>>();
+    await DatabaseSeeder.SeedAsync(db, hasher);
+    Log.Information("Seeding finished. Exiting.");
+    return;
+}
 
 if (app.Environment.IsDevelopment())
 {

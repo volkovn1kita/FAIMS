@@ -35,7 +35,8 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   String _errorMessage = '';
   late String _userName;
 
-  List<MedicationDto> _filteredMedications = [];
+  List<_MedicationGroup> _filteredGroups = [];
+  final Set<String> _expandedGroups = {};
   final _searchController = TextEditingController();
   String _searchQuery = '';
   final Set<ExpirationStatus> _statusFilters = {};
@@ -76,13 +77,44 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       filtered =
           filtered.where((m) => _statusFilters.contains(m.status)).toList();
     }
-    if (_filterLowStock) {
-      filtered =
-          filtered.where((m) => m.quantity < m.minimumQuantity).toList();
-    }
     setState(() {
-      _filteredMedications = filtered;
+      _filteredGroups = _buildGroups(filtered);
+      if (_filterLowStock) {
+        _filteredGroups = _filteredGroups.where((g) => g.isLow).toList();
+      }
     });
+  }
+
+  /// Groups medications by name (case-insensitive). Within a group, batches
+  /// with quantity == 0 are hidden if at least one non-zero batch exists,
+  /// so stale "out of stock" entries don't pollute the view once new stock
+  /// arrives. If every batch in a group is zero, all are kept (the user
+  /// genuinely has no stock and should see the warning).
+  List<_MedicationGroup> _buildGroups(List<MedicationDto> meds) {
+    final Map<String, List<MedicationDto>> byName = {};
+    for (final m in meds) {
+      // Group by (name, unit) so two records with the same name but
+      // different units never get summed together.
+      final key = '${m.name.trim().toLowerCase()}|${m.unit.name}';
+      byName.putIfAbsent(key, () => []).add(m);
+    }
+
+    final groups = <_MedicationGroup>[];
+    byName.forEach((_, batches) {
+      final nonZero = batches.where((m) => m.quantity > 0).toList();
+      final visible = nonZero.isNotEmpty ? nonZero : batches;
+      // Sort batches by expiration ascending so the earliest is first.
+      visible.sort((a, b) => a.expirationDate.compareTo(b.expirationDate));
+      groups.add(_MedicationGroup(
+        name: batches.first.name,
+        visibleBatches: visible,
+        allBatches: batches,
+      ));
+    });
+
+    // Sort groups by worst (earliest) expiration date so urgent items rise to top.
+    groups.sort((a, b) => a.earliestExpiration.compareTo(b.earliestExpiration));
+    return groups;
   }
 
   Future<void> _loadMyKitAndMedications() async {
@@ -1097,7 +1129,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   Widget _buildMedicationList(AppLocalizations l10n) {
-    if (_filteredMedications.isEmpty) {
+    if (_filteredGroups.isEmpty) {
       return Center(
           child: Padding(
               padding: const EdgeInsets.all(40),
@@ -1107,9 +1139,231 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: _filteredMedications.length,
-        itemBuilder: (c, i) =>
-            _buildMedicationCard(_filteredMedications[i], l10n));
+        itemCount: _filteredGroups.length,
+        itemBuilder: (c, i) => _buildGroupCard(_filteredGroups[i], l10n));
+  }
+
+  Widget _buildGroupCard(_MedicationGroup group, AppLocalizations l10n) {
+    // Single-batch groups render exactly like the original card so the
+    // common case stays unchanged.
+    if (!group.hasMultipleBatches) {
+      return _buildMedicationCard(group.visibleBatches.first, l10n);
+    }
+
+    final theme = Theme.of(context);
+    final sColor = _getStatusColor(group.worstStatus);
+    final isExpanded = _expandedGroups.contains(group.name);
+    final unitName = group.unit.localizedName(context);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+          color: theme.cardColor,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+                color: theme.shadowColor.withValues(alpha: 0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 4))
+          ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // ---- Header (tap to expand/collapse) ----
+          InkWell(
+            borderRadius: BorderRadius.circular(20),
+            onTap: () => setState(() {
+              if (isExpanded) {
+                _expandedGroups.remove(group.name);
+              } else {
+                _expandedGroups.add(group.name);
+              }
+            }),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(children: [
+                Row(children: [
+                  Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: sColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Icon(Icons.vaccines_rounded, color: sColor, size: 24)),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(group.name,
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${l10n.earliestExpiration}: ${DateFormat('dd.MM.yyyy').format(group.earliestExpiration)}',
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: theme.colorScheme.onSurfaceVariant),
+                        ),
+                      ],
+                    ),
+                  ),
+                  _buildStatusTag(group.worstStatus, l10n),
+                ]),
+                const SizedBox(height: 16),
+                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                  _buildStatItem(
+                    l10n.quantity,
+                    '${group.totalQuantity} $unitName',
+                    group.isLow ? Colors.red : theme.colorScheme.onSurface,
+                  ),
+                  _buildStatItem(
+                    l10n.minRequired,
+                    '${group.totalMinimum} $unitName',
+                    theme.colorScheme.onSurfaceVariant,
+                  ),
+                  // Batch count chip
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isExpanded
+                              ? Icons.expand_less_rounded
+                              : Icons.expand_more_rounded,
+                          size: 16,
+                          color: theme.colorScheme.primary,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          l10n.batchesCount(group.visibleBatches.length),
+                          style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: theme.colorScheme.primary),
+                        ),
+                      ],
+                    ),
+                  ),
+                ]),
+              ]),
+            ),
+          ),
+          // ---- Expanded list of individual batches ----
+          if (isExpanded) ...[
+            Divider(height: 1, color: theme.dividerColor.withValues(alpha: 0.3)),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              child: Column(
+                children: [
+                  for (int i = 0; i < group.visibleBatches.length; i++)
+                    _buildBatchTile(group.visibleBatches[i], i + 1, l10n),
+                ],
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildBatchTile(MedicationDto med, int index, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final sColor = _getStatusColor(med.status);
+    return Container(
+      margin: const EdgeInsets.only(top: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border(
+          left: BorderSide(color: sColor, width: 3),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Text('#$index',
+                style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: theme.colorScheme.onSurfaceVariant)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                l10n.batchExpires(DateFormat('dd.MM.yyyy').format(med.expirationDate)),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              ),
+            ),
+            _buildStatusTag(med.status, l10n),
+          ]),
+          const SizedBox(height: 6),
+          Text(
+            '${med.quantity} ${med.unit.localizedName(context)}',
+            style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface),
+          ),
+          const SizedBox(height: 10),
+          if (med.quantity > 0)
+            Row(children: [
+              Expanded(
+                child: SizedBox(
+                  height: 36,
+                  child: ElevatedButton.icon(
+                      onPressed: () => _showUseMedicationDialog(med, l10n),
+                      icon: const Icon(Icons.medical_services_outlined, size: 16),
+                      label: Text(l10n.use, style: const TextStyle(fontSize: 12)),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primary,
+                          foregroundColor: Colors.white,
+                          padding: EdgeInsets.zero,
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          elevation: 0)),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: SizedBox(
+                  height: 36,
+                  child: OutlinedButton.icon(
+                      onPressed: () => _showWriteOffDialog(med, l10n),
+                      icon: const Icon(Icons.delete_outline_rounded, size: 16),
+                      label: Text(l10n.writeOff, style: const TextStyle(fontSize: 12)),
+                      style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          padding: EdgeInsets.zero,
+                          side: BorderSide(color: Colors.red.shade200),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10)))),
+                ),
+              ),
+            ])
+          else
+            SizedBox(
+              height: 36,
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                  onPressed: () => _showRefillDialog(med, l10n),
+                  icon: const Icon(Icons.add_shopping_cart_rounded, size: 16),
+                  label: Text(l10n.refill, style: const TextStyle(fontSize: 12)),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.primaryContainer,
+                      foregroundColor: AppTheme.primary,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)))),
+            ),
+        ],
+      ),
+    );
   }
 
   Widget _buildMedicationCard(MedicationDto med, AppLocalizations l10n) {
@@ -1290,5 +1544,50 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
           ],
         ),
       );
+  }
+}
+
+/// Aggregated view of all batches of a medication that share the same name.
+/// Batches with quantity == 0 are hidden when at least one non-zero batch
+/// exists, so an old empty record stops triggering false "out of stock"
+/// warnings the moment a fresh batch is added.
+class _MedicationGroup {
+  final String name;
+  final List<MedicationDto> visibleBatches;
+  final List<MedicationDto> allBatches;
+
+  _MedicationGroup({
+    required this.name,
+    required this.visibleBatches,
+    required this.allBatches,
+  });
+
+  bool get hasMultipleBatches => visibleBatches.length > 1;
+
+  int get totalQuantity =>
+      visibleBatches.fold<int>(0, (sum, m) => sum + m.quantity);
+
+  int get totalMinimum => visibleBatches.isEmpty
+      ? 0
+      : visibleBatches.first.minimumQuantity;
+
+  bool get isLow => totalQuantity < totalMinimum;
+
+  MeasurementUnit get unit => visibleBatches.first.unit;
+
+  DateTime get earliestExpiration => visibleBatches
+      .map((m) => m.expirationDate)
+      .reduce((a, b) => a.isBefore(b) ? a : b);
+
+  ExpirationStatus get worstStatus {
+    const order = {
+      ExpirationStatus.expired: 4,
+      ExpirationStatus.critical: 3,
+      ExpirationStatus.warning: 2,
+      ExpirationStatus.good: 1,
+    };
+    return visibleBatches
+        .map((m) => m.status)
+        .reduce((a, b) => order[a]! >= order[b]! ? a : b);
   }
 }

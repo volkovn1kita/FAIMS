@@ -875,4 +875,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get userDeletedSuccessfully => 'User deleted successfully!';
+
+  @override
+  String batchesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count batches',
+      one: '$count batch',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String batchExpires(String date) {
+    return 'Expires $date';
+  }
+
+  @override
+  String get tapToShowBatches => 'Tap to view batches';
+
+  @override
+  String get earliestExpiration => 'Earliest expiration';
+
+  @override
+  String get pdfSystemReport => 'FAIMS System Report';
+
+  @override
+  String get pdfReportPeriod => 'Report period';
+
+  @override
+  String get pdfTotalRecords => 'Total records';
+
+  @override
+  String get pdfTotalQuantity => 'Total quantity';
+
+  @override
+  String get pdfGeneratedOn => 'Generated on';
+
+  @override
+  String pdfPageOf(int current, int total) {
+    return 'Page $current of $total';
+  }
+
+  @override
+  String get pdfNoData => 'No records for the selected period';
+
+  @override
+  String get pdfConfidential => 'Internal document — for organization use only';
 }
