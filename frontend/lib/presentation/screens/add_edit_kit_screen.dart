@@ -86,10 +86,40 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
         final kitToEdit = await _kitRepository.getFirstAidKitById(widget.kitId!);
         _nameController.text = kitToEdit.name;
         _uniqueNumberController.text = kitToEdit.uniqueNumber;
-        _selectedDepartment = _departments.firstWhere((dep) => dep.id == kitToEdit.departmentId);
-        await _loadRoomsForDepartment(_selectedDepartment!.id);
-        _selectedRoom = _roomsInSelectedDepartment.firstWhere((room) => room.id == kitToEdit.roomId);
-        _selectedResponsibleUser = _responsibleUsers.firstWhere((user) => user.id == kitToEdit.responsibleUserId);
+
+        // Defensive lookups: any of these may legitimately miss if the
+        // referenced entity was deleted, hidden by filters, or truncated by
+        // pagination. Fall back to null and let the user pick again instead
+        // of crashing the whole screen with "Bad state: No element".
+        _selectedDepartment = _firstOrNull(
+          _departments,
+          (dep) => dep.id == kitToEdit.departmentId,
+        );
+
+        if (_selectedDepartment != null) {
+          await _loadRoomsForDepartment(_selectedDepartment!.id);
+          _selectedRoom = _firstOrNull(
+            _roomsInSelectedDepartment,
+            (room) => room.id == kitToEdit.roomId,
+          );
+        } else {
+          developer.log(
+            'Department ${kitToEdit.departmentId} not found when editing kit ${kitToEdit.id}',
+            name: 'AddEditKitScreen',
+          );
+        }
+
+        _selectedResponsibleUser = _firstOrNull(
+          _responsibleUsers,
+          (user) => user.id == kitToEdit.responsibleUserId,
+        );
+
+        if (_selectedResponsibleUser == null) {
+          developer.log(
+            'Responsible user ${kitToEdit.responsibleUserId} not found when editing kit ${kitToEdit.id}',
+            name: 'AddEditKitScreen',
+          );
+        }
       } else {
         _generateUniqueNumber();
       }
@@ -102,6 +132,15 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
+  }
+
+  /// Safe replacement for `firstWhere` — returns `null` instead of throwing
+  /// `Bad state: No element` when no match is found.
+  T? _firstOrNull<T>(Iterable<T> items, bool Function(T) test) {
+    for (final item in items) {
+      if (test(item)) return item;
+    }
+    return null;
   }
 
   Future<void> _loadRoomsForDepartment(String departmentId) async {

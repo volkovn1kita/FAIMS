@@ -32,6 +32,7 @@ public class FirstAidKitRepository : IFirstAidKitRepository
         int? pageSize = null)
     {
         var query = _dbContext.FirstAidKits
+            .AsNoTracking()
             .Include(k => k.Room)
                 .ThenInclude(r => r.Department)
             .Include(k => k.ResponsibleUser)
@@ -62,18 +63,10 @@ public class FirstAidKitRepository : IFirstAidKitRepository
         return await query.ToListAsync();
     }
 
-    // public async Task<IEnumerable<FirstAidKit>> GetAllKitsAsync()
-    // {
-    //     return await _dbContext.FirstAidKits
-    //         .Include(k => k.Room)
-    //             .ThenInclude(k => k.Department)
-    //         .Include(k => k.ResponsibleUser)
-    //         .ToListAsync();
-    // }
-
     public async Task<FirstAidKit?> GetKitByResponsibleUserIdAsync(Guid userId)
     {
         return await _dbContext.FirstAidKits
+            .AsNoTracking()
             .Include(k => k.Room)
                 .ThenInclude(r => r.Department)
             .Include(k => k.ResponsibleUser)
@@ -105,9 +98,28 @@ public class FirstAidKitRepository : IFirstAidKitRepository
         return Task.CompletedTask;
     }
 
-    public async Task<IEnumerable<Medication>> GetAllMedicationsAsync()
+    public async Task<IEnumerable<Medication>> GetAllMedicationsAsync(
+        int? pageNumber = null,
+        int? pageSize = null)
     {
-        return await _dbContext.Medications.ToListAsync();
+        var query = _dbContext.Medications
+            .AsNoTracking()
+            .OrderBy(m => m.Name)
+            .AsQueryable();
+
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            query = query
+                .Skip((pageNumber.Value - 1) * pageSize.Value)
+                .Take(pageSize.Value);
+        }
+
+        return await query.ToListAsync();
+    }
+
+    public async Task<int> GetMedicationsCountAsync()
+    {
+        return await _dbContext.Medications.CountAsync();
     }
 
     public async Task<Medication?> GetMedicationByIdAsync(Guid id)
@@ -125,6 +137,7 @@ public class FirstAidKitRepository : IFirstAidKitRepository
     public async Task<IEnumerable<Medication>> GetMedicationsByKitIdAsync(Guid kitId)
     {
         return await _dbContext.Medications
+            .AsNoTracking()
             .Where(m => m.FirstAidKitId == kitId)
             .OrderBy(m => m.ExpirationDate)
             .ToListAsync();
@@ -167,16 +180,18 @@ public class FirstAidKitRepository : IFirstAidKitRepository
         var endWindow = targetUtc.AddHours(36);
 
         return await _dbContext.Medications
+            .AsNoTracking()
             .IgnoreQueryFilters()
             .Include(m => m.FirstAidKit)
             .ThenInclude(k => k.ResponsibleUser)
             .Where(m => m.ExpirationDate >= startWindow && m.ExpirationDate <= endWindow)
             .ToListAsync();
     }
-    
+
     public async Task<IEnumerable<Medication>> GetLowStockMedicationsWithUsersAsync()
     {
         return await _dbContext.Medications
+            .AsNoTracking()
             .IgnoreQueryFilters()
             .Include(m => m.FirstAidKit)
             .ThenInclude(k => k.ResponsibleUser)

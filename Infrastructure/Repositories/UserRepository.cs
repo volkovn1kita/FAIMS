@@ -22,7 +22,7 @@ namespace Infrastructure.Repositories
 
         public async Task<IEnumerable<User>> GetAllFilteredAndSortedAsync(UserFilterAndPaginationDto filterDto)
         {
-            IQueryable<User> query = _dbContext.Users;
+            IQueryable<User> query = _dbContext.Users.AsNoTracking();
 
             // 1. Фільтрація за роллю
             if (filterDto.Role.HasValue)
@@ -66,14 +66,25 @@ namespace Infrastructure.Repositories
         }
         public async Task<IEnumerable<User>> GetAllAsync()
         {
-            return await _dbContext.Users.ToListAsync();
+            return await _dbContext.Users
+                .AsNoTracking()
+                .IgnoreQueryFilters()
+                .Where(u => u.OrganizationId == _dbContext.CurrentOrganizationId)
+                .ToListAsync();
         }
 
         public async Task<User?> GetByIdAsync(Guid id)
         {
             return await _dbContext.Users.FindAsync(id);
         }
-
+        public async Task<IEnumerable<User>> GetAllByOrganizationAsync(Guid organizationId)
+        {
+            return await _dbContext.Users
+                .AsNoTracking()
+                .IgnoreQueryFilters()
+                .Where(u => u.OrganizationId == organizationId)
+                .ToListAsync();
+        }
         public async Task<User?> GetByEmailAsync(string email)
         {
             return await _dbContext.Users

@@ -56,6 +56,33 @@ namespace Application.Services
             }).ToList();
         }
 
+        // Returns every responsible user (UserRole.User) in the current
+        // organization, without pagination. Used by screens that render picker
+        // dropdowns (e.g. when creating/editing a first aid kit) — those must
+        // see *all* candidates, otherwise editing a kit whose responsible user
+        // is beyond the first page would throw "Bad state: No element".
+        public async Task<IEnumerable<UserDto>> GetAllResponsibleUsersAsync()
+        {
+            var orgId = _currentUserService.GetOrganizationId();
+            var all = await _userRepository.GetAllByOrganizationAsync(orgId);
+            return all
+            .Where(u => u.Role == UserRole.User)
+            .OrderBy(u => u.LastName)
+            .ThenBy(u => u.FirstName)
+            .Select(u => new UserDto
+            {
+                Id = u.Id,
+                Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Role = u.Role.ToString(),
+                CreatedDate = u.CreatedDate,
+                UpdatedDate = u.UpdatedDate,
+                AvatarUrl = u.AvatarUrl
+            })
+            .ToList();
+        }
+
         public async Task<UserDto> GetUserByIdAsync(Guid id)
         {
             var user = await _userRepository.GetByIdAsync(id);

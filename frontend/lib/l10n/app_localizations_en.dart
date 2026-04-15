@@ -680,6 +680,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterEmailAndPassword => 'Please enter email and password';
 
   @override
+  String get invalidCredentials => 'Incorrect email or password';
+
+  @override
+  String get connectionError =>
+      'Server is not responding. Check your connection and try again';
+
+  @override
   String get welcomeBack => 'Welcome back';
 
   @override

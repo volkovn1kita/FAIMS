@@ -4,7 +4,8 @@ namespace Application.Interfaces;
 
 public interface IDepartmentRepository
 {
-    Task<IEnumerable<Department>> GetAllDepartmentsAsync();
+    Task<IEnumerable<Department>> GetAllDepartmentsAsync(int? pageNumber = null, int? pageSize = null);
+    Task<int> GetDepartmentsCountAsync();
     Task<Department?> GetDepartmentByIdAsync(Guid id);
     Task<Department?> GetDepartmentByNameAsync(string name);
     Task AddDepartmentAsync(Department department);

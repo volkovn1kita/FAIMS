@@ -74,7 +74,14 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           _firstNameController.text = userToEdit.firstName;
           _lastNameController.text = userToEdit.lastName;
           _emailController.text = userToEdit.email;
-          _selectedRole = _availableRoles.firstWhere((role) => role.name == userToEdit.role);
+          // Defensive: if backend returns a role we don't recognize, fall
+          // back to the first available instead of crashing the screen.
+          _selectedRole = _availableRoles.firstWhere(
+            (role) => role.name == userToEdit.role,
+            orElse: () => _availableRoles.isNotEmpty
+                ? _availableRoles.first
+                : throw StateError('No roles available'),
+          );
         });
       } else {
         _selectedRole = _availableRoles.firstWhere((role) => role.name == 'User', orElse: () => _availableRoles.first);

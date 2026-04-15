@@ -7,6 +7,7 @@ namespace Application.Interfaces
     public interface IUserService
     {
         Task<IEnumerable<UserDto>> GetAllUsersAsync(UserFilterAndPaginationDto filterDto); // <--- ЗМІНЕНО
+        Task<IEnumerable<UserDto>> GetAllResponsibleUsersAsync();
         Task<UserDto> GetUserByIdAsync(Guid id);
         Task<UserDto> GetCurrentUserProfileAsync(Guid currentUserId);
         Task<AuthResultDto?> LoginAsync(UserLoginDto dto);

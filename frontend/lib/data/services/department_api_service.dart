@@ -10,6 +10,7 @@ import 'package:faims/data/dtos/room_list_dto.dart'; // Використовує
 import 'package:faims/data/dtos/room_create_dto.dart';
 import 'package:faims/data/dtos/room_update_dto.dart';
 import 'package:faims/data/dtos/room_list_all_dto.dart'; // Для getAllRooms, якщо потрібно
+import 'package:faims/utils/session_service.dart';
 
 class DepartmentApiService {
   final String _baseUrl = Constants.baseUrl;
@@ -46,6 +47,7 @@ class DepartmentApiService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => DepartmentDto.fromJson(json)).toList();
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -74,6 +76,7 @@ class DepartmentApiService {
         final Map<String, dynamic> jsonMap = json.decode(response.body);
         return DepartmentDetailDto.fromJson(jsonMap);
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Department with ID $id not found.');
@@ -107,6 +110,7 @@ class DepartmentApiService {
         // Backend повертає ID департаменту в тілі відповіді
         return response.body.isNotEmpty ? json.decode(response.body) : 'Success';
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -139,6 +143,7 @@ class DepartmentApiService {
       if (response.statusCode == 204) { // 204 No Content
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Department with ID $id not found.');
@@ -167,6 +172,7 @@ class DepartmentApiService {
       if (response.statusCode == 204) { // 204 No Content
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Department with ID $id not found.');
@@ -199,6 +205,7 @@ class DepartmentApiService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => RoomListAllDto.fromJson(json)).toList();
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -227,6 +234,7 @@ class DepartmentApiService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => RoomListDto.fromJson(json)).toList();
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -257,6 +265,7 @@ class DepartmentApiService {
       if (response.statusCode == 201) { // 201 Created
         return response.body.isNotEmpty ? json.decode(response.body) : 'Success';
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -287,6 +296,7 @@ class DepartmentApiService {
       if (response.statusCode == 204) { // 204 No Content
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Room with ID $id not found.');
@@ -315,6 +325,7 @@ class DepartmentApiService {
       if (response.statusCode == 204) { // 204 No Content
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Room with ID $id not found.');

@@ -21,6 +21,7 @@ public class JournalRepository : IJournalRepository
     public async Task<IEnumerable<Journal>> GetEntriesByDateRangeAsync(DateTime startDate, DateTime endDate)
     {
         return await _dbContext.Journals
+            .AsNoTracking()
             .Include(j => j.User)
             .Include(j => j.FirstAidKit)
             .Where(j => j.CreatedDate >= startDate && j.CreatedDate <= endDate)
@@ -31,11 +32,12 @@ public class JournalRepository : IJournalRepository
     public async Task<IEnumerable<Journal>> GetEntriesByKitIdAsync(Guid kitId)
     {
         return await _dbContext.Journals
+            .AsNoTracking()
             .Include(j => j.User)
             .Include(j => j.FirstAidKit)
             .Where(j => j.FirstAidKitId == kitId)
             .OrderByDescending(j => j.CreatedDate)
-            .ToListAsync(); 
+            .ToListAsync();
     }
 
     public async Task SaveChangesAsync()

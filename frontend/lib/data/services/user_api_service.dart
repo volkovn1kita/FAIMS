@@ -9,6 +9,7 @@ import 'package:faims/data/dtos/user_role_dto.dart';
 import 'package:faims/data/dtos/update_user_request_dto.dart'; // <--- НОВИЙ DTO
 import 'package:http/http.dart' as http;
 import 'package:faims/utils/token_storage_service.dart';
+import 'package:faims/utils/session_service.dart';
 
 class UserApiService {
   final String _baseUrl = Constants.baseUrl;
@@ -38,6 +39,7 @@ class UserApiService {
         Iterable l = json.decode(response.body);
         return List<UserDto>.from(l.map((model) => UserDto.fromJson(model)));
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized or Forbidden. Please log in with an Administrator account.');
       } else {
         final errorBody = jsonDecode(response.body);
@@ -61,6 +63,7 @@ class UserApiService {
       if (response.statusCode == 200) {
         return UserDto.fromJson(json.decode(response.body));
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized or Forbidden. Please log in with an Administrator account.');
       } else if (response.statusCode == 404) {
         throw Exception('User not found.');
@@ -91,6 +94,7 @@ class UserApiService {
         final errorBody = jsonDecode(response.body);
         throw Exception(errorBody['message'] ?? 'Validation error.');
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized or Forbidden. Please log in with an Administrator account.');
       } else {
         final errorBody = jsonDecode(response.body);
@@ -124,6 +128,7 @@ class UserApiService {
         final errorBody = jsonDecode(response.body);
         throw Exception(errorBody['message'] ?? 'Validation error.');
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized or Forbidden. Please log in with an Administrator account.');
       } else if (response.statusCode == 404) {
         throw Exception('User not found.');
@@ -149,6 +154,7 @@ class UserApiService {
       if (response.statusCode == 204) { // 204 No Content - зазвичай повертається при успішному видаленні
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized or Forbidden. Please log in with an Administrator account.');
       } else if (response.statusCode == 404) {
         throw Exception('User not found.');
@@ -184,6 +190,7 @@ class UserApiService {
       if (response.statusCode == 200) {
         return UserDto.fromJson(json.decode(response.body));
       } else if (response.statusCode == 401) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized. Please log in.');
       } else {
         final errorBody = jsonDecode(response.body);
@@ -272,6 +279,7 @@ class UserApiService {
         final responseBody = json.decode(response.body);
         return responseBody['avatarUrl'] as String?;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized or Forbidden. Please log in.');
       } else if (response.statusCode == 400) {
         final errorBody = jsonDecode(response.body);
@@ -298,6 +306,7 @@ class UserApiService {
       if (response.statusCode == 204) {
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized or Forbidden. Please log in.');
       } else {
         final errorBody = jsonDecode(response.body);
@@ -328,6 +337,7 @@ class UserApiService {
         final responseBody = json.decode(response.body);
         return responseBody['avatarUrl'] as String?;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized or Forbidden. Please log in with an Administrator account.');
       } else if (response.statusCode == 400) {
         final errorBody = jsonDecode(response.body);
@@ -354,6 +364,7 @@ class UserApiService {
       if (response.statusCode == 204) {
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Unauthorized or Forbidden. Please log in with an Administrator account.');
       } else {
         final errorBody = jsonDecode(response.body);

@@ -58,10 +58,14 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
       if (!mounted) return;
       setState(() {
         _departments = departments;
-        if (isEditing) {
+        // Guard against the "no departments yet" edge case — .first would
+        // throw Bad state: No element otherwise.
+        if (_departments.isEmpty) {
+          _selectedDepartment = null;
+        } else if (isEditing) {
           _selectedDepartment = _departments.firstWhere(
             (dept) => dept.id == widget.initialDepartmentId,
-            orElse: () => _departments.first, 
+            orElse: () => _departments.first,
           );
         } else if (widget.currentDepartmentId != null) {
           _selectedDepartment = _departments.firstWhere(
@@ -69,7 +73,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
             orElse: () => _departments.first,
           );
         } else {
-          _selectedDepartment = _departments.first; 
+          _selectedDepartment = _departments.first;
         }
       });
     } catch (e) {

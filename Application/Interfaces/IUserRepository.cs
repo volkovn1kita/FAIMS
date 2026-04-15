@@ -12,7 +12,7 @@ namespace Application.Interfaces
         Task<IEnumerable<User>> GetAllFilteredAndSortedAsync(UserFilterAndPaginationDto filterDto); // <--- НОВИЙ МЕТОД
         
         Task<IEnumerable<User>> GetAllAsync();
-
+        Task<IEnumerable<User>> GetAllByOrganizationAsync(Guid organizationId);
         Task<User?> GetByIdAsync(Guid id);
         Task<User?> GetByEmailAsync(string email);
         Task<User?> GetByFirstAndLastNameAsync(string firstName, string lastName);

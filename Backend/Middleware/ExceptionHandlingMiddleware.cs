@@ -30,6 +30,9 @@ public class ExceptionHandlingMiddleware
 
     private Task HandleExceptionAsync(HttpContext context, Exception exception)
     {
+        _logger.LogError("EXCEPTION TYPE: {Type}, MESSAGE: {Message}, STACK: {Stack}",
+        exception.GetType().FullName, exception.Message, exception.StackTrace);
+        
         context.Response.ContentType = "application/json";
         var statusCode = HttpStatusCode.InternalServerError;
 

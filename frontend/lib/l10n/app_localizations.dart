@@ -1370,6 +1370,18 @@ abstract class AppLocalizations {
   /// **'Please enter email and password'**
   String get enterEmailAndPassword;
 
+  /// No description provided for @invalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect email or password'**
+  String get invalidCredentials;
+
+  /// No description provided for @connectionError.
+  ///
+  /// In en, this message translates to:
+  /// **'Server is not responding. Check your connection and try again'**
+  String get connectionError;
+
   /// No description provided for @welcomeBack.
   ///
   /// In en, this message translates to:

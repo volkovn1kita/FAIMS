@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -10,6 +11,8 @@ import 'package:faims/data/services/notification_service.dart';
 import 'package:faims/core/firebase_config.dart';
 import 'package:faims/core/router.dart';
 import 'package:faims/core/app_theme.dart';
+import 'package:faims/utils/session_service.dart';
+import 'package:faims/utils/token_storage_service.dart';
 import 'package:flutter/foundation.dart';
 
 void main() async {
@@ -47,8 +50,34 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  StreamSubscription<void>? _sessionSub;
+  final _tokenStorage = TokenStorageService();
+
+  @override
+  void initState() {
+    super.initState();
+    // Listen for forced logouts triggered by API 401 responses.
+    // Clear all stored credentials and redirect to the login screen.
+    _sessionSub = SessionService.instance.onForceLogout.listen((_) async {
+      await _tokenStorage.deleteToken();
+      // appRouter is a GoRouter — navigate anywhere via the router directly.
+      appRouter.go('/login');
+    });
+  }
+
+  @override
+  void dispose() {
+    _sessionSub?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {

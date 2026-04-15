@@ -35,9 +35,28 @@ public class DepartmentRepository : IDepartmentRepository
         return Task.CompletedTask;
     }
 
-    public async Task<IEnumerable<Department>> GetAllDepartmentsAsync()
+    public async Task<IEnumerable<Department>> GetAllDepartmentsAsync(
+        int? pageNumber = null,
+        int? pageSize = null)
     {
-        return await _dbContext.Departments.ToListAsync();
+        var query = _dbContext.Departments
+            .AsNoTracking()
+            .OrderBy(d => d.Name)
+            .AsQueryable();
+
+        if (pageNumber.HasValue && pageSize.HasValue)
+        {
+            query = query
+                .Skip((pageNumber.Value - 1) * pageSize.Value)
+                .Take(pageSize.Value);
+        }
+
+        return await query.ToListAsync();
+    }
+
+    public async Task<int> GetDepartmentsCountAsync()
+    {
+        return await _dbContext.Departments.CountAsync();
     }
 
     public async Task<Department?> GetDepartmentByIdAsync(Guid id)
@@ -55,6 +74,7 @@ public class DepartmentRepository : IDepartmentRepository
     public async Task<IEnumerable<Room>> GetRoomsAsync()
     {
         return await _dbContext.Rooms
+            .AsNoTracking()
             .Include(r => r.Department)
             .ToListAsync();
     }
@@ -68,7 +88,10 @@ public class DepartmentRepository : IDepartmentRepository
 
     public async Task<IEnumerable<Room>> GetRoomsByDepartmentIdAsync(Guid departmentId)
     {
-        return await _dbContext.Rooms.Where(r => r.DepartmentId == departmentId).ToListAsync();
+        return await _dbContext.Rooms
+            .AsNoTracking()
+            .Where(r => r.DepartmentId == departmentId)
+            .ToListAsync();
     }
 
     public async Task SaveChangesAsync()

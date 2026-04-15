@@ -20,7 +20,9 @@ class AppTheme {
   );
 
   static ThemeData get lightTheme {
-    final base = GoogleFonts.notoSansTextTheme();
+    // Manrope — геометричний, сучасний, має повну підтримку кирилиці
+    // і виглядає однаково якісно на Android та iOS.
+    final base = GoogleFonts.manropeTextTheme();
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
@@ -74,7 +76,7 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    final base = GoogleFonts.notoSansTextTheme(ThemeData.dark().textTheme);
+    final base = GoogleFonts.manropeTextTheme(ThemeData.dark().textTheme);
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,

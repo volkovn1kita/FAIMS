@@ -372,6 +372,8 @@
   "register": "Зареєструватися",
   "newOrg": "Нова організація?",
   "enterEmailAndPassword": "Будь ласка, введіть email та пароль",
+  "invalidCredentials": "Невірний email або пароль",
+  "connectionError": "Сервер не відповідає. Перевірте підключення та спробуйте знову",
   "processing": "Обробка...",
   "unitPieces": "Штуки",
   "unitMilliliters": "Мілілітри",

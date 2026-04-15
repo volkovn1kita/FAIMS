@@ -76,7 +76,18 @@ namespace Backend.Controllers
             return Ok(users);
         }
 
-        [HttpGet("{id}")]
+        // Returns every ResponsibleUser without pagination. Used by the kit
+        // edit screen to render the "Responsible person" picker — the paginated
+        // endpoint could truncate the list and cause firstWhere to throw.
+        [HttpGet("responsible")]
+        [Authorize(Roles = nameof(UserRole.Administrator))]
+        public async Task<IActionResult> GetResponsibleUsers()
+        {
+            var users = await _userService.GetAllResponsibleUsersAsync();
+            return Ok(users);
+        }
+
+        [HttpGet("{id:guid}")]
         [Authorize(Roles = nameof(UserRole.Administrator))]
         public async Task<IActionResult> GetUserById(Guid id)
         {

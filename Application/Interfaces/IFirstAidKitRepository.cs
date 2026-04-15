@@ -29,7 +29,8 @@ public interface IFirstAidKitRepository
     Task AddMedicationToKitAsync(Medication medication, Guid kitId);
     Task UpdateMedicationInKit(Medication medication);
     Task RemoveMedicationFromKit(Medication medication, Guid kitId);
-    Task<IEnumerable<Medication>> GetAllMedicationsAsync();
+    Task<IEnumerable<Medication>> GetAllMedicationsAsync(int? pageNumber = null, int? pageSize = null);
+    Task<int> GetMedicationsCountAsync();
     Task<IEnumerable<Medication>> GetMedicationsExpiringOnDateWithUsersAsync(DateTime date);
     Task<IEnumerable<Medication>> GetLowStockMedicationsWithUsersAsync();
     Task SaveChangesAsync();

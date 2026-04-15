@@ -680,6 +680,13 @@ class AppLocalizationsUk extends AppLocalizations {
   String get enterEmailAndPassword => 'Будь ласка, введіть email та пароль';
 
   @override
+  String get invalidCredentials => 'Невірний email або пароль';
+
+  @override
+  String get connectionError =>
+      'Сервер не відповідає. Перевірте підключення та спробуйте знову';
+
+  @override
   String get welcomeBack => 'З поверненням';
 
   @override

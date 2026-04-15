@@ -46,43 +46,88 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Returns true if the JWT access token is expired (or unparseable).
+  bool _isTokenExpired(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return true;
+      final normalized = base64Url.normalize(parts[1]);
+      final payload = json.decode(
+        String.fromCharCodes(base64Url.decode(normalized)),
+      );
+      final exp = payload['exp'];
+      if (exp == null) return false;
+      final expiry = DateTime.fromMillisecondsSinceEpoch((exp as int) * 1000);
+      // Add a 30-second buffer so we don't navigate with an about-to-expire token.
+      return DateTime.now().isAfter(expiry.subtract(const Duration(seconds: 30)));
+    } catch (_) {
+      return true;
+    }
+  }
+
+  /// Navigates to the correct home screen using [token] and [name].
+  void _navigateHome(String token, String name) {
+    final payload = _decodeJwt(token);
+    final role = payload['role'] ??
+        payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+    if (role == 'Administrator') {
+      context.go('/home', extra: {'userName': name, 'userRole': role});
+    } else {
+      context.go('/user-home', extra: name);
+    }
+  }
+
   Future<void> _checkAutoLogin() async {
     try {
       final token = await _authRepository.getToken();
-      if (token != null && token.isNotEmpty) {
-        final payload = _decodeJwt(token);
 
-        final role = payload['role'] ?? payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      // No token stored → show login form.
+      if (token == null || token.isEmpty) {
+        if (mounted) setState(() => _isLoading = false);
+        return;
+      }
 
-        final savedName = await _authRepository.getName();
+      String activeToken = token;
 
-        String name = savedName ?? '';
-
-        if (name.isEmpty) {
-          final email = payload['email'] ?? payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ?? '';
-          if (email.isNotEmpty) {
-            name = email.split('@')[0];
-          } else {
-            name = 'User';
-          }
-        }
-
-        if (role != null) {
-          if (!mounted) return;
-          if (role == 'Administrator') {
-            context.go('/home', extra: {'userName': name, 'userRole': role});
-          } else {
-            context.go('/user-home', extra: name);
-          }
+      // If the access token is expired, try to silently refresh it.
+      if (_isTokenExpired(token)) {
+        final refreshed = await _authRepository.tryRefreshToken();
+        if (refreshed == null) {
+          // Refresh failed (backend restarted with wiped DB, or token too old).
+          // Clear stored credentials and show login form.
+          await _authRepository.logout();
+          if (mounted) setState(() => _isLoading = false);
           return;
         }
+        activeToken = refreshed.token;
       }
-    } catch (_) {}
 
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
+      // Token is valid — decode and navigate.
+      final payload = _decodeJwt(activeToken);
+      final role = payload['role'] ??
+          payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+
+      if (role == null) {
+        // Token present but no role claim — treat as invalid.
+        await _authRepository.logout();
+        if (mounted) setState(() => _isLoading = false);
+        return;
+      }
+
+      final savedName = await _authRepository.getName();
+      String name = savedName ?? '';
+      if (name.isEmpty) {
+        final email = payload['email'] ??
+            payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress'] ??
+            '';
+        name = email.isNotEmpty ? email.split('@')[0] : 'User';
+      }
+
+      if (!mounted) return;
+      _navigateHome(activeToken, name);
+    } catch (_) {
+      // Any unexpected error → fall back to login form safely.
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -96,9 +141,19 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
+    // Client-side validation — catches the most common cases before
+    // hitting the network, and ensures all error messages are localized.
     if (email.isEmpty || password.isEmpty) {
       setState(() {
         _errorMessage = l10n.enterEmailAndPassword;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    if (password.length < 6) {
+      setState(() {
+        _errorMessage = l10n.passwordLenghtHint;
         _isLoading = false;
       });
       return;
@@ -120,17 +175,19 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (!mounted) return;
+      final raw = e.toString();
       setState(() {
-        _errorMessage = e.toString().contains('Exception:')
-            ? e.toString().replaceAll('Exception: ', '')
-            : 'Login error: check API.';
+        if (raw.contains('AUTH_INVALID_CREDENTIALS')) {
+          _errorMessage = l10n.invalidCredentials;
+        } else if (raw.contains('AUTH_CONNECTION_ERROR')) {
+          _errorMessage = l10n.connectionError;
+        } else {
+          // Fallback for anything unexpected (network plugin errors, etc.)
+          _errorMessage = l10n.connectionError;
+        }
       });
     } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -163,15 +220,25 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  width: 112,
+                  height: 112,
                   decoration: BoxDecoration(
                     color: AppTheme.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primary.withValues(alpha: 0.15),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
                   ),
-                  child: const Icon(
-                    Icons.medical_services_rounded,
-                    size: 56,
-                    color: AppTheme.primary,
+                  padding: const EdgeInsets.all(14),
+                  child: ClipOval(
+                    child: Image.asset(
+                      'assets/icon.png',
+                      fit: BoxFit.cover,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),

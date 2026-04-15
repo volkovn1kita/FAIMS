@@ -15,6 +15,7 @@ import 'package:faims/data/dtos/update_kit_dto.dart';
 import 'package:faims/data/dtos/medication_dto.dart';
 import 'package:faims/data/dtos/medication_create_dto.dart'; // <<<--- НОВИЙ ІМПОРТ
 import 'package:faims/data/dtos/medication_update_dto.dart'; // <<<--- НОВИЙ ІМПОРТ
+import 'package:faims/utils/session_service.dart';
 
 class FirstAidKitApiService {
   final String _baseUrl = Constants.baseUrl;
@@ -34,7 +35,10 @@ class FirstAidKitApiService {
   }
 
   Future<List<UserDto>> getResponsibleUsers() async {
-    final Uri uri = Uri.parse('$_baseUrl/users');
+    // Use the dedicated /users/responsible endpoint which returns *all*
+    // responsible users without pagination — critical for pickers on the
+    // kit edit screen, otherwise firstWhere can fail on users past page 1.
+    final Uri uri = Uri.parse('$_baseUrl/users/responsible');
     try {
       final headers = await _getHeaders();
       final response = await http.get(uri, headers: headers).timeout(
@@ -49,6 +53,7 @@ class FirstAidKitApiService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => UserDto.fromJson(json)).toList();
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -77,6 +82,7 @@ class FirstAidKitApiService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => DepartmentDto.fromJson(json)).toList();
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -121,6 +127,7 @@ class FirstAidKitApiService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => FirstAidKitListDto.fromJson(json)).toList();
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -151,6 +158,7 @@ class FirstAidKitApiService {
         final Map<String, dynamic> jsonMap = json.decode(response.body);
         return FirstAidKitListDto.fromJson(jsonMap);
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('You are not assigned to any first aid kit.');
@@ -181,6 +189,7 @@ class FirstAidKitApiService {
         final Map<String, dynamic> jsonMap = json.decode(response.body);
         return FirstAidKitListDto.fromJson(jsonMap);
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Kit with ID $id not found.');
@@ -214,6 +223,7 @@ class FirstAidKitApiService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => MedicationDto.fromJson(json)).toList();
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -242,6 +252,7 @@ class FirstAidKitApiService {
         final Map<String, dynamic> jsonMap = json.decode(response.body);
         return MedicationDto.fromJson(jsonMap);
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Medication with ID $medicationId not found.');
@@ -275,6 +286,7 @@ class FirstAidKitApiService {
         // Залежно від того, що повертає бекенд: тут очікуємо ID нового медикаменту
         return response.body.isNotEmpty ? json.decode(response.body) : 'Success';
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -305,6 +317,7 @@ class FirstAidKitApiService {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Medication with ID $medicationId not found.');
@@ -337,6 +350,7 @@ class FirstAidKitApiService {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Medication with ID $medicationId not found.');
@@ -369,6 +383,7 @@ class FirstAidKitApiService {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return; // Успішно оновлено, контенту немає
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -396,6 +411,7 @@ class FirstAidKitApiService {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return; // Успішно видалено, контенту немає
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Medication with ID $medicationId not found.');
@@ -428,6 +444,7 @@ class FirstAidKitApiService {
         final List<dynamic> jsonList = json.decode(response.body);
         return jsonList.map((json) => RoomDto.fromJson(json)).toList();
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -458,6 +475,7 @@ class FirstAidKitApiService {
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -491,6 +509,7 @@ class FirstAidKitApiService {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else {
         final String errorMessage = response.body.isNotEmpty
@@ -517,6 +536,7 @@ class FirstAidKitApiService {
       if (response.statusCode == 200 || response.statusCode == 204) {
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
+        if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
       } else if (response.statusCode == 404) {
         throw Exception('Kit with ID $kitId not found.');
