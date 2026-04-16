@@ -2,20 +2,20 @@ import 'dart:convert';
 import 'package:faims/core/constants.dart';
 import 'package:faims/data/dtos/dashboard_overview.dart';
 import 'package:http/http.dart' as http;
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-
+import 'package:faims/utils/token_storage_service.dart';
 
 class DashboardRepository {
-  final FlutterSecureStorage _storage = const FlutterSecureStorage(); 
-  static const _tokenKey = 'jwt_token'; 
+  final TokenStorageService _tokenStorageService = TokenStorageService();
 
   Future<DashboardOverview> getDashboardOverview() async {
-    final token = await _storage.read(key: _tokenKey);
-
+    final token = await _tokenStorageService.getToken();
     if (token == null) {
       throw Exception('Auth token not found. User not logged in.');
     }
+    return _fetchDashboard(token);
+  }
 
+  Future<DashboardOverview> _fetchDashboard(String token) async {
     final response = await http.get(
       Uri.parse('${Constants.baseUrl}/dashboard/overview'),
       headers: {
@@ -29,7 +29,7 @@ class DashboardRepository {
     } else if (response.statusCode == 401) {
       throw Exception('Unauthorized. Please log in again.');
     } else {
-      throw Exception('Failed to load dashboard overview: ${response.statusCode}. Body: ${response.body}');
+      throw Exception('Failed to load dashboard: ${response.statusCode}');
     }
   }
 }

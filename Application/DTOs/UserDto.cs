@@ -1,4 +1,3 @@
-// Application/DTOs/UserDto.cs
 using System;
 
 namespace Application.DTOs

@@ -39,7 +39,6 @@ public class FirstAidKitRepository : IFirstAidKitRepository
             .Include(k => k.Medications)
             .AsQueryable();
 
-        // Застосування фільтрів
         if (!string.IsNullOrWhiteSpace(searchTerm))
         {
             query = query.Where(k =>
@@ -74,6 +73,13 @@ public class FirstAidKitRepository : IFirstAidKitRepository
             .FirstOrDefaultAsync(k => k.ResponsibleUserId == userId);
     }
 
+    public async Task ClearResponsibleUserFromKitsAsync(Guid userId)
+    {
+        await _dbContext.FirstAidKits
+            .Where(k => k.ResponsibleUserId == userId)
+            .ExecuteUpdateAsync(s => s.SetProperty(k => k.ResponsibleUserId, (Guid?)null));
+    }
+
     public async Task<FirstAidKit?> GetKitByIdAsync(Guid id)
     {
         return await _dbContext.FirstAidKits
@@ -94,7 +100,9 @@ public class FirstAidKitRepository : IFirstAidKitRepository
 
     public Task DeleteKitAsync(FirstAidKit kit)
     {
-        _dbContext.FirstAidKits.Remove(kit);
+        kit.IsDeleted = true;
+        kit.DeletedAt = DateTime.UtcNow;
+        _dbContext.FirstAidKits.Update(kit);
         return Task.CompletedTask;
     }
 
@@ -151,7 +159,9 @@ public class FirstAidKitRepository : IFirstAidKitRepository
 
     public Task RemoveMedicationFromKit(Medication medication, Guid kitId)
     {
-        _dbContext.Medications.Remove(medication);
+        medication.IsDeleted = true;
+        medication.DeletedAt = DateTime.UtcNow;
+        _dbContext.Medications.Update(medication);
         return Task.CompletedTask;
     }
 

@@ -208,7 +208,7 @@ class _AddEditMedicationScreenState extends State<AddEditMedicationScreen> {
         elevation: 0,
         title: Text(
           _isEditing ? l10n.editMedication : l10n.addMedication,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
         ),
         centerTitle: true,
         leading: IconButton(

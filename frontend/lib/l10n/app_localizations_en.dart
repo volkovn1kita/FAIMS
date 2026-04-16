@@ -634,6 +634,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteRoom => 'Delete Room';
 
   @override
+  String get confirmDeleteRoom =>
+      'Are you sure you want to delete this room? This action cannot be undone.';
+
+  @override
+  String get roomDeletedSuccessfully => 'Room deleted successfully';
+
+  @override
   String cannotDeleteKit(String kitName) {
     return 'Cannot delete \"$kitName\" because it still contains medications. Please remove all medications first.';
   }
@@ -930,4 +937,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pdfConfidential => 'Internal document — for organization use only';
+
+  @override
+  String get deleteAccount => 'Delete Account';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Delete Account';
+
+  @override
+  String get deleteAccountConfirmMessage =>
+      'Are you sure you want to permanently delete your account? This action cannot be undone.';
+
+  @override
+  String get accountDeletedSuccessfully => 'Account deleted successfully';
+
+  @override
+  String get dangerZone => 'Danger Zone';
+
+  @override
+  String get cannotDeleteOnlyAdmin =>
+      'Cannot delete the only administrator of the organization. Create another administrator first.';
+
+  @override
+  String get expiredMedicationError =>
+      'Cannot add or refill a medication with an expired date. Please select a future date.';
+
+  @override
+  String get insufficientQuantityError =>
+      'Insufficient medication quantity for this operation. Please check the available stock.';
+
+  @override
+  String get exportInventory => 'Export Inventory';
+
+  @override
+  String get exportJournal => 'Export Journal';
+
+  @override
+  String get exporting => 'Exporting...';
+
+  @override
+  String get exportSuccess => 'File ready to share';
+
+  @override
+  String get invalidQuantityError =>
+      'Please enter a valid quantity (greater than 0).';
+
+  @override
+  String get cannotAssignAdminAsResponsible =>
+      'An administrator cannot be assigned as the responsible person for a kit.';
 }

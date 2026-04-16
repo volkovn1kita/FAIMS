@@ -87,10 +87,6 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
         _nameController.text = kitToEdit.name;
         _uniqueNumberController.text = kitToEdit.uniqueNumber;
 
-        // Defensive lookups: any of these may legitimately miss if the
-        // referenced entity was deleted, hidden by filters, or truncated by
-        // pagination. Fall back to null and let the user pick again instead
-        // of crashing the whole screen with "Bad state: No element".
         _selectedDepartment = _firstOrNull(
           _departments,
           (dep) => dep.id == kitToEdit.departmentId,
@@ -134,8 +130,6 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
     }
   }
 
-  /// Safe replacement for `firstWhere` — returns `null` instead of throwing
-  /// `Bad state: No element` when no match is found.
   T? _firstOrNull<T>(Iterable<T> items, bool Function(T) test) {
     for (final item in items) {
       if (test(item)) return item;
@@ -200,7 +194,15 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
       }
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
-      setState(() => _errorMessage = e.toString());
+      final l10n2 = AppLocalizations.of(context)!;
+      final raw = e.toString().replaceAll('Exception: ', '');
+      final String mapped;
+      if (raw.toLowerCase().contains('administrator cannot')) {
+        mapped = l10n2.cannotAssignAdminAsResponsible;
+      } else {
+        mapped = raw;
+      }
+      setState(() => _errorMessage = mapped);
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -244,7 +246,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
       appBar: AppBar(
         title: Text(
           widget.kitId == null ? l10n.addKitTitle : l10n.editKitTitle,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
         ),
         elevation: 0,
         centerTitle: true,

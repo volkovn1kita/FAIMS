@@ -1,4 +1,3 @@
-// lib/domain/repositories/first_aid_kit_repository.dart
 import 'package:faims/data/dtos/create_kit_dto.dart';
 import 'package:faims/data/dtos/department_dto.dart';
 import 'package:faims/data/dtos/first_aid_kit_list_dto.dart';
@@ -65,8 +64,6 @@ class FirstAidKitRepository {
       rethrow;
     }
   }
-
-  // ==== МЕТОДИ ДЛЯ МЕДИКАМЕНТІВ ====
 
   Future<List<MedicationDto>> getMedicationsForKit(String kitId) async {
     try {

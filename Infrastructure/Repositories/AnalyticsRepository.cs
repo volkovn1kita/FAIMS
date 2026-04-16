@@ -15,7 +15,6 @@ public class AnalyticsRepository : IAnalyticsRepository
         _context = context;
     }
 
-    // Допоміжний метод (без змін)
     private async Task<Dictionary<string, MeasurementUnit>> GetUnitsForMedications(List<string> names)
     {
         var medications = await _context.Medications
@@ -48,7 +47,7 @@ public class AnalyticsRepository : IAnalyticsRepository
         var unitsMap = await GetUnitsForMedications(names);
 
         var convertedData = rawData.Select(item => {
-            var name = item.Name ?? "Unknown"; // <--- Змінна 'name' (маленька)
+            var name = item.Name ?? "Unknown";
             var qty = item.TotalQty;
             var unitLabel = item.UnitEnum.ToString();
 
@@ -58,11 +57,9 @@ public class AnalyticsRepository : IAnalyticsRepository
                 unitLabel = "L";
             }
             
-            // === ВИПРАВЛЕННЯ ТУТ ===
             return new { Name = name, Qty = qty, Unit = unitLabel };
         });
 
-        // Цей код тепер спрацює, бо 'convertedData' має властивість 'Name'
         var aggregatedData = convertedData
             .GroupBy(x => x.Name)
             .Select(g => new MedicationStatDto(
@@ -96,7 +93,7 @@ public class AnalyticsRepository : IAnalyticsRepository
         var unitsMap = await GetUnitsForMedications(names);
 
         var convertedData = rawData.Select(item => {
-            var name = item.Name ?? "Unknown"; // <--- Змінна 'name' (маленька)
+            var name = item.Name ?? "Unknown";
             var qty = item.TotalQty;
             var unitLabel = item.UnitEnum.ToString();
 
@@ -106,7 +103,6 @@ public class AnalyticsRepository : IAnalyticsRepository
                 unitLabel = "L";
             }
             
-            // === ВИПРАВЛЕННЯ ТУТ ===
             return new { Name = name, Qty = qty, Unit = unitLabel };
         });
 

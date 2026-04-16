@@ -307,7 +307,7 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
                 Expanded(
                   child: Text(
                     department.name,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

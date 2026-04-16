@@ -1,12 +1,17 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:faims/core/app_theme.dart';
 import 'package:intl/intl.dart';
 import 'package:faims/data/dtos/report_item_dto.dart';
+import 'package:faims/data/services/export_api_service.dart';
 import 'package:faims/domain/repositories/reports_repository.dart';
 import 'package:faims/l10n/app_localizations.dart';
 import 'package:faims/utils/pdf_generator.dart';
 import 'package:faims/data/dtos/measurement_unit.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:printing/printing.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ReportsScreen extends StatefulWidget {
   const ReportsScreen({super.key});
@@ -19,7 +24,10 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
   late TabController _tabController;
   final ReportsRepository _repository = ReportsRepository();
 
+  final ExportApiService _exportService = ExportApiService();
+
   bool _isLoading = true;
+  bool _isExporting = false;
   String _errorMessage = '';
 
   List<ReportItemDto> _purchaseList = [];
@@ -111,6 +119,47 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
     }
   }
 
+  Future<void> _shareCsv(Uint8List bytes, String fileName) async {
+    if (kIsWeb) return;
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsBytes(bytes);
+    await Share.shareXFiles([XFile(file.path, mimeType: 'text/csv')], subject: fileName);
+  }
+
+  Future<void> _exportInventoryCsv(AppLocalizations l10n) async {
+    setState(() => _isExporting = true);
+    try {
+      final bytes = await _exportService.downloadInventoryCsv();
+      if (!mounted) return;
+      await _shareCsv(bytes, 'inventory_${DateFormat('yyyyMMdd').format(DateTime.now())}.csv');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
+  }
+
+  Future<void> _exportJournalCsv(AppLocalizations l10n) async {
+    setState(() => _isExporting = true);
+    try {
+      final bytes = await _exportService.downloadJournalCsv(_startDate, _endDate);
+      if (!mounted) return;
+      final fmt = DateFormat('yyyyMMdd');
+      await _shareCsv(bytes, 'journal_${fmt.format(_startDate)}_${fmt.format(_endDate)}.csv');
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) setState(() => _isExporting = false);
+    }
+  }
+
   Future<void> _exportPdf(AppLocalizations l10n) async {
     final isPurchaseTab = _tabController.index == 0;
     final items = isPurchaseTab ? _purchaseList : _disposalList;
@@ -178,6 +227,27 @@ class _ReportsScreenState extends State<ReportsScreen> with SingleTickerProvider
             color: theme.colorScheme.onSurface,
           ),
         ),
+        actions: [
+          if (_isExporting)
+            const Padding(
+              padding: EdgeInsets.all(16),
+              child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
+            )
+          else
+            PopupMenuButton<String>(
+              icon: Icon(Icons.table_chart_outlined, color: theme.colorScheme.onSurface),
+              tooltip: 'CSV',
+              onSelected: (value) {
+                if (value == 'inventory') _exportInventoryCsv(l10n);
+                if (value == 'journal') _exportJournalCsv(l10n);
+              },
+              itemBuilder: (_) => [
+                PopupMenuItem(value: 'inventory', child: Row(children: [const Icon(Icons.inventory_2_outlined, size: 20), const SizedBox(width: 12), Text(l10n.exportInventory)])),
+                PopupMenuItem(value: 'journal', child: Row(children: [const Icon(Icons.history_rounded, size: 20), const SizedBox(width: 12), Text(l10n.exportJournal)])),
+              ],
+            ),
+          const SizedBox(width: 8),
+        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: AppTheme.primary,

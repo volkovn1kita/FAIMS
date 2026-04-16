@@ -95,10 +95,9 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
         title: Text(
           isEditing ? l10n.editDepartment : l10n.addDepartment,
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 20,
             fontWeight: FontWeight.w700,
             color: theme.colorScheme.onSurface,
-            letterSpacing: -0.3,
           ),
         ),
         elevation: 0,

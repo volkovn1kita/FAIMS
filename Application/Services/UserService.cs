@@ -56,11 +56,6 @@ namespace Application.Services
             }).ToList();
         }
 
-        // Returns every responsible user (UserRole.User) in the current
-        // organization, without pagination. Used by screens that render picker
-        // dropdowns (e.g. when creating/editing a first aid kit) — those must
-        // see *all* candidates, otherwise editing a kit whose responsible user
-        // is beyond the first page would throw "Bad state: No element".
         public async Task<IEnumerable<UserDto>> GetAllResponsibleUsersAsync()
         {
             var orgId = _currentUserService.GetOrganizationId();
@@ -370,6 +365,7 @@ namespace Application.Services
                 throw new NotFoundException($"User with Id: {userId} not found.");
             }
 
+            await _kitRepository.ClearResponsibleUserFromKitsAsync(userId);
             await _userRepository.RemoveAsync(userToDelete);
             await _userRepository.SaveChangesAsync();
         }
@@ -453,13 +449,38 @@ namespace Application.Services
             );
         }
 
+        public async Task DeleteMyAccountAsync(Guid userId)
+        {
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new NotFoundException($"User with Id: {userId} not found.");
+
+            if (user.Role == UserRole.Administrator)
+            {
+                var adminCount = await _userRepository.CountActiveAdminsAsync(user.OrganizationId);
+                if (adminCount <= 1)
+                    throw new ValidationException("Cannot delete the only administrator of the organization. Create another administrator first.");
+            }
+
+            await _kitRepository.ClearResponsibleUserFromKitsAsync(userId);
+
+            user.Email = $"deleted_{userId:N}@deleted.faims";
+            user.FirstName = "Видалено";
+            user.LastName = "Користувач";
+            user.PasswordHash = Guid.NewGuid().ToString();
+            user.AvatarUrl = null;
+            user.FcmToken = null;
+            user.IsDeleted = true;
+            user.DeletedAt = DateTime.UtcNow;
+            await _userRepository.SaveChangesAsync();
+        }
+
         public async Task<AuthResultDto?> RefreshTokenAsync(string refreshToken)
         {
             var tokenEntity = await _refreshTokenRepository.GetByTokenAsync(refreshToken);
             if (tokenEntity == null)
                 return null;
 
-            // Rotate: revoke old token
             tokenEntity.IsRevoked = true;
 
             var newRefreshToken = new RefreshToken

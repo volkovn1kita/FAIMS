@@ -1,4 +1,3 @@
-// lib/data/dtos/medication_quantity_update_dto.dart
 import 'package:json_annotation/json_annotation.dart';
 
 part 'medication_quantity_update_dto.g.dart';

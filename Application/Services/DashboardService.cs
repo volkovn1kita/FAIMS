@@ -30,7 +30,7 @@ public class DashboardService : IDashboardService
         var totalDepartments = allDepartments.Count();
 
         var allUsers = await _userRepository.GetAllAsync();
-        var totalUsers = allUsers.Count();
+        var totalUsers = allUsers.Count(u => !u.IsDeleted);
 
         var allKits = await _firstAidKitRepository.GetFilteredKitsAsync(null,null,null);
         var totalKits = allKits.Count();

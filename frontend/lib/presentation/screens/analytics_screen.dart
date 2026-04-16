@@ -52,10 +52,9 @@ class _AnalyticsScreenState extends State<AnalyticsScreen> {
         title: Text(
           l10n.globalAnalytics,
           style: TextStyle(
-            fontSize: 22,
+            fontSize: 20,
             color: theme.colorScheme.onSurface,
             fontWeight: FontWeight.w700,
-            letterSpacing: -0.3,
           ),
         ),
         backgroundColor: theme.scaffoldBackgroundColor,

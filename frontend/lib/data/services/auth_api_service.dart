@@ -24,13 +24,8 @@ class AuthApiService {
       if (response.statusCode == 200) {
         return AuthResult.fromJson(jsonDecode(response.body));
       } else if (response.statusCode == 401 || response.statusCode == 400) {
-        // Both 401 (wrong credentials) and 400 (e.g. model validation — too
-        // short password) are shown to the user as the same generic message.
-        // The login screen maps AUTH_INVALID_CREDENTIALS to the localized string.
         throw Exception('AUTH_INVALID_CREDENTIALS');
       } else {
-        // Unexpected server error — pass a sentinel so the login screen can
-        // show a localized connection/server error message.
         throw Exception('AUTH_CONNECTION_ERROR');
       }
     } on TimeoutException {

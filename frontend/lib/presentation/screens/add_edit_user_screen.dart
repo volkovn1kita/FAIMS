@@ -74,8 +74,6 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           _firstNameController.text = userToEdit.firstName;
           _lastNameController.text = userToEdit.lastName;
           _emailController.text = userToEdit.email;
-          // Defensive: if backend returns a role we don't recognize, fall
-          // back to the first available instead of crashing the screen.
           _selectedRole = _availableRoles.firstWhere(
             (role) => role.name == userToEdit.role,
             orElse: () => _availableRoles.isNotEmpty
@@ -84,7 +82,12 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
           );
         });
       } else {
-        _selectedRole = _availableRoles.firstWhere((role) => role.name == 'User', orElse: () => _availableRoles.first);
+        if (_availableRoles.isNotEmpty) {
+          _selectedRole = _availableRoles.firstWhere(
+            (role) => role.name == 'User',
+            orElse: () => _availableRoles.first,
+          );
+        }
       }
     } catch (e) {
       if (!mounted) return;
@@ -193,7 +196,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
       appBar: AppBar(
         title: Text(
           _isEditing ? l10n.editUser : l10n.addNewUser,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
         ),
         elevation: 0,
         centerTitle: true,

@@ -4,15 +4,14 @@ services:
     container_name: faims_postgres
     restart: always
     environment:
-      POSTGRES_USER: faims_admin
-      POSTGRES_PASSWORD: faims_password
-      POSTGRES_DB: faims_db
-    ports:
-      - "5555:5432"
+      POSTGRES_USER: ${POSTGRES_USER:-faims_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB:-faims_db}
+    # Port intentionally not exposed — DB is internal only
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U faims_admin -d faims_db"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -26,11 +25,12 @@ services:
     ports:
       - "5076:5076"
     environment:
-      ConnectionStrings__PostgreSqlConnection: "Host=postgres_db;Port=5432;Database=faims_db;Username=faims_admin;Password=faims_password;"
+      ConnectionStrings__PostgreSqlConnection: "Host=postgres_db;Port=5432;Database=${POSTGRES_DB:-faims_db};Username=${POSTGRES_USER:-faims_admin};Password=${POSTGRES_PASSWORD};"
       JwtSettings__SecurityKey: "${JWT_SECRET_KEY}"
       JwtSettings__Issuer: "FirstAidKit.API"
       JwtSettings__Audience: "FirstAidKit.Client"
       JwtSettings__ExpiryMinutes: "60"
+      CORS_ALLOWED_ORIGINS: "${CORS_ALLOWED_ORIGINS:-}"
       ASPNETCORE_ENVIRONMENT: "Production"
     depends_on:
       postgres_db:
@@ -40,6 +40,36 @@ services:
       - backend_logs:/app/logs
       - backend_avatars:/app/wwwroot/avatars
 
+
+  # Runs pg_dump every 6 hours, keeps the last BACKUP_KEEP_DAYS days of files.
+  # Backups land in ./backups/ on the host as faims_YYYYMMDD_HHMMSS.sql.gz
+  # To restore: gunzip -c backups/faims_20260415_060000.sql.gz | docker exec -i faims_postgres psql -U $POSTGRES_USER $POSTGRES_DB
+  pg_backup:
+    image: postgres:15-alpine
+    container_name: faims_pg_backup
+    restart: always
+    depends_on:
+      postgres_db:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres_db
+      PGPORT: 5432
+      PGUSER: ${POSTGRES_USER:-faims_admin}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-faims_db}
+      BACKUP_KEEP_DAYS: "3"
+    volumes:
+      - ./backups:/backups
+    entrypoint: >
+      sh -c '
+        echo "pg_backup started — every 6 h, keeping $$BACKUP_KEEP_DAYS days";
+        while true; do
+          FILE="/backups/faims_$$(date +%Y%m%d_%H%M%S).sql.gz";
+          pg_dump | gzip > "$$FILE" && echo "Backup: $$FILE";
+          find /backups -name "faims_*.sql.gz" -mtime +$$BACKUP_KEEP_DAYS -delete;
+          sleep 21600;
+        done
+      '
 
 volumes:
   pgdata:

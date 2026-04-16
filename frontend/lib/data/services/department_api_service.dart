@@ -1,4 +1,3 @@
-// lib/data/services/department_api_service.dart
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -6,7 +5,7 @@ import 'package:faims/core/constants.dart';
 import 'package:faims/data/dtos/department_dto.dart';
 import 'package:faims/data/dtos/department_create_dto.dart';
 import 'package:faims/data/dtos/department_detail_dto.dart';
-import 'package:faims/data/dtos/room_list_dto.dart'; // Використовуємо RoomListDto для деталей департаменту
+import 'package:faims/data/dtos/room_list_dto.dart';
 import 'package:faims/data/dtos/room_create_dto.dart';
 import 'package:faims/data/dtos/room_update_dto.dart';
 import 'package:faims/data/dtos/room_list_all_dto.dart'; // Для getAllRooms, якщо потрібно
@@ -29,7 +28,6 @@ class DepartmentApiService {
     };
   }
 
-  // ============== DEPARTMENT OPERATIONS ================
 
   Future<List<DepartmentDto>> getAllDepartments() async {
     final Uri uri = Uri.parse('$_baseUrl/departments');
@@ -106,8 +104,7 @@ class DepartmentApiService {
             },
           );
 
-      if (response.statusCode == 201) { // 201 Created
-        // Backend повертає ID департаменту в тілі відповіді
+      if (response.statusCode == 201) {
         return response.body.isNotEmpty ? json.decode(response.body) : 'Success';
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         if (response.statusCode == 401) SessionService.instance.forceLogout();
@@ -127,7 +124,6 @@ class DepartmentApiService {
     final Uri uri = Uri.parse('$_baseUrl/departments/$id');
     try {
       final headers = await _getHeaders();
-      // Використовуємо DepartmentCreateDto для тіла запиту, як на бекенді
       final updateDto = DepartmentCreateDto(name: name);
       final response = await http.put(
         uri,
@@ -186,8 +182,6 @@ class DepartmentApiService {
       rethrow;
     }
   }
-
-  // ============== ROOM OPERATIONS ================
 
   Future<List<RoomListAllDto>> getAllRooms() async {
     final Uri uri = Uri.parse('$_baseUrl/departments/rooms/all');
@@ -262,7 +256,7 @@ class DepartmentApiService {
             },
           );
 
-      if (response.statusCode == 201) { // 201 Created
+      if (response.statusCode == 201) {
         return response.body.isNotEmpty ? json.decode(response.body) : 'Success';
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         if (response.statusCode == 401) SessionService.instance.forceLogout();

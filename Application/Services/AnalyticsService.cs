@@ -1,4 +1,3 @@
-// Application/Services/AnalyticsService.cs
 using Application.DTOs;
 using Application.Interfaces;
 
@@ -15,7 +14,6 @@ public class AnalyticsService : IAnalyticsService
 
     public async Task<DashboardStatsDto> GetGlobalStatsAsync()
     {
-        // Отримуємо глобальні топи (наприклад, топ-5)
         var topUsed = await _analyticsRepository.GetGlobalTopUsedMedicationsAsync(5);
         var topExpired = await _analyticsRepository.GetGlobalTopExpiredMedicationsAsync(5);
 

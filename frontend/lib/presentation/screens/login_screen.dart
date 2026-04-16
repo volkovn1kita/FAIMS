@@ -46,7 +46,6 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  /// Returns true if the JWT access token is expired (or unparseable).
   bool _isTokenExpired(String token) {
     try {
       final parts = token.split('.');
@@ -58,14 +57,12 @@ class _LoginScreenState extends State<LoginScreen> {
       final exp = payload['exp'];
       if (exp == null) return false;
       final expiry = DateTime.fromMillisecondsSinceEpoch((exp as int) * 1000);
-      // Add a 30-second buffer so we don't navigate with an about-to-expire token.
       return DateTime.now().isAfter(expiry.subtract(const Duration(seconds: 30)));
     } catch (_) {
       return true;
     }
   }
 
-  /// Navigates to the correct home screen using [token] and [name].
   void _navigateHome(String token, String name) {
     final payload = _decodeJwt(token);
     final role = payload['role'] ??
@@ -81,7 +78,6 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final token = await _authRepository.getToken();
 
-      // No token stored → show login form.
       if (token == null || token.isEmpty) {
         if (mounted) setState(() => _isLoading = false);
         return;
@@ -89,12 +85,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       String activeToken = token;
 
-      // If the access token is expired, try to silently refresh it.
       if (_isTokenExpired(token)) {
         final refreshed = await _authRepository.tryRefreshToken();
         if (refreshed == null) {
-          // Refresh failed (backend restarted with wiped DB, or token too old).
-          // Clear stored credentials and show login form.
           await _authRepository.logout();
           if (mounted) setState(() => _isLoading = false);
           return;
@@ -102,13 +95,11 @@ class _LoginScreenState extends State<LoginScreen> {
         activeToken = refreshed.token;
       }
 
-      // Token is valid — decode and navigate.
       final payload = _decodeJwt(activeToken);
       final role = payload['role'] ??
           payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
 
       if (role == null) {
-        // Token present but no role claim — treat as invalid.
         await _authRepository.logout();
         if (mounted) setState(() => _isLoading = false);
         return;
@@ -126,7 +117,6 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       _navigateHome(activeToken, name);
     } catch (_) {
-      // Any unexpected error → fall back to login form safely.
       if (mounted) setState(() => _isLoading = false);
     }
   }
@@ -141,8 +131,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    // Client-side validation — catches the most common cases before
-    // hitting the network, and ensures all error messages are localized.
     if (email.isEmpty || password.isEmpty) {
       setState(() {
         _errorMessage = l10n.enterEmailAndPassword;
@@ -182,7 +170,6 @@ class _LoginScreenState extends State<LoginScreen> {
         } else if (raw.contains('AUTH_CONNECTION_ERROR')) {
           _errorMessage = l10n.connectionError;
         } else {
-          // Fallback for anything unexpected (network plugin errors, etc.)
           _errorMessage = l10n.connectionError;
         }
       });

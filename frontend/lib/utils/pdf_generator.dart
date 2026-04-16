@@ -5,13 +5,6 @@ import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 import 'package:faims/l10n/app_localizations.dart';
 
-/// Generates a styled, fully-localized PDF report.
-///
-/// Layout:
-///   - Branded header band (FAIMS bar + title + subtitle)
-///   - Summary card with: period, total records, total quantity
-///   - Zebra-striped table with rounded header
-///   - Footer with page X of Y, generation date, and a confidentiality note
 class PdfGenerator {
   static Future<Uint8List> generateReport({
     required String title,
@@ -29,7 +22,6 @@ class PdfGenerator {
       subject: title,
     );
 
-    // Noto Sans has full Cyrillic coverage, perfect for Ukrainian.
     final font = await PdfGoogleFonts.notoSansRegular();
     final boldFont = await PdfGoogleFonts.notoSansBold();
     final mediumFont = await PdfGoogleFonts.notoSansMedium();
@@ -37,7 +29,6 @@ class PdfGenerator {
     final dateFormat = DateFormat('dd.MM.yyyy');
     final dateTimeFormat = DateFormat('dd.MM.yyyy HH:mm');
 
-    // Brand palette aligned with the app's primary color.
     final primary = PdfColor.fromHex('#8F58E1');
     final primaryDark = PdfColor.fromHex('#6B3DBA');
     final primarySoft = PdfColor.fromHex('#F5F3FF');
@@ -46,7 +37,6 @@ class PdfGenerator {
     final hairline = PdfColor.fromHex('#E9E6F2');
     final zebra = PdfColor.fromHex('#FAFAFE');
 
-    // Compute summary numbers.
     final totalRecords = tableData.length;
 
     pdf.addPage(
@@ -55,7 +45,6 @@ class PdfGenerator {
         margin: const pw.EdgeInsets.fromLTRB(36, 36, 36, 48),
         theme: pw.ThemeData.withFont(base: font, bold: boldFont),
         header: (context) {
-          // Show the compact brand bar on every page after the first.
           if (context.pageNumber == 1) return pw.SizedBox();
           return pw.Container(
             margin: const pw.EdgeInsets.only(bottom: 16),
@@ -109,7 +98,6 @@ class PdfGenerator {
           ),
         ),
         build: (context) => [
-          // ---- Hero header (only on first page) ----
           _buildHero(
             l10n: l10n,
             title: title,
@@ -124,8 +112,6 @@ class PdfGenerator {
             boldFont: boldFont,
           ),
           pw.SizedBox(height: 18),
-
-          // ---- Summary card with two stats ----
           _buildSummaryCard(
             l10n: l10n,
             startDate: startDate,
@@ -142,8 +128,6 @@ class PdfGenerator {
             boldFont: boldFont,
           ),
           pw.SizedBox(height: 22),
-
-          // ---- Data table or empty state ----
           if (tableData.isEmpty)
             _buildEmptyState(
               l10n: l10n,
@@ -165,8 +149,6 @@ class PdfGenerator {
             ),
 
           pw.SizedBox(height: 22),
-
-          // ---- Generated-on stamp ----
           pw.Row(
             mainAxisAlignment: pw.MainAxisAlignment.end,
             children: [
@@ -182,10 +164,6 @@ class PdfGenerator {
 
     return pdf.save();
   }
-
-  // ---------------------------------------------------------------------------
-  //  Section builders
-  // ---------------------------------------------------------------------------
 
   static pw.Widget _buildHero({
     required AppLocalizations l10n,

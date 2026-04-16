@@ -67,4 +67,8 @@ class UserRepository {
   Future<void> deleteUserAvatar(String userId) async {
     return await _userApiService.deleteUserAvatar(userId);
   }
+
+  Future<void> deleteMyAccount() async {
+    return await _userApiService.deleteMyAccount();
+  }
 }

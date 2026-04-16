@@ -58,8 +58,6 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
       if (!mounted) return;
       setState(() {
         _departments = departments;
-        // Guard against the "no departments yet" edge case — .first would
-        // throw Bad state: No element otherwise.
         if (_departments.isEmpty) {
           _selectedDepartment = null;
         } else if (isEditing) {
@@ -177,7 +175,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
       appBar: AppBar(
         title: Text(
           isEditing ? l10n.editRoom : l10n.addRoom,
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface, letterSpacing: -0.3),
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
         ),
         elevation: 0,
         centerTitle: true,

@@ -61,13 +61,29 @@ builder.Services.AddRateLimiter(options =>
 
 builder.Services.AddControllers();
 
+builder.Services.AddHealthChecks();
+
+var corsOrigins = builder.Configuration["CORS_ALLOWED_ORIGINS"]
+    ?.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        if (corsOrigins is { Length: > 0 })
+        {
+            policy.WithOrigins(corsOrigins)
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
+        else
+        {
+            // Mobile-only app: no browser CORS enforcement, AllowAny is safe.
+            // Set CORS_ALLOWED_ORIGINS in .env to restrict when adding a web client.
+            policy.AllowAnyOrigin()
+                  .AllowAnyMethod()
+                  .AllowAnyHeader();
+        }
     });
 });
 
@@ -161,6 +177,13 @@ builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    await db.Database.MigrateAsync();
+    Log.Information("Database migrations applied.");
+}
+
 if (args.Contains("--seed"))
 {
     using var scope = app.Services.CreateScope();
@@ -191,6 +214,7 @@ app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.UseStaticFiles();
 

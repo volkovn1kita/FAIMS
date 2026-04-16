@@ -27,7 +27,6 @@ class UpdateKitDto {
   factory UpdateKitDto.fromJson(Map<String, dynamic> json) => _$UpdateKitDtoFromJson(json);
   Map<String, dynamic> toJson() => _$UpdateKitDtoToJson(this);
 
-  // CopyWith все ще може бути корисним
   UpdateKitDto copyWith({
     String? id,
     String? name,

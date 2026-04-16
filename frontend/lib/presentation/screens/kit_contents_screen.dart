@@ -97,10 +97,6 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
     }
   }
 
-  /// Groups medications by (name, unit). Within a group, batches with
-  /// quantity == 0 are hidden when at least one non-zero batch exists,
-  /// so a stale empty record stops triggering false "out of stock"
-  /// warnings the moment a fresh batch is added.
   List<_MedicationGroup> _buildGroups(List<MedicationDto> meds) {
     final Map<String, List<MedicationDto>> byKey = {};
     for (final m in meds) {
@@ -589,9 +585,8 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
       appBar: AppBar(
         elevation: 0,
         title: Text(
-          _kitDetails?.name ?? l10n.kitsContent,
+          l10n.kitsContent,
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
-          overflow: TextOverflow.ellipsis,
         ),
         centerTitle: true,
         leading: IconButton(
@@ -716,12 +711,12 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                   children: [
                     Text(
                       _kitDetails!.name,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
-                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
                     ),
+                    const SizedBox(height: 2),
                     Text(
-                      'ID: ${_kitDetails!.uniqueNumber}',
-                      style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
+                      _kitDetails!.uniqueNumber,
+                      style: TextStyle(fontSize: 13, color: AppTheme.primary, fontWeight: FontWeight.w500),
                     ),
                   ],
                 ),
@@ -801,9 +796,7 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    // Left status stripe
                     Container(width: 4, color: sColor),
-                    // Content
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(12, 12, 12, 12),
@@ -996,7 +989,6 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // ---- Compact header (tap to expand/collapse) ----
               InkWell(
                 onTap: () => setState(() {
                   if (isExpanded) {
@@ -1108,7 +1100,6 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
                   ),
                 ),
               ),
-              // ---- Expanded list of individual batches ----
               if (isExpanded) ...[
                 Divider(height: 1, color: theme.dividerColor.withValues(alpha: 0.3)),
                 Padding(
@@ -1260,10 +1251,6 @@ class _KitContentsScreenState extends State<KitContentsScreen> {
   }
 }
 
-/// Aggregated view of all batches of a medication that share the same name
-/// AND unit. Batches with quantity == 0 are hidden when at least one
-/// non-zero batch exists, so an old empty record stops triggering false
-/// "out of stock" warnings the moment a fresh batch is added.
 class _MedicationGroup {
   final String name;
   final List<MedicationDto> visibleBatches;

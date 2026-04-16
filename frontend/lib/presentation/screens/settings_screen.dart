@@ -36,10 +36,9 @@ class SettingsScreen extends StatelessWidget {
             child: Text(
               l10n.settings,
               style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w800,
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
                 color: theme.colorScheme.onSurface,
-                letterSpacing: -0.5,
               ),
             ),
           ),
@@ -55,7 +54,6 @@ class SettingsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // --- Appearance / Dark Mode ---
                   _sectionLabel(l10n.appearance, theme),
                   Container(
                     decoration: BoxDecoration(
@@ -96,8 +94,8 @@ class SettingsScreen extends StatelessWidget {
                           ),
                           Switch.adaptive(
                             value: themeProvider.isDark,
-                            // ignore: deprecated_member_use
-                            activeColor: AppTheme.primaryLight,
+                            activeThumbColor: AppTheme.primaryLight,
+                            activeTrackColor: AppTheme.primaryLight.withValues(alpha: 0.4),
                             onChanged: (_) => themeProvider.toggleTheme(),
                           ),
                         ],
@@ -106,7 +104,6 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
 
-                  // --- Language ---
                   _sectionLabel(l10n.languageLabel, theme),
                   Container(
                     decoration: BoxDecoration(

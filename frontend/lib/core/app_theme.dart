@@ -19,10 +19,29 @@ class AppTheme {
     end: Alignment.bottomRight,
   );
 
+  static TextTheme _applyNumericFeatures(TextTheme base) {
+    const features = [FontFeature.tabularFigures(), FontFeature.liningFigures()];
+    return base.copyWith(
+      displayLarge:  base.displayLarge?.copyWith(fontFeatures: features),
+      displayMedium: base.displayMedium?.copyWith(fontFeatures: features),
+      displaySmall:  base.displaySmall?.copyWith(fontFeatures: features),
+      headlineLarge:  base.headlineLarge?.copyWith(fontFeatures: features),
+      headlineMedium: base.headlineMedium?.copyWith(fontFeatures: features),
+      headlineSmall:  base.headlineSmall?.copyWith(fontFeatures: features),
+      titleLarge:  base.titleLarge?.copyWith(fontFeatures: features),
+      titleMedium: base.titleMedium?.copyWith(fontFeatures: features),
+      titleSmall:  base.titleSmall?.copyWith(fontFeatures: features),
+      bodyLarge:  base.bodyLarge?.copyWith(fontFeatures: features),
+      bodyMedium: base.bodyMedium?.copyWith(fontFeatures: features),
+      bodySmall:  base.bodySmall?.copyWith(fontFeatures: features),
+      labelLarge:  base.labelLarge?.copyWith(fontFeatures: features),
+      labelMedium: base.labelMedium?.copyWith(fontFeatures: features),
+      labelSmall:  base.labelSmall?.copyWith(fontFeatures: features),
+    );
+  }
+
   static ThemeData get lightTheme {
-    // Manrope — геометричний, сучасний, має повну підтримку кирилиці
-    // і виглядає однаково якісно на Android та iOS.
-    final base = GoogleFonts.manropeTextTheme();
+    final base = _applyNumericFeatures(GoogleFonts.plusJakartaSansTextTheme());
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
@@ -76,7 +95,7 @@ class AppTheme {
   }
 
   static ThemeData get darkTheme {
-    final base = GoogleFonts.manropeTextTheme(ThemeData.dark().textTheme);
+    final base = _applyNumericFeatures(GoogleFonts.plusJakartaSansTextTheme(ThemeData.dark().textTheme));
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
@@ -130,6 +149,5 @@ class AppTheme {
     );
   }
 
-  // Backward compatibility
   static ThemeData get themeData => lightTheme;
 }

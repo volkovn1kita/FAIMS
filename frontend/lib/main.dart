@@ -64,11 +64,8 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // Listen for forced logouts triggered by API 401 responses.
-    // Clear all stored credentials and redirect to the login screen.
     _sessionSub = SessionService.instance.onForceLogout.listen((_) async {
       await _tokenStorage.deleteToken();
-      // appRouter is a GoRouter — navigate anywhere via the router directly.
       appRouter.go('/login');
     });
   }

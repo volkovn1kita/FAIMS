@@ -76,9 +76,6 @@ namespace Backend.Controllers
             return Ok(users);
         }
 
-        // Returns every ResponsibleUser without pagination. Used by the kit
-        // edit screen to render the "Responsible person" picker — the paginated
-        // endpoint could truncate the list and cause firstWhere to throw.
         [HttpGet("responsible")]
         [Authorize(Roles = nameof(UserRole.Administrator))]
         public async Task<IActionResult> GetResponsibleUsers()
@@ -269,6 +266,28 @@ namespace Backend.Controllers
                     return Unauthorized(new { Message = "User not authenticated." });
                 }
                 await _userService.DeleteUserAvatarAsync(userId);
+                return NoContent();
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new { Message = ex.Message });
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(new { Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("me")]
+        public async Task<IActionResult> DeleteMyAccount()
+        {
+            try
+            {
+                var userId = _currentUserService.GetUserId();
+                if (userId == Guid.Empty)
+                    return Unauthorized(new { Message = "User not authenticated." });
+
+                await _userService.DeleteMyAccountAsync(userId);
                 return NoContent();
             }
             catch (ValidationException ex)

@@ -180,8 +180,7 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
           l10n.manageUsers,
           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 20, color: theme.colorScheme.onSurface),
         ),
-        centerTitle: false,
-        titleSpacing: 0,
+        centerTitle: true,
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios_new, color: theme.colorScheme.onSurface, size: 20),

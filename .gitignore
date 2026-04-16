@@ -18,6 +18,7 @@ GoogleService-Info.plist
 appsettings.*.json
 !appsettings.json
 !appsettings.Example.json
+!appsettings.Production.json
 
 # Логи
 logs/

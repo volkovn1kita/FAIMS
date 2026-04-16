@@ -95,24 +95,22 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
   }
 
   Future<void> _deleteRoom(String roomId) async {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final bool? confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Confirm Deletion', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(
-          'Are you sure you want to delete this room? This action cannot be undone.',
-          style: TextStyle(),
-        ),
+        title: Text(l10n.confirmDeletion, style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(l10n.confirmDeleteRoom),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(false),
-            child: Text('Cancel', style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
+            child: Text(l10n.cancel, style: TextStyle(color: theme.colorScheme.onSurfaceVariant)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop(true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: Text('Delete', style: TextStyle(color: Colors.white)),
+            child: Text(l10n.deleteRoom, style: const TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -128,7 +126,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Room deleted successfully!', style: TextStyle()),
+              content: Text(l10n.roomDeletedSuccessfully),
               backgroundColor: Colors.green,
             ),
           );
@@ -136,17 +134,11 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
         }
       } catch (e) {
         if (mounted) {
-          setState(() {
-            _errorMessage = e.toString().contains('Exception:')
-                ? e.toString().replaceAll('Exception: ', '')
-                : 'Failed to delete room: ${e.toString()}';
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(_errorMessage, style: TextStyle()),
-                backgroundColor: Colors.red,
-              ),
-            );
-          });
+          final msg = e.toString().replaceAll('Exception: ', '');
+          setState(() { _errorMessage = msg; });
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(msg), backgroundColor: Colors.red),
+          );
         }
       } finally {
         if (mounted) {
@@ -261,7 +253,7 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
                 Expanded(
                   child: Text(
                     room.name,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
+                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),

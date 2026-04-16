@@ -1,4 +1,3 @@
-// lib/data/dtos/medication_write_off_dto.dart
 import 'package:json_annotation/json_annotation.dart';
 
 part 'medication_write_off_dto.g.dart';

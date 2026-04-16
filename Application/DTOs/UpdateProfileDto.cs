@@ -17,7 +17,6 @@ namespace Application.DTOs
         [EmailAddress(ErrorMessage = "Invalid email format.")]
         public string Email { get; set; } = string.Empty;
 
-        // Поля для зміни пароля
         public string? OldPassword { get; set; } 
         
         [StringLength(100, MinimumLength = 6, ErrorMessage = "New password must be at least 6 characters.")]

@@ -24,8 +24,6 @@ extension MeasurementUnitExtension on MeasurementUnit {
     return localizedNameFor(l10n);
   }
 
-  /// Same as [localizedName] but takes [AppLocalizations] directly. Useful
-  /// outside of widget trees (e.g. PDF generation, isolates).
   String localizedNameFor(AppLocalizations l10n) {
     switch (this) {
       case MeasurementUnit.pieces:
@@ -44,9 +42,6 @@ extension MeasurementUnitExtension on MeasurementUnit {
   }
 }
 
-/// Parses a backend unit string (e.g. "Tablets", "Milliliters") into a
-/// localized name. Falls back to the raw string if no match — that way an
-/// unknown unit at least renders something instead of crashing.
 String localizeUnitString(String? raw, AppLocalizations l10n) {
   if (raw == null || raw.isEmpty) return '';
   final unit = parseMeasurementUnit(raw);

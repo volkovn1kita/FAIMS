@@ -25,13 +25,17 @@ public class DepartmentRepository : IDepartmentRepository
 
     public Task DeleteDepartment(Department department)
     {
-        _dbContext.Departments.Remove(department);
+        department.IsDeleted = true;
+        department.DeletedAt = DateTime.UtcNow;
+        _dbContext.Departments.Update(department);
         return Task.CompletedTask;
     }
 
     public Task DeleteRoom(Room room)
     {
-        _dbContext.Rooms.Remove(room);
+        room.IsDeleted = true;
+        room.DeletedAt = DateTime.UtcNow;
+        _dbContext.Rooms.Update(room);
         return Task.CompletedTask;
     }
 

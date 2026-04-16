@@ -636,6 +636,13 @@ class AppLocalizationsUk extends AppLocalizations {
   String get deleteRoom => 'Видалити кімнату';
 
   @override
+  String get confirmDeleteRoom =>
+      'Ви впевнені, що хочете видалити цю кімнату? Цю дію неможливо скасувати.';
+
+  @override
+  String get roomDeletedSuccessfully => 'Кімнату успішно видалено';
+
+  @override
   String cannotDeleteKit(String kitName) {
     return 'Неможливо видалити \"$kitName\", оскільки він все ще містить ліки. Спочатку видаліть усі ліки.';
   }
@@ -935,4 +942,51 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get pdfConfidential =>
       'Внутрішній документ — для використання в межах організації';
+
+  @override
+  String get deleteAccount => 'Видалити акаунт';
+
+  @override
+  String get deleteAccountConfirmTitle => 'Видалити акаунт';
+
+  @override
+  String get deleteAccountConfirmMessage =>
+      'Ви впевнені, що хочете назавжди видалити свій акаунт? Цю дію неможливо скасувати.';
+
+  @override
+  String get accountDeletedSuccessfully => 'Акаунт успішно видалено';
+
+  @override
+  String get dangerZone => 'Небезпечна зона';
+
+  @override
+  String get cannotDeleteOnlyAdmin =>
+      'Неможливо видалити єдиного адміністратора організації. Спочатку призначте іншого адміністратора.';
+
+  @override
+  String get expiredMedicationError =>
+      'Неможливо додати або поповнити медикамент із простроченим терміном придатності. Виберіть майбутню дату.';
+
+  @override
+  String get insufficientQuantityError =>
+      'Недостатня кількість медикаменту для цієї операції. Перевірте наявний залишок.';
+
+  @override
+  String get exportInventory => 'Експорт інвентарю';
+
+  @override
+  String get exportJournal => 'Експорт журналу';
+
+  @override
+  String get exporting => 'Експортування...';
+
+  @override
+  String get exportSuccess => 'Файл готовий до передачі';
+
+  @override
+  String get invalidQuantityError => 'Введіть коректну кількість (більше 0).';
+
+  @override
+  String get cannotAssignAdminAsResponsible =>
+      'Адміністратор не може бути відповідальним за аптечку.';
 }

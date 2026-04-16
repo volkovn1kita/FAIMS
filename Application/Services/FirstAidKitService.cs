@@ -53,6 +53,10 @@ public class FirstAidKitService : IFirstAidKitService
         {
             throw new NotFoundException("Responsible user is not found");
         }
+        if (user.Role == UserRole.Administrator)
+        {
+            throw new ValidationException("An administrator cannot be assigned as the responsible person for a kit.");
+        }
 
         var newKit = new FirstAidKit
         {
@@ -240,6 +244,10 @@ public class FirstAidKitService : IFirstAidKitService
         if (responsibleUser == null)
         {
             throw new NotFoundException("User is not found");
+        }
+        if (responsibleUser.Role == UserRole.Administrator)
+        {
+            throw new ValidationException("An administrator cannot be assigned as the responsible person for a kit.");
         }
 
         kitToUpdate.Name = dto.Name;

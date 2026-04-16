@@ -24,7 +24,6 @@ namespace Infrastructure.Repositories
         {
             IQueryable<User> query = _dbContext.Users.AsNoTracking();
 
-            // 1. Фільтрація за роллю
             if (filterDto.Role.HasValue)
             {
                 query = query.Where(u => u.Role == filterDto.Role.Value);
@@ -57,13 +56,21 @@ namespace Infrastructure.Repositories
                 query = query.OrderBy(orderByExpression);
             }
 
-            // 4. Пагінація
             query = query
                 .Skip((filterDto.PageNumber - 1) * filterDto.PageSize)
                 .Take(filterDto.PageSize);
 
             return await query.ToListAsync();
         }
+        public async Task<int> CountActiveAdminsAsync(Guid organizationId)
+        {
+            return await _dbContext.Users
+                .IgnoreQueryFilters()
+                .CountAsync(u => u.OrganizationId == organizationId
+                              && u.Role == UserRole.Administrator
+                              && !u.IsDeleted);
+        }
+
         public async Task<IEnumerable<User>> GetAllAsync()
         {
             return await _dbContext.Users
@@ -110,7 +117,9 @@ namespace Infrastructure.Repositories
 
         public Task RemoveAsync(User user)
         {
-            _dbContext.Users.Remove(user);
+            user.IsDeleted = true;
+            user.DeletedAt = DateTime.UtcNow;
+            _dbContext.Users.Update(user);
             return Task.CompletedTask;
         }
 

@@ -5,6 +5,8 @@ import 'package:faims/data/dtos/user_dto.dart';
 import 'package:faims/domain/repositories/user_repository.dart';
 import 'package:faims/l10n/app_localizations.dart';
 import 'package:faims/core/app_theme.dart';
+import 'package:faims/utils/token_storage_service.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 
 class MyProfileScreen extends StatefulWidget {
@@ -16,6 +18,7 @@ class MyProfileScreen extends StatefulWidget {
 
 class _MyProfileScreenState extends State<MyProfileScreen> {
   final UserRepository _userRepository = UserRepository();
+  final TokenStorageService _tokenStorage = TokenStorageService();
   final ImagePicker _picker = ImagePicker();
   static final String _baseUrl = Constants.baseUrl.replaceAll('/api', '');
 
@@ -256,6 +259,57 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     );
   }
 
+  Future<void> _deleteMyAccount() async {
+    final l10n = AppLocalizations.of(context)!;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: Text(l10n.deleteAccountConfirmTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(l10n.deleteAccountConfirmMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+            child: Text(l10n.deleteAccount),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm != true || !mounted) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = '';
+    });
+
+    try {
+      await _userRepository.deleteMyAccount();
+      await _tokenStorage.deleteToken();
+      if (mounted) context.go('/login');
+    } catch (e) {
+      if (!mounted) return;
+      final raw = e.toString().replaceAll('Exception: ', '');
+      final l10n = AppLocalizations.of(context)!;
+      final msg = raw.toLowerCase().contains('administrator') || raw.toLowerCase().contains('only admin')
+          ? l10n.cannotDeleteOnlyAdmin
+          : raw;
+      setState(() { _isLoading = false; });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(msg),
+          backgroundColor: Colors.red.shade700,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -374,6 +428,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
                             ),
                           ),
                         _isEditing ? _buildEditProfileForm(l10n) : _buildProfileDetails(l10n),
+                        if (!_isEditing) _buildDangerZone(l10n),
                       ],
                     ),
                   ),
@@ -457,6 +512,83 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildDangerZone(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    return Padding(
+      padding: const EdgeInsets.only(top: 32),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.red.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Colors.red.withValues(alpha: 0.15)),
+        ),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.red.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(Icons.warning_amber_rounded, color: Colors.red.shade400, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  l10n.dangerZone,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.red.shade400,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Text(
+              l10n.deleteAccountConfirmMessage,
+              style: TextStyle(
+                fontSize: 13,
+                color: theme.colorScheme.onSurfaceVariant,
+                height: 1.5,
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: ElevatedButton.icon(
+                onPressed: _isLoading ? null : _deleteMyAccount,
+                icon: const Icon(Icons.delete_forever_rounded, color: Colors.white, size: 20),
+                label: Text(
+                  l10n.deleteAccount,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                  ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade600,
+                  disabledBackgroundColor: Colors.red.shade200,
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

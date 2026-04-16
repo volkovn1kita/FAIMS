@@ -1,4 +1,3 @@
-// lib/data/dtos/user_dto.dart - ОНОВЛЕНА ВЕРСІЯ
 import 'package:json_annotation/json_annotation.dart';
 
 part 'user_dto.g.dart';
@@ -26,7 +25,6 @@ class UserDto {
 
   String get fullName => '$firstName $lastName';
 
-  // Метод copyWith для зручного оновлення UserDto
   UserDto copyWith({
     String? id,
     String? firstName,

@@ -6,9 +6,8 @@ namespace Application.Interfaces;
 public interface IFirstAidKitRepository
 {
     Task<FirstAidKit?> GetKitByIdAsync(Guid id);
-
-    //Task<IEnumerable<FirstAidKit>> GetAllKitsAsync();
     Task<FirstAidKit?> GetKitByResponsibleUserIdAsync(Guid userId);
+    Task ClearResponsibleUserFromKitsAsync(Guid userId);
     Task<IEnumerable<FirstAidKit>> GetFilteredKitsAsync(
         string? searchTerm,
         Guid? responsibleUserId,

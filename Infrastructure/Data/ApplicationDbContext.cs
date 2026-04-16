@@ -43,14 +43,18 @@ public class ApplicationDbContext : DbContext
             .HasIndex(k => k.UniqueNumber)
             .IsUnique();
 
-        modelBuilder.Entity<User>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
-        modelBuilder.Entity<Department>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
-        modelBuilder.Entity<Room>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
-        modelBuilder.Entity<FirstAidKit>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
-        modelBuilder.Entity<Medication>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
-        modelBuilder.Entity<Journal>().HasQueryFilter(e => e.OrganizationId == CurrentOrganizationId);
-
-        // RefreshToken: no multi-tenancy filter — tokens are looked up globally by value
+        modelBuilder.Entity<User>().HasQueryFilter(e =>
+            e.OrganizationId == CurrentOrganizationId && !e.IsDeleted);
+        modelBuilder.Entity<Department>().HasQueryFilter(e =>
+            e.OrganizationId == CurrentOrganizationId && !e.IsDeleted);
+        modelBuilder.Entity<Room>().HasQueryFilter(e =>
+            e.OrganizationId == CurrentOrganizationId && !e.IsDeleted);
+        modelBuilder.Entity<FirstAidKit>().HasQueryFilter(e =>
+            e.OrganizationId == CurrentOrganizationId && !e.IsDeleted);
+        modelBuilder.Entity<Medication>().HasQueryFilter(e =>
+            e.OrganizationId == CurrentOrganizationId && !e.IsDeleted);
+        modelBuilder.Entity<Journal>().HasQueryFilter(e =>
+            e.OrganizationId == CurrentOrganizationId && !e.IsDeleted);
         modelBuilder.Entity<RefreshToken>()
             .HasOne(rt => rt.User)
             .WithMany(u => u.RefreshTokens)

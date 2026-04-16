@@ -1,5 +1,4 @@
-// Application/Interfaces/IUserRepository.cs - ОНОВЛЕНА ВЕРСІЯ
-using Application.DTOs; // Для UserFilterAndPaginationDto
+using Application.DTOs;
 using Domain;
 using System;
 using System.Collections.Generic;
@@ -9,8 +8,9 @@ namespace Application.Interfaces
 {
     public interface IUserRepository
     {
-        Task<IEnumerable<User>> GetAllFilteredAndSortedAsync(UserFilterAndPaginationDto filterDto); // <--- НОВИЙ МЕТОД
-        
+        Task<IEnumerable<User>> GetAllFilteredAndSortedAsync(UserFilterAndPaginationDto filterDto);
+        Task<int> CountActiveAdminsAsync(Guid organizationId);
+
         Task<IEnumerable<User>> GetAllAsync();
         Task<IEnumerable<User>> GetAllByOrganizationAsync(Guid organizationId);
         Task<User?> GetByIdAsync(Guid id);

@@ -36,7 +36,6 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
   String? _selectedResponsibleIdFilter;
   String? _selectedDepartmentIdFilter;
 
-  // Status filter values sent to backend (English)
   static const _statusValueAll = 'All';
   static const _statusValueGood = 'Good';
   static const _statusValueNeedsAttention = 'Needs Attention';
@@ -426,7 +425,7 @@ class _ManageKitsScreenState extends State<ManageKitsScreen> {
                                 children: [
                                   Text(
                                     kit.name,
-                                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
+                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                   const SizedBox(height: 2),

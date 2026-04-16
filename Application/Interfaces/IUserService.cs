@@ -6,7 +6,7 @@ namespace Application.Interfaces
 {
     public interface IUserService
     {
-        Task<IEnumerable<UserDto>> GetAllUsersAsync(UserFilterAndPaginationDto filterDto); // <--- ЗМІНЕНО
+        Task<IEnumerable<UserDto>> GetAllUsersAsync(UserFilterAndPaginationDto filterDto);
         Task<IEnumerable<UserDto>> GetAllResponsibleUsersAsync();
         Task<UserDto> GetUserByIdAsync(Guid id);
         Task<UserDto> GetCurrentUserProfileAsync(Guid currentUserId);
@@ -21,5 +21,6 @@ namespace Application.Interfaces
         Task UpdateFcmTokenAsync(Guid userId, string token);
         Task<string?> GetUserFcmTokenAsync(Guid userId);
         Task<AuthResultDto?> RefreshTokenAsync(string refreshToken);
+        Task DeleteMyAccountAsync(Guid userId);
     }
 }

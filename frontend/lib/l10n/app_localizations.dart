@@ -1298,6 +1298,18 @@ abstract class AppLocalizations {
   /// **'Delete Room'**
   String get deleteRoom;
 
+  /// No description provided for @confirmDeleteRoom.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this room? This action cannot be undone.'**
+  String get confirmDeleteRoom;
+
+  /// No description provided for @roomDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Room deleted successfully'**
+  String get roomDeletedSuccessfully;
+
   /// No description provided for @cannotDeleteKit.
   ///
   /// In en, this message translates to:
@@ -1816,6 +1828,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Internal document — for organization use only'**
   String get pdfConfidential;
+
+  /// No description provided for @deleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccount;
+
+  /// No description provided for @deleteAccountConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Account'**
+  String get deleteAccountConfirmTitle;
+
+  /// No description provided for @deleteAccountConfirmMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to permanently delete your account? This action cannot be undone.'**
+  String get deleteAccountConfirmMessage;
+
+  /// No description provided for @accountDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deleted successfully'**
+  String get accountDeletedSuccessfully;
+
+  /// No description provided for @dangerZone.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger Zone'**
+  String get dangerZone;
+
+  /// No description provided for @cannotDeleteOnlyAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot delete the only administrator of the organization. Create another administrator first.'**
+  String get cannotDeleteOnlyAdmin;
+
+  /// No description provided for @expiredMedicationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot add or refill a medication with an expired date. Please select a future date.'**
+  String get expiredMedicationError;
+
+  /// No description provided for @insufficientQuantityError.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient medication quantity for this operation. Please check the available stock.'**
+  String get insufficientQuantityError;
+
+  /// No description provided for @exportInventory.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Inventory'**
+  String get exportInventory;
+
+  /// No description provided for @exportJournal.
+  ///
+  /// In en, this message translates to:
+  /// **'Export Journal'**
+  String get exportJournal;
+
+  /// No description provided for @exporting.
+  ///
+  /// In en, this message translates to:
+  /// **'Exporting...'**
+  String get exporting;
+
+  /// No description provided for @exportSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'File ready to share'**
+  String get exportSuccess;
+
+  /// No description provided for @invalidQuantityError.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid quantity (greater than 0).'**
+  String get invalidQuantityError;
+
+  /// No description provided for @cannotAssignAdminAsResponsible.
+  ///
+  /// In en, this message translates to:
+  /// **'An administrator cannot be assigned as the responsible person for a kit.'**
+  String get cannotAssignAdminAsResponsible;
 }
 
 class _AppLocalizationsDelegate

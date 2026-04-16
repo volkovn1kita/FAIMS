@@ -1,4 +1,3 @@
-// lib/data/services/first_aid_kit_api_service.dart
 import 'dart:convert';
 import 'package:faims/data/dtos/create_kit_dto.dart';
 import 'package:faims/data/dtos/department_dto.dart';
@@ -13,8 +12,8 @@ import 'package:faims/core/constants.dart';
 import 'package:faims/data/dtos/first_aid_kit_list_dto.dart';
 import 'package:faims/data/dtos/update_kit_dto.dart';
 import 'package:faims/data/dtos/medication_dto.dart';
-import 'package:faims/data/dtos/medication_create_dto.dart'; // <<<--- НОВИЙ ІМПОРТ
-import 'package:faims/data/dtos/medication_update_dto.dart'; // <<<--- НОВИЙ ІМПОРТ
+import 'package:faims/data/dtos/medication_create_dto.dart';
+import 'package:faims/data/dtos/medication_update_dto.dart';
 import 'package:faims/utils/session_service.dart';
 
 class FirstAidKitApiService {
@@ -35,9 +34,6 @@ class FirstAidKitApiService {
   }
 
   Future<List<UserDto>> getResponsibleUsers() async {
-    // Use the dedicated /users/responsible endpoint which returns *all*
-    // responsible users without pagination — critical for pickers on the
-    // kit edit screen, otherwise firstWhere can fail on users past page 1.
     final Uri uri = Uri.parse('$_baseUrl/users/responsible');
     try {
       final headers = await _getHeaders();
@@ -204,10 +200,7 @@ class FirstAidKitApiService {
     }
   }
 
-  // ==== МЕТОДИ ДЛЯ МЕДИКАМЕНТІВ ====
-
   Future<List<MedicationDto>> getMedicationsForKit(String kitId) async {
-    // Змінено URL відповідно до вашого контролера
     final Uri uri = Uri.parse('$_baseUrl/kits/$kitId/medications');
     try {
       final headers = await _getHeaders();
@@ -283,7 +276,6 @@ class FirstAidKitApiService {
           );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        // Залежно від того, що повертає бекенд: тут очікуємо ID нового медикаменту
         return response.body.isNotEmpty ? json.decode(response.body) : 'Success';
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         if (response.statusCode == 401) SessionService.instance.forceLogout();
@@ -381,7 +373,7 @@ class FirstAidKitApiService {
           );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        return; // Успішно оновлено, контенту немає
+        return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
@@ -397,7 +389,6 @@ class FirstAidKitApiService {
   }
 
   Future<void> deleteMedication(String medicationId, String kitId) async {
-    // Змінено URL відповідно до вашого контролера
     final Uri uri = Uri.parse('$_baseUrl/kits/medications/$medicationId?kitId=$kitId');
     try {
       final headers = await _getHeaders();
@@ -409,7 +400,7 @@ class FirstAidKitApiService {
           );
 
       if (response.statusCode == 200 || response.statusCode == 204) {
-        return; // Успішно видалено, контенту немає
+        return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
@@ -425,8 +416,6 @@ class FirstAidKitApiService {
       rethrow;
     }
   }
-
-  // ==== МЕТОДИ ДЛЯ AddEditKitScreen (без змін) ====
 
   Future<List<RoomDto>> getRoomsByDepartmentId(String departmentId) async {
     final Uri uri = Uri.parse('$_baseUrl/departments/$departmentId/rooms');

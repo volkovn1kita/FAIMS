@@ -1,4 +1,3 @@
-// lib/data/api_services/user_api_service.dart - ОНОВЛЕНА ВЕРСІЯ (з доданими методами керування користувачами)
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
@@ -6,7 +5,7 @@ import 'package:faims/core/constants.dart';
 import 'package:faims/data/dtos/user_dto.dart';
 import 'package:faims/data/dtos/create_user_request_dto.dart';
 import 'package:faims/data/dtos/user_role_dto.dart';
-import 'package:faims/data/dtos/update_user_request_dto.dart'; // <--- НОВИЙ DTO
+import 'package:faims/data/dtos/update_user_request_dto.dart';
 import 'package:http/http.dart' as http;
 import 'package:faims/utils/token_storage_service.dart';
 import 'package:faims/utils/session_service.dart';
@@ -27,11 +26,10 @@ class UserApiService {
     return headers;
   }
 
-  // --- GET ALL USERS ---
   Future<List<UserDto>> getAllUsers() async {
     try {
       final response = await http.get(
-        Uri.parse('$_baseUrl/users'),
+        Uri.parse('$_baseUrl/users?PageSize=1000&PageNumber=1'),
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 30));
 
@@ -52,7 +50,6 @@ class UserApiService {
     }
   }
 
-  // --- GET USER BY ID (Admin) --- <--- НОВИЙ МЕТОД
   Future<UserDto> getUserById(String userId) async {
     try {
       final response = await http.get(
@@ -78,7 +75,6 @@ class UserApiService {
     }
   }
 
-  // --- CREATE USER (Admin) ---
   Future<String> adminCreateUser(CreateUserRequestDto dto) async {
     try {
       final response = await http.post(
@@ -107,7 +103,6 @@ class UserApiService {
     }
   }
 
-  // --- UPDATE USER (Admin) --- <--- НОВИЙ МЕТОД
   Future<void> adminUpdateUser(String userId, UpdateUserRequestDto dto) async {
     try {
       final response = await http.put(
@@ -116,14 +111,8 @@ class UserApiService {
         body: jsonEncode(dto.toJson()),
       ).timeout(const Duration(seconds: 30));
 
-      if (response.statusCode == 200) {
-        if (response.body.isNotEmpty) {
-          return; 
-        } else {
-          return;
-        }
-      } else if (response.statusCode == 204) { 
-        return; // Успішне оновлення, повертаємо void
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        return;
       } else if (response.statusCode == 400) {
         final errorBody = jsonDecode(response.body);
         throw Exception(errorBody['message'] ?? 'Validation error.');
@@ -143,7 +132,6 @@ class UserApiService {
     }
   }
 
-  // --- DELETE USER (Admin) --- <--- НОВИЙ МЕТОД
   Future<void> adminDeleteUser(String userId) async {
     try {
       final response = await http.delete(
@@ -151,7 +139,7 @@ class UserApiService {
         headers: await _getHeaders(),
       ).timeout(const Duration(seconds: 30));
 
-      if (response.statusCode == 204) { // 204 No Content - зазвичай повертається при успішному видаленні
+      if (response.statusCode == 204) {
         return;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         if (response.statusCode == 401) SessionService.instance.forceLogout();
@@ -169,8 +157,6 @@ class UserApiService {
     }
   }
 
-
-  // --- GET AVAILABLE ROLES ---
   Future<List<UserRoleDto>> getAvailableRoles() async {
     await Future.delayed(const Duration(milliseconds: 100));
     return [
@@ -179,7 +165,6 @@ class UserApiService {
     ];
   }
 
-  // --- GET MY PROFILE ---
   Future<UserDto> getMyProfile() async {
     try {
       final response = await http.get(
@@ -190,7 +175,7 @@ class UserApiService {
       if (response.statusCode == 200) {
         return UserDto.fromJson(json.decode(response.body));
       } else if (response.statusCode == 401) {
-        if (response.statusCode == 401) SessionService.instance.forceLogout();
+        SessionService.instance.forceLogout();
         throw Exception('Unauthorized. Please log in.');
       } else {
         final errorBody = jsonDecode(response.body);
@@ -203,7 +188,6 @@ class UserApiService {
     }
   }
 
-  // --- UPDATE MY PROFILE ---
   Future<UserDto?> updateMyProfile({
     required String firstName,
     required String lastName,
@@ -233,17 +217,13 @@ class UserApiService {
           return UserDto.fromJson(json.decode(response.body));
         }
         return null;
-      }
-
-      else if (response.statusCode == 400) {
+      } else if (response.statusCode == 400) {
         final errorBody = jsonDecode(response.body);
         throw Exception(errorBody['message'] ?? 'Validation error.');
-      }
-
-      else if (response.statusCode == 401) {
+      } else if (response.statusCode == 401) {
+        SessionService.instance.forceLogout();
         throw Exception('Unauthorized. Please log in.');
-      }
-      else {
+      } else {
         String message = 'Failed to update profile. Status: ${response.statusCode}';
         if (response.body.isNotEmpty) {
           try {
@@ -260,8 +240,29 @@ class UserApiService {
     }
   }
 
+  Future<void> deleteMyAccount() async {
+    try {
+      final response = await http.delete(
+        Uri.parse('$_baseUrl/users/me'),
+        headers: await _getHeaders(),
+      ).timeout(const Duration(seconds: 30));
 
-  // --- ЗАВАНТАЖЕННЯ АВАТАРА ДЛЯ ПОТОЧНОГО КОРИСТУВАЧА ---
+      if (response.statusCode == 204) {
+        return;
+      } else if (response.statusCode == 401) {
+        SessionService.instance.forceLogout();
+        throw Exception('Unauthorized. Please log in.');
+      } else {
+        final errorBody = jsonDecode(response.body);
+        throw Exception(errorBody['message'] ?? 'Failed to delete account. Status: ${response.statusCode}');
+      }
+    } on TimeoutException {
+      throw Exception('The server is not responding. Please check your connection or try again later.');
+    } catch (e) {
+      rethrow;
+    }
+  }
+
   Future<String?> uploadMyAvatar(File avatarFile) async {
     try {
       final uri = Uri.parse('$_baseUrl/users/me/avatar');
@@ -295,7 +296,6 @@ class UserApiService {
     }
   }
 
-  // --- ВИДАЛЕННЯ АВАТАРА ДЛЯ ПОТОЧНОГО КОРИСТУВАЧА ---
   Future<void> deleteMyAvatar() async {
     try {
       final response = await http.delete(
@@ -319,7 +319,6 @@ class UserApiService {
     }
   }
 
-  // --- Завантаження аватара для конкретного користувача (Admin) ---
   Future<String?> uploadUserAvatar(String userId, File avatarFile) async {
     try {
       final uri = Uri.parse('$_baseUrl/users/$userId/avatar');
@@ -353,7 +352,6 @@ class UserApiService {
     }
   }
 
-  // --- Видалення аватара для конкретного користувача (Admin) ---
   Future<void> deleteUserAvatar(String userId) async {
     try {
       final response = await http.delete(

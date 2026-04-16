@@ -85,16 +85,9 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     });
   }
 
-  /// Groups medications by name (case-insensitive). Within a group, batches
-  /// with quantity == 0 are hidden if at least one non-zero batch exists,
-  /// so stale "out of stock" entries don't pollute the view once new stock
-  /// arrives. If every batch in a group is zero, all are kept (the user
-  /// genuinely has no stock and should see the warning).
   List<_MedicationGroup> _buildGroups(List<MedicationDto> meds) {
     final Map<String, List<MedicationDto>> byName = {};
     for (final m in meds) {
-      // Group by (name, unit) so two records with the same name but
-      // different units never get summed together.
       final key = '${m.name.trim().toLowerCase()}|${m.unit.name}';
       byName.putIfAbsent(key, () => []).add(m);
     }
@@ -103,7 +96,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     byName.forEach((_, batches) {
       final nonZero = batches.where((m) => m.quantity > 0).toList();
       final visible = nonZero.isNotEmpty ? nonZero : batches;
-      // Sort batches by expiration ascending so the earliest is first.
       visible.sort((a, b) => a.expirationDate.compareTo(b.expirationDate));
       groups.add(_MedicationGroup(
         name: batches.first.name,
@@ -112,7 +104,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       ));
     });
 
-    // Sort groups by worst (earliest) expiration date so urgent items rise to top.
     groups.sort((a, b) => a.earliestExpiration.compareTo(b.earliestExpiration));
     return groups;
   }
@@ -144,20 +135,26 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     }
   }
 
-  void _onItemTapped(int index) async {
+  Future<void> _onItemTapped(int index) async {
     if (index == _selectedIndex && index != 1) return;
-    if (index == 0) {
-      setState(() => _selectedIndex = index);
-    } else if (index == 1) {
-      final updatedName = await Navigator.of(context).push<String>(
-        MaterialPageRoute(builder: (context) => const MyProfileScreen()),
-      );
-      if (!mounted) return;
-      if (updatedName != null) {
-        setState(() => _userName = updatedName);
+    try {
+      if (index == 0) {
+        setState(() => _selectedIndex = index);
+      } else if (index == 1) {
+        final updatedName = await Navigator.of(context).push<String>(
+          MaterialPageRoute(builder: (context) => const MyProfileScreen()),
+        );
+        if (!mounted) return;
+        if (updatedName != null) {
+          setState(() => _userName = updatedName);
+        }
+        setState(() => _selectedIndex = 0);
+        await _loadMyKitAndMedications();
       }
-      setState(() => _selectedIndex = 0);
-      await _loadMyKitAndMedications();
+    } catch (e) {
+      if (mounted) {
+        setState(() => _errorMessage = e.toString().replaceAll('Exception: ', ''));
+      }
     }
   }
 
@@ -358,13 +355,30 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
 
     if (confirmed) {
       final q = int.tryParse(quantityController.text) ?? 0;
-      if (q > 0 && q <= medication.quantity) {
-        await _performAction(
-          () => _kitRepository.useMedication(
-              medication.id, MedicationQuantityUpdateDto(quantity: q)),
-          l10n.medicationUsedSuccess,
-        );
+      if (q <= 0) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(l10n.invalidQuantityError),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ));
+        return;
       }
+      if (q > medication.quantity) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(l10n.insufficientQuantityError),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
+        ));
+        return;
+      }
+      await _performAction(
+        () => _kitRepository.useMedication(
+            medication.id, MedicationQuantityUpdateDto(quantity: q)),
+        l10n.medicationUsedSuccess,
+      );
     }
   }
 
@@ -424,7 +438,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       final picked = await showDatePicker(
                         context: ctx,
                         initialDate: date,
-                        firstDate: DateTime.now(),
+                        firstDate: DateTime.now().add(const Duration(days: 1)),
                         lastDate: DateTime.now()
                             .add(const Duration(days: 3650)),
                         builder: (context, child) => Theme(
@@ -595,13 +609,39 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
     if (confirmed) {
       final q = int.tryParse(qController.text) ?? 0;
       final r = rController.text.trim();
-      if (q > 0 && r.isNotEmpty) {
-        await _performAction(
-          () => _kitRepository.writeOffMedication(medication.id,
-              MedicationWriteOffDto(quantity: q, reason: r)),
-          l10n.medicationWrittenOffSuccess,
-        );
+      if (q <= 0) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(l10n.invalidQuantityError),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+        ));
+        return;
       }
+      if (q > medication.quantity) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(l10n.insufficientQuantityError),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5),
+        ));
+        return;
+      }
+      if (r.isEmpty) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(l10n.reasonRequired),
+          backgroundColor: Colors.orange,
+          behavior: SnackBarBehavior.floating,
+        ));
+        return;
+      }
+      await _performAction(
+        () => _kitRepository.writeOffMedication(medication.id,
+            MedicationWriteOffDto(quantity: q, reason: r)),
+        l10n.medicationWrittenOffSuccess,
+      );
     }
   }
 
@@ -697,7 +737,7 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                       final picked = await showDatePicker(
                         context: ctx,
                         initialDate: date,
-                        firstDate: DateTime.now(),
+                        firstDate: DateTime.now().add(const Duration(days: 1)),
                         lastDate: DateTime.now()
                             .add(const Duration(days: 3650)),
                         builder: (context, child) => Theme(
@@ -804,8 +844,21 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       await _loadMyKitAndMedications();
     } catch (e) {
       if (!mounted) return;
+      final l10n = AppLocalizations.of(context)!;
+      final raw = e.toString().replaceAll('Exception: ', '');
+      final String msg;
+      if (raw.toLowerCase().contains('expired') || raw.toLowerCase().contains('expir')) {
+        msg = l10n.expiredMedicationError;
+      } else if (raw.toLowerCase().contains('not enough') || raw.toLowerCase().contains('insufficient')) {
+        msg = l10n.insufficientQuantityError;
+      } else {
+        msg = raw;
+      }
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(e.toString()), backgroundColor: Colors.red));
+          content: Text(msg),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          duration: const Duration(seconds: 5)));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -1144,8 +1197,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 
   Widget _buildGroupCard(_MedicationGroup group, AppLocalizations l10n) {
-    // Single-batch groups render exactly like the original card so the
-    // common case stays unchanged.
     if (!group.hasMultipleBatches) {
       return _buildMedicationCard(group.visibleBatches.first, l10n);
     }
@@ -1169,7 +1220,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ---- Header (tap to expand/collapse) ----
           InkWell(
             borderRadius: BorderRadius.circular(20),
             onTap: () => setState(() {
@@ -1221,7 +1271,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
                     '${group.totalMinimum} $unitName',
                     theme.colorScheme.onSurfaceVariant,
                   ),
-                  // Batch count chip
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
@@ -1253,7 +1302,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
               ]),
             ),
           ),
-          // ---- Expanded list of individual batches ----
           if (isExpanded) ...[
             Divider(height: 1, color: theme.dividerColor.withValues(alpha: 0.3)),
             Padding(
@@ -1547,10 +1595,6 @@ class _UserHomeScreenState extends State<UserHomeScreen> {
   }
 }
 
-/// Aggregated view of all batches of a medication that share the same name.
-/// Batches with quantity == 0 are hidden when at least one non-zero batch
-/// exists, so an old empty record stops triggering false "out of stock"
-/// warnings the moment a fresh batch is added.
 class _MedicationGroup {
   final String name;
   final List<MedicationDto> visibleBatches;

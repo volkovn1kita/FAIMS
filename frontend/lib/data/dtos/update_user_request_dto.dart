@@ -1,4 +1,3 @@
-// lib/data/dtos/update_user_request_dto.dart
 import 'package:json_annotation/json_annotation.dart';
 
 part 'update_user_request_dto.g.dart';
@@ -8,8 +7,8 @@ class UpdateUserRequestDto {
   final String firstName;
   final String lastName;
   final String email;
-  final String role; // Адмін може змінити роль
-  final String? password; // Адмін може змінити пароль, опціонально
+  final String role;
+  final String? password;
 
   UpdateUserRequestDto({
     required this.firstName,
