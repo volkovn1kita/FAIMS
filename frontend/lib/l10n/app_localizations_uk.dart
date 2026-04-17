@@ -989,4 +989,31 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get cannotAssignAdminAsResponsible =>
       'Адміністратор не може бути відповідальним за аптечку.';
+
+  @override
+  String get onboardingTitle => 'Початкове налаштування';
+
+  @override
+  String get onboardingSubtitle => 'Завершіть налаштування, щоб почати роботу';
+
+  @override
+  String get onboardingStep1 => 'Створіть відділ';
+
+  @override
+  String get onboardingStep2 => 'Додайте кімнату до відділу';
+
+  @override
+  String get onboardingStep3 => 'Зареєструйте співробітника';
+
+  @override
+  String get onboardingStep4 => 'Створіть аптечку';
+
+  @override
+  String get helpSection => 'Довідка';
+
+  @override
+  String get helpGuideTitle => 'Покрокова інструкція';
+
+  @override
+  String get helpGuideSubtitle => 'Порядок налаштування системи FAIMS';
 }

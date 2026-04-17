@@ -29,6 +29,8 @@ public class DashboardService : IDashboardService
         var allDepartments = await _departmentRepository.GetAllDepartmentsAsync();
         var totalDepartments = allDepartments.Count();
 
+        var totalRooms = await _departmentRepository.GetTotalRoomsCountAsync();
+
         var allUsers = await _userRepository.GetAllAsync();
         var totalUsers = allUsers.Count(u => !u.IsDeleted);
 
@@ -46,7 +48,8 @@ public class DashboardService : IDashboardService
             totalKits,
             kitsNeedingAttention,
             totalUsers,
-            totalDepartments
+            totalDepartments,
+            totalRooms
         );
     }
 }

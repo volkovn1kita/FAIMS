@@ -419,5 +419,14 @@
   "exporting": "Експортування...",
   "exportSuccess": "Файл готовий до передачі",
   "invalidQuantityError": "Введіть коректну кількість (більше 0).",
-  "cannotAssignAdminAsResponsible": "Адміністратор не може бути відповідальним за аптечку."
+  "cannotAssignAdminAsResponsible": "Адміністратор не може бути відповідальним за аптечку.",
+  "onboardingTitle": "Початкове налаштування",
+  "onboardingSubtitle": "Завершіть налаштування, щоб почати роботу",
+  "onboardingStep1": "Створіть відділ",
+  "onboardingStep2": "Додайте кімнату до відділу",
+  "onboardingStep3": "Зареєструйте співробітника",
+  "onboardingStep4": "Створіть аптечку",
+  "helpSection": "Довідка",
+  "helpGuideTitle": "Покрокова інструкція",
+  "helpGuideSubtitle": "Порядок налаштування системи FAIMS"
 }

@@ -63,6 +63,11 @@ public class DepartmentRepository : IDepartmentRepository
         return await _dbContext.Departments.CountAsync();
     }
 
+    public async Task<int> GetTotalRoomsCountAsync()
+    {
+        return await _dbContext.Rooms.CountAsync(r => !r.IsDeleted);
+    }
+
     public async Task<Department?> GetDepartmentByIdAsync(Guid id)
     {
         return await _dbContext.Departments

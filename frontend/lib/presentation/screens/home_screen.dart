@@ -308,7 +308,10 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 24),
+          if (!_isOverviewLoading && _overviewData != null)
+            _buildOnboardingChecklist(l10n),
+          const SizedBox(height: 24),
           Text(
             l10n.overview,
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Theme.of(context).colorScheme.onSurface),
@@ -391,6 +394,130 @@ class _HomeScreenState extends State<HomeScreen> {
                           ],
                         ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOnboardingChecklist(AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final data = _overviewData!;
+
+    final steps = [
+      (label: l10n.onboardingStep1, done: data.totalDepartments > 0),
+      (label: l10n.onboardingStep2, done: data.totalRooms > 0),
+      (label: l10n.onboardingStep3, done: data.totalUsers > 0),
+      (label: l10n.onboardingStep4, done: data.totalKits > 0),
+    ];
+
+    final allDone = steps.every((s) => s.done);
+    if (allDone) return const SizedBox.shrink();
+
+    final completedCount = steps.where((s) => s.done).length;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: isDark ? AppTheme.darkCard : Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.25), width: 1.5),
+        boxShadow: [
+          BoxShadow(color: AppTheme.primary.withValues(alpha: 0.08), blurRadius: 12, offset: const Offset(0, 4)),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.rocket_launch_rounded, color: AppTheme.primary, size: 20),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.onboardingTitle,
+                        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: theme.colorScheme.onSurface),
+                      ),
+                      Text(
+                        l10n.onboardingSubtitle,
+                        style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    '$completedCount/${steps.length}',
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w700, color: AppTheme.primary),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: completedCount / steps.length,
+                minHeight: 6,
+                backgroundColor: AppTheme.primary.withValues(alpha: 0.12),
+                valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primary),
+              ),
+            ),
+            const SizedBox(height: 16),
+            ...steps.map((step) => _buildChecklistItem(step.label, step.done, theme)),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildChecklistItem(String label, bool done, ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10.0),
+      child: Row(
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 250),
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              color: done ? AppTheme.primary : Colors.transparent,
+              border: Border.all(color: done ? AppTheme.primary : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4), width: 2),
+              shape: BoxShape.circle,
+            ),
+            child: done
+                ? const Icon(Icons.check_rounded, color: Colors.white, size: 14)
+                : null,
+          ),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: done
+                  ? theme.colorScheme.onSurfaceVariant
+                  : theme.colorScheme.onSurface,
+              decoration: done ? TextDecoration.lineThrough : null,
+              decorationColor: theme.colorScheme.onSurfaceVariant,
+            ),
+          ),
         ],
       ),
     );

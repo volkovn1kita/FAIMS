@@ -985,4 +985,31 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get cannotAssignAdminAsResponsible =>
       'An administrator cannot be assigned as the responsible person for a kit.';
+
+  @override
+  String get onboardingTitle => 'Getting started';
+
+  @override
+  String get onboardingSubtitle => 'Complete the setup to start working';
+
+  @override
+  String get onboardingStep1 => 'Create a department';
+
+  @override
+  String get onboardingStep2 => 'Add a room to the department';
+
+  @override
+  String get onboardingStep3 => 'Register an employee';
+
+  @override
+  String get onboardingStep4 => 'Create a first aid kit';
+
+  @override
+  String get helpSection => 'Help';
+
+  @override
+  String get helpGuideTitle => 'Step-by-step guide';
+
+  @override
+  String get helpGuideSubtitle => 'How to set up the FAIMS system';
 }

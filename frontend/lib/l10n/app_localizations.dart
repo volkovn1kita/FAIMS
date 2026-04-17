@@ -1912,6 +1912,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'An administrator cannot be assigned as the responsible person for a kit.'**
   String get cannotAssignAdminAsResponsible;
+
+  /// No description provided for @onboardingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting started'**
+  String get onboardingTitle;
+
+  /// No description provided for @onboardingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete the setup to start working'**
+  String get onboardingSubtitle;
+
+  /// No description provided for @onboardingStep1.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a department'**
+  String get onboardingStep1;
+
+  /// No description provided for @onboardingStep2.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a room to the department'**
+  String get onboardingStep2;
+
+  /// No description provided for @onboardingStep3.
+  ///
+  /// In en, this message translates to:
+  /// **'Register an employee'**
+  String get onboardingStep3;
+
+  /// No description provided for @onboardingStep4.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a first aid kit'**
+  String get onboardingStep4;
+
+  /// No description provided for @helpSection.
+  ///
+  /// In en, this message translates to:
+  /// **'Help'**
+  String get helpSection;
+
+  /// No description provided for @helpGuideTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Step-by-step guide'**
+  String get helpGuideTitle;
+
+  /// No description provided for @helpGuideSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to set up the FAIMS system'**
+  String get helpGuideSubtitle;
 }
 
 class _AppLocalizationsDelegate

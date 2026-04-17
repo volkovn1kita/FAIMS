@@ -194,6 +194,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
       }
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
+      if (!mounted) return;
       final l10n2 = AppLocalizations.of(context)!;
       final raw = e.toString().replaceAll('Exception: ', '');
       final String mapped;

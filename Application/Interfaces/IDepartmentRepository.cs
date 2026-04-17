@@ -12,6 +12,7 @@ public interface IDepartmentRepository
     Task UpdateDepartment(Department department);
     Task DeleteDepartment(Department department);
 
+    Task<int> GetTotalRoomsCountAsync();
     Task<IEnumerable<Room>> GetRoomsByDepartmentIdAsync(Guid departmentId);
     Task<IEnumerable<Room>> GetRoomsAsync();
     Task<Room?> GetRoomByIdAsync(Guid id);
