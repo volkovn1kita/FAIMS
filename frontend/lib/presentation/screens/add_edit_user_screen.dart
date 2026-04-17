@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:faims/core/error_mapper.dart';
 import 'package:faims/data/dtos/create_user_request_dto.dart';
 import 'package:faims/data/dtos/update_user_request_dto.dart';
 import 'package:faims/data/dtos/user_role_dto.dart';
@@ -174,9 +175,7 @@ class _AddEditUserScreenState extends State<AddEditUserScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = e.toString().contains('Exception:')
-            ? e.toString().replaceAll('Exception: ', '')
-            : 'Failed to save user: ${e.toString()}';
+        _errorMessage = ErrorMapper.map(e, AppLocalizations.of(context)!);
       });
     }
     

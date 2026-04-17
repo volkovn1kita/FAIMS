@@ -1966,6 +1966,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How to set up the FAIMS system'**
   String get helpGuideSubtitle;
+
+  /// No description provided for @errorRoomHasKit.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot delete room: it has a first aid kit assigned. Please delete or move the kit first.'**
+  String get errorRoomHasKit;
+
+  /// No description provided for @errorDepartmentAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'A department with this name already exists.'**
+  String get errorDepartmentAlreadyExists;
+
+  /// No description provided for @errorRoomAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'A room with this name already exists in this department.'**
+  String get errorRoomAlreadyExists;
+
+  /// No description provided for @errorKitNumberAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'A kit with this unique number already exists.'**
+  String get errorKitNumberAlreadyExists;
+
+  /// No description provided for @errorEmailAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'A user with this email already exists.'**
+  String get errorEmailAlreadyExists;
+
+  /// No description provided for @errorIncorrectOldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect current password.'**
+  String get errorIncorrectOldPassword;
+
+  /// No description provided for @errorOldPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password is required to change the password.'**
+  String get errorOldPasswordRequired;
+
+  /// No description provided for @errorGeneral.
+  ///
+  /// In en, this message translates to:
+  /// **'An error occurred. Please try again.'**
+  String get errorGeneral;
+
+  /// No description provided for @errorUserIsLastAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Cannot delete the only administrator. Assign another administrator first.'**
+  String get errorUserIsLastAdmin;
 }
 
 class _AppLocalizationsDelegate

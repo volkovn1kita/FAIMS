@@ -1,6 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:faims/core/constants.dart';
+import 'package:faims/core/error_mapper.dart';
 import 'package:faims/data/dtos/user_dto.dart';
 import 'package:faims/data/dtos/user_role_dto.dart';
 import 'package:faims/domain/repositories/user_repository.dart';
@@ -153,12 +154,12 @@ class _ManageUsersScreenState extends State<ManageUsersScreen> {
         _loadData(); 
       } catch (e) {
         if (!mounted) return;
-        setState(() {
-          _errorMessage = e.toString().contains('Exception:')
-              ? e.toString().replaceAll('Exception: ', '')
-              : 'Failed to delete user: ${e.toString()}';
-        });
         developer.log('Error deleting user: $e', name: 'ManageUsersScreen');
+        final msg = ErrorMapper.map(e, AppLocalizations.of(context)!);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating),
+        );
+        setState(() { _isLoading = false; });
       }
       
       if (mounted) {

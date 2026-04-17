@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:faims/core/constants.dart';
+import 'package:faims/core/error_mapper.dart';
 import 'package:faims/data/dtos/user_dto.dart';
 import 'package:faims/domain/repositories/user_repository.dart';
 import 'package:faims/l10n/app_localizations.dart';
@@ -137,9 +138,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _errorMessage = e.toString().contains('Exception:')
-            ? e.toString().replaceAll('Exception: ', '')
-            : 'Failed to update profile: ${e.toString()}';
+        _errorMessage = ErrorMapper.map(e, AppLocalizations.of(context)!);
         _isLoading = false;
       });
     }
@@ -293,11 +292,7 @@ class _MyProfileScreenState extends State<MyProfileScreen> {
       if (mounted) context.go('/login');
     } catch (e) {
       if (!mounted) return;
-      final raw = e.toString().replaceAll('Exception: ', '');
-      final l10n = AppLocalizations.of(context)!;
-      final msg = raw.toLowerCase().contains('administrator') || raw.toLowerCase().contains('only admin')
-          ? l10n.cannotDeleteOnlyAdmin
-          : raw;
+      final msg = ErrorMapper.map(e, AppLocalizations.of(context)!);
       setState(() { _isLoading = false; });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

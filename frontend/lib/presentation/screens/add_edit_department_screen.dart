@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:faims/core/error_mapper.dart';
 import 'package:faims/data/dtos/department_create_dto.dart';
 import 'package:faims/domain/repositories/department_repository.dart';
 import 'package:faims/l10n/app_localizations.dart';
@@ -73,7 +74,7 @@ class _AddEditDepartmentScreenState extends State<AddEditDepartmentScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(l10n.failedToSaveDepartment(e.toString())),
+            content: Text(ErrorMapper.map(e, AppLocalizations.of(context)!)),
             backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

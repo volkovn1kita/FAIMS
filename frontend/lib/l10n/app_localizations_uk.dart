@@ -1016,4 +1016,36 @@ class AppLocalizationsUk extends AppLocalizations {
 
   @override
   String get helpGuideSubtitle => 'Порядок налаштування системи FAIMS';
+
+  @override
+  String get errorRoomHasKit =>
+      'Неможливо видалити кімнату: в ній є закріплена аптечка. Спочатку видаліть або перемістіть аптечку.';
+
+  @override
+  String get errorDepartmentAlreadyExists => 'Відділ з такою назвою вже існує.';
+
+  @override
+  String get errorRoomAlreadyExists =>
+      'Кімната з такою назвою вже існує в цьому відділі.';
+
+  @override
+  String get errorKitNumberAlreadyExists =>
+      'Аптечка з таким унікальним номером вже існує.';
+
+  @override
+  String get errorEmailAlreadyExists => 'Користувач з таким email вже існує.';
+
+  @override
+  String get errorIncorrectOldPassword => 'Невірний поточний пароль.';
+
+  @override
+  String get errorOldPasswordRequired =>
+      'Поточний пароль є обов\'язковим для зміни.';
+
+  @override
+  String get errorGeneral => 'Виникла помилка. Спробуйте ще раз.';
+
+  @override
+  String get errorUserIsLastAdmin =>
+      'Неможливо видалити єдиного адміністратора організації. Спочатку призначте іншого адміністратора.';
 }

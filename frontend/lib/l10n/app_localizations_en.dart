@@ -1012,4 +1012,38 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get helpGuideSubtitle => 'How to set up the FAIMS system';
+
+  @override
+  String get errorRoomHasKit =>
+      'Cannot delete room: it has a first aid kit assigned. Please delete or move the kit first.';
+
+  @override
+  String get errorDepartmentAlreadyExists =>
+      'A department with this name already exists.';
+
+  @override
+  String get errorRoomAlreadyExists =>
+      'A room with this name already exists in this department.';
+
+  @override
+  String get errorKitNumberAlreadyExists =>
+      'A kit with this unique number already exists.';
+
+  @override
+  String get errorEmailAlreadyExists =>
+      'A user with this email already exists.';
+
+  @override
+  String get errorIncorrectOldPassword => 'Incorrect current password.';
+
+  @override
+  String get errorOldPasswordRequired =>
+      'Current password is required to change the password.';
+
+  @override
+  String get errorGeneral => 'An error occurred. Please try again.';
+
+  @override
+  String get errorUserIsLastAdmin =>
+      'Cannot delete the only administrator. Assign another administrator first.';
 }

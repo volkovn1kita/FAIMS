@@ -407,7 +407,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final steps = [
       (label: l10n.onboardingStep1, done: data.totalDepartments > 0),
       (label: l10n.onboardingStep2, done: data.totalRooms > 0),
-      (label: l10n.onboardingStep3, done: data.totalUsers > 0),
+      (label: l10n.onboardingStep3, done: data.totalUsers > 1),
       (label: l10n.onboardingStep4, done: data.totalKits > 0),
     ];
 

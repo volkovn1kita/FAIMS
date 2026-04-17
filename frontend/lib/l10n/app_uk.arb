@@ -428,5 +428,14 @@
   "onboardingStep4": "Створіть аптечку",
   "helpSection": "Довідка",
   "helpGuideTitle": "Покрокова інструкція",
-  "helpGuideSubtitle": "Порядок налаштування системи FAIMS"
+  "helpGuideSubtitle": "Порядок налаштування системи FAIMS",
+  "errorRoomHasKit": "Неможливо видалити кімнату: в ній є закріплена аптечка. Спочатку видаліть або перемістіть аптечку.",
+  "errorDepartmentAlreadyExists": "Відділ з такою назвою вже існує.",
+  "errorRoomAlreadyExists": "Кімната з такою назвою вже існує в цьому відділі.",
+  "errorKitNumberAlreadyExists": "Аптечка з таким унікальним номером вже існує.",
+  "errorEmailAlreadyExists": "Користувач з таким email вже існує.",
+  "errorIncorrectOldPassword": "Невірний поточний пароль.",
+  "errorOldPasswordRequired": "Поточний пароль є обов'язковим для зміни.",
+  "errorGeneral": "Виникла помилка. Спробуйте ще раз.",
+  "errorUserIsLastAdmin": "Неможливо видалити єдиного адміністратора організації. Спочатку призначте іншого адміністратора."
 }

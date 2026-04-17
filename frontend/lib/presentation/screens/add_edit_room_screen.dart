@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:faims/core/error_mapper.dart';
 import 'package:faims/data/dtos/department_dto.dart';
 import 'package:faims/data/dtos/room_create_dto.dart';
 import 'package:faims/data/dtos/room_update_dto.dart';
@@ -152,9 +153,7 @@ class _AddEditRoomScreenState extends State<AddEditRoomScreen> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = e.toString().contains('Exception:')
-              ? e.toString().replaceAll('Exception: ', '')
-              : 'Failed to save room: ${e.toString()}';
+          _errorMessage = ErrorMapper.map(e, AppLocalizations.of(context)!);
         });
       }
     } finally {

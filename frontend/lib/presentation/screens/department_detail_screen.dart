@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:faims/core/error_mapper.dart';
 import 'package:faims/data/dtos/department_detail_dto.dart';
 import 'package:faims/data/dtos/room_list_dto.dart';
 import 'package:faims/domain/repositories/department_repository.dart';
@@ -134,10 +135,10 @@ class _DepartmentDetailScreenState extends State<DepartmentDetailScreen> {
         }
       } catch (e) {
         if (mounted) {
-          final msg = e.toString().replaceAll('Exception: ', '');
-          setState(() { _errorMessage = msg; });
+          final msg = ErrorMapper.map(e, AppLocalizations.of(context)!);
+          setState(() { _errorMessage = ''; });
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(msg), backgroundColor: Colors.red),
+            SnackBar(content: Text(msg), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating),
           );
         }
       } finally {

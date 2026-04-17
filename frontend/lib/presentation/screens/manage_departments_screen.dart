@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:faims/core/error_mapper.dart';
 import 'package:faims/data/dtos/department_dto.dart';
 import 'package:faims/domain/repositories/department_repository.dart';
 import 'package:faims/l10n/app_localizations.dart';
@@ -107,17 +108,10 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() {
-          _errorMessage = e.toString().contains('Exception:')
-              ? e.toString().replaceAll('Exception: ', '')
-              : 'Failed to check department rooms: ${e.toString()}';
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(_errorMessage, style: TextStyle()),
-              backgroundColor: Colors.red,
-            ),
-          );
-        });
+        final msg = ErrorMapper.map(e, AppLocalizations.of(context)!);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(msg), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating),
+        );
       }
       return;
     } finally {
@@ -170,17 +164,10 @@ class _ManageDepartmentsScreenState extends State<ManageDepartmentsScreen> {
         }
       } catch (e) {
         if (mounted) {
-          setState(() {
-            _errorMessage = e.toString().contains('Exception:')
-                ? e.toString().replaceAll('Exception: ', '')
-                : 'Failed to delete department: ${e.toString()}';
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(_errorMessage, style: TextStyle()),
-                backgroundColor: Colors.red,
-              ),
-            );
-          });
+          final msg = ErrorMapper.map(e, AppLocalizations.of(context)!);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(msg), backgroundColor: Colors.red, behavior: SnackBarBehavior.floating),
+          );
         }
       } finally {
         if (mounted) {
