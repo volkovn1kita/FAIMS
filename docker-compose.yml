@@ -22,8 +22,7 @@ services:
       dockerfile: Backend/Dockerfile
     container_name: faims_backend
     restart: always
-    ports:
-      - "5076:5076"
+    # Port not exposed publicly — Caddy proxies HTTPS traffic internally
     environment:
       ConnectionStrings__PostgreSqlConnection: "Host=postgres_db;Port=5432;Database=${POSTGRES_DB:-faims_db};Username=${POSTGRES_USER:-faims_admin};Password=${POSTGRES_PASSWORD};"
       JwtSettings__SecurityKey: "${JWT_SECRET_KEY}"
@@ -44,6 +43,20 @@ services:
   # Runs pg_dump every 6 hours, keeps the last BACKUP_KEEP_DAYS days of files.
   # Backups land in ./backups/ on the host as faims_YYYYMMDD_HHMMSS.sql.gz
   # To restore: gunzip -c backups/faims_20260415_060000.sql.gz | docker exec -i faims_postgres psql -U $POSTGRES_USER $POSTGRES_DB
+  caddy:
+    image: caddy:2-alpine
+    container_name: faims_caddy
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - backend
+
   pg_backup:
     image: postgres:15-alpine
     container_name: faims_pg_backup
@@ -75,3 +88,5 @@ volumes:
   pgdata:
   backend_logs:
   backend_avatars:
+  caddy_data:
+  caddy_config:

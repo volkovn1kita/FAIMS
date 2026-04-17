@@ -1,0 +1,4 @@
+# Replace YOUR_DOMAIN with your actual DuckDNS domain, e.g. faims.duckdns.org
+YOUR_DOMAIN.duckdns.org {
+    reverse_proxy backend:5076
+}

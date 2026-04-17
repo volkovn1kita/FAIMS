@@ -4,7 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:faims/main.dart' as app;
 import 'package:faims/core/router.dart';
 
-const String kAdminEmail = 'admin@org1.faims';
+const String kAdminEmail = 'admin2@org1.faims';
 const String kAdminPassword = 'Admin123!';
 const String kUserEmail = 'user1@org1.faims';
 const String kUserPassword = 'User123!';
@@ -25,8 +25,6 @@ Future<void> launchApp(WidgetTester tester) async {
   app.main();
   await tester.pump();
   appRouter.go('/login');
-  // Give _checkAutoLogin() time to read secure storage and set _isLoading=false
-  await tester.pump(const Duration(seconds: 3));
   await tester.pumpAndSettle(kLong);
 }
 
@@ -67,18 +65,14 @@ Future<void> login(WidgetTester tester, String email, String password) async {
   await tester.pumpAndSettle(kXLong);
 }
 
-Future<void> loginAsAdmin(WidgetTester tester) async {
-  await login(tester, kAdminEmail, kAdminPassword);
-  // Wait for dashboard API response and grid rebuild (_overviewData != null)
-  await tester.pump(const Duration(seconds: 4));
-  await tester.pumpAndSettle(kShort);
-}
+Future<void> loginAsAdmin(WidgetTester tester) =>
+    login(tester, kAdminEmail, kAdminPassword);
 
 Future<void> loginAsUser(WidgetTester tester) =>
     login(tester, kUserEmail, kUserPassword);
 
 Future<void> openDrawer(WidgetTester tester) async {
-  final menu = find.byIcon(Icons.menu_rounded);
+  final menu = find.byIcon(Icons.menu);
   if (menu.evaluate().isNotEmpty) {
     await tester.tap(menu);
     await tester.pumpAndSettle(kShort);
