@@ -89,7 +89,7 @@ namespace Infrastructure.Repositories
             return await _dbContext.Users
                 .AsNoTracking()
                 .IgnoreQueryFilters()
-                .Where(u => u.OrganizationId == organizationId)
+                .Where(u => u.OrganizationId == organizationId && !u.IsDeleted)
                 .ToListAsync();
         }
         public async Task<User?> GetByEmailAsync(string email)

@@ -40,12 +40,6 @@ class _HomeScreenState extends State<HomeScreen> {
     _loadOverviewData();
   }
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _loadOverviewData();
-  }
-
   Future<void> _loadOverviewData() async {
     if (!mounted) return;
     setState(() {
