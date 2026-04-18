@@ -132,21 +132,21 @@
 └───────────────────────────┼─────────────────────────────┘
                             │ HTTPS / REST + JWT
                             ▼
-┌─────────────────────────────────────────────────────────┐
+┌──────────────────────────────────────────────────────────┐
 │                  Backend (ASP.NET Core 9.0)              │
 │  ┌─────────────────────────────────────────────────┐     │
-│  │  Presentation Layer — Controllers, Middleware    │     │
-│  │  JWT Auth, Rate Limiting, CORS, Swagger          │     │
+│  │  Presentation Layer — Controllers, Middleware   │     │
+│  │  JWT Auth, Rate Limiting, CORS, Swagger         │     │
 │  └──────────────────────┬──────────────────────────┘     │
 │  ┌──────────────────────▼──────────────────────────┐     │
-│  │  Application Layer — Services, DTOs, Configs     │     │
+│  │  Application Layer — Services, DTOs, Configs    │     │
 │  └──────────────────────┬──────────────────────────┘     │
 │  ┌──────────────────────▼──────────────────────────┐     │
-│  │  Domain Layer — Entities, Enums                  │     │
+│  │  Domain Layer — Entities, Enums                 │     │
 │  └──────────────────────┬──────────────────────────┘     │
 │  ┌──────────────────────▼──────────────────────────┐     │
-│  │  Infrastructure Layer — EF Core, Repositories,   │     │
-│  │  Firebase, Password Hasher, JWT Services         │     │
+│  │  Infrastructure Layer — EF Core, Repositories,  │     │
+│  │  Firebase, Password Hasher, JWT Services        │     │
 │  └──────────────────────┬──────────────────────────┘     │
 └─────────────────────────┼────────────────────────────────┘
                           │
