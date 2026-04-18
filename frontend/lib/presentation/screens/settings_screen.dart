@@ -3,7 +3,6 @@ import 'package:faims/l10n/app_localizations.dart';
 import 'package:faims/presentation/providers/locale_provider.dart';
 import 'package:faims/presentation/providers/theme_provider.dart';
 import 'package:faims/core/app_theme.dart';
-import 'package:faims/presentation/screens/help_guide_screen.dart';
 import 'package:provider/provider.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -100,56 +99,6 @@ class SettingsScreen extends StatelessWidget {
                             onChanged: (_) => themeProvider.toggleTheme(),
                           ),
                         ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 28),
-
-                  _sectionLabel(l10n.helpSection, theme),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: isDark ? AppTheme.darkCard : Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
-                      ],
-                    ),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(20),
-                      onTap: () => Navigator.of(context).push(
-                        MaterialPageRoute(builder: (_) => const HelpGuideScreen()),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                        child: Row(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.all(10),
-                              decoration: BoxDecoration(
-                                color: AppTheme.primary.withValues(alpha: 0.1),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.rocket_launch_rounded, color: AppTheme.primary, size: 22),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    l10n.helpGuideTitle,
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface),
-                                  ),
-                                  Text(
-                                    l10n.helpGuideSubtitle,
-                                    style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurfaceVariant),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Icon(Icons.chevron_right_rounded, color: theme.colorScheme.onSurfaceVariant),
-                          ],
-                        ),
                       ),
                     ),
                   ),

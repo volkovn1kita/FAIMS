@@ -4,6 +4,7 @@ import 'package:faims/domain/repositories/dashboard_repository.dart';
 import 'package:faims/domain/repositories/auth_repository.dart';
 import 'package:faims/l10n/app_localizations.dart';
 import 'package:faims/presentation/screens/analytics_screen.dart';
+import 'package:faims/presentation/screens/help_guide_screen.dart';
 import 'package:faims/presentation/screens/manage_departments_screen.dart';
 import 'package:faims/presentation/screens/manage_users_screen.dart';
 import 'package:faims/presentation/screens/manage_kits_screen.dart';
@@ -229,6 +230,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     if (!isWeb) Navigator.pop(context);
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ReportsScreen()));
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.rocket_launch_rounded,
+                  title: l10n.helpGuideTitle,
+                  onTap: () {
+                    if (!isWeb) Navigator.pop(context);
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const HelpGuideScreen()));
                   },
                 ),
               ],
