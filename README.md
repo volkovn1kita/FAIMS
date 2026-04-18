@@ -4,7 +4,7 @@
 [![Flutter](https://img.shields.io/badge/Flutter-Dart-02569B?logo=flutter&logoColor=white)](https://flutter.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-15-4169E1?logo=postgresql&logoColor=white)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-Proprietary-red.svg)](#)
 
 > Інформаційна система управління аптечками першої допомоги з мобільним застосунком та серверним API. Повний цикл обліку медикаментів: від надходження та моніторингу термінів придатності до списання, поповнення та звітності.
 
@@ -37,16 +37,23 @@
 ### Адміністратор
 | Головна / Дашборд | Управління аптечками | Аналітика |
 |:-:|:-:|:-:|
-| *(скріншот)* | *(скріншот)* | *(скріншот)* |
+| <img width="288" height="640" alt="image" src="https://github.com/user-attachments/assets/a38ae827-07a2-410c-954b-1fb38c674cbc" /> | <img width="288" height="640" alt="image" src="https://github.com/user-attachments/assets/bf91fc99-a870-443d-a05f-621072ca8157" /> | <img width="288" height="640" alt="image" src="https://github.com/user-attachments/assets/0a399cce-1119-4f55-ba80-cd94342b7e14" /> |
+
 
 | Управління відділами | Управління користувачами | Звіти |
 |:-:|:-:|:-:|
-| *(скріншот)* | *(скріншот)* | *(скріншот)* |
+| <img width="288" height="640" alt="image" src="https://github.com/user-attachments/assets/dd887fa0-f583-41e5-ad59-da865dc2a0d3" /> | <img width="288" height="640" alt="image" src="https://github.com/user-attachments/assets/7bcf20f9-0f18-49d7-9559-4d5a9d82c59d" /> | <img width="288" height="640" alt="image" src="https://github.com/user-attachments/assets/7103fe3e-7855-4999-963c-5ff86496a9df" /> |
+
+
+
 
 ### Відповідальна особа
 | Огляд аптечки | Медикаменти | Профіль |
 |:-:|:-:|:-:|
-| *(скріншот)* | *(скріншот)* | *(скріншот)* |
+| <img width="288" height="640" alt="image" src="https://github.com/user-attachments/assets/673d1b0e-74a9-4bea-8738-a7d8cede9c6a" /> | <img width="288" height="640" alt="image" src="https://github.com/user-attachments/assets/2fa84158-1a65-426a-bbc7-d218902a674b" /> | <img width="288" height="640" alt="image" src="https://github.com/user-attachments/assets/0ac0c1f0-6f9a-4036-a780-2327f8e22c4c" /> |
+
+
+
 
 ---
 
@@ -497,6 +504,15 @@ cd ../frontend && ../scripts/run_flutter.bat
 Дипломний проєкт розроблено в рамках кваліфікаційної роботи з розробки інформаційних систем.
 
 - GitHub: [@volkovn1kita](https://github.com/volkovn1kita)
+
+
+---
+
+## Ліцензія
+
+© 2025 Волков Нікіта. Всі права захищені.
+
+Програмний продукт є власністю автора. Будь-яке копіювання, розповсюдження, модифікація або комерційне використання без письмового дозволу автора заборонено.
 
 ---
 
