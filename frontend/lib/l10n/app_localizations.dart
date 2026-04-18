@@ -1966,6 +1966,10 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How to set up the FAIMS system'**
   String get helpGuideSubtitle;
+  String get helpStepDesc1;
+  String get helpStepDesc2;
+  String get helpStepDesc3;
+  String get helpStepDesc4;
 
   /// No description provided for @errorRoomHasKit.
   ///

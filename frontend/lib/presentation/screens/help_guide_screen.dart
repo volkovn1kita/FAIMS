@@ -115,17 +115,10 @@ class HelpGuideScreen extends StatelessWidget {
     );
   }
 
-  String _stepDesc1(AppLocalizations l10n) =>
-      'Перейдіть до розділу "Управління відділами" через головне меню. Натисніть "+" та введіть назву відділу (наприклад: Медична служба, Турбінний цех).';
-
-  String _stepDesc2(AppLocalizations l10n) =>
-      'Відкрийте створений відділ і натисніть "Додати кімнату". Вкажіть назву приміщення (наприклад: Медпункт №1, Машинний зал).';
-
-  String _stepDesc3(AppLocalizations l10n) =>
-      'Перейдіть до "Управління користувачами". Натисніть "+" та заповніть дані співробітника. Роль "Користувач" дозволяє призначати людину відповідальною за аптечку.';
-
-  String _stepDesc4(AppLocalizations l10n) =>
-      'Перейдіть до "Управління аптечками". Натисніть "+" та оберіть відділ, кімнату і відповідальну особу. Після створення аптечки — додайте медикаменти через перегляд аптечки.';
+  String _stepDesc1(AppLocalizations l10n) => l10n.helpStepDesc1;
+  String _stepDesc2(AppLocalizations l10n) => l10n.helpStepDesc2;
+  String _stepDesc3(AppLocalizations l10n) => l10n.helpStepDesc3;
+  String _stepDesc4(AppLocalizations l10n) => l10n.helpStepDesc4;
 
   Widget _buildStepCard({
     required BuildContext context,

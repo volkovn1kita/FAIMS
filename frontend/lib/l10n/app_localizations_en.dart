@@ -1014,6 +1014,22 @@ class AppLocalizationsEn extends AppLocalizations {
   String get helpGuideSubtitle => 'How to set up the FAIMS system';
 
   @override
+  String get helpStepDesc1 =>
+      'Go to the «Manage Departments» section via the main menu. Tap «+» and enter the department name (e.g. Medical Service, Turbine Shop).';
+
+  @override
+  String get helpStepDesc2 =>
+      'Open the created department and tap «Add Room». Enter the room name (e.g. First Aid Post №1, Machine Hall).';
+
+  @override
+  String get helpStepDesc3 =>
+      'Go to «Manage Users». Tap «+» and fill in the employee details. The «User» role allows assigning the person as responsible for a kit.';
+
+  @override
+  String get helpStepDesc4 =>
+      'Go to «Manage Kits». Tap «+» and select the department, room, and responsible person. After creating the kit — add medications via the kit view.';
+
+  @override
   String get errorRoomHasKit =>
       'Cannot delete room: it has a first aid kit assigned. Please delete or move the kit first.';
 
