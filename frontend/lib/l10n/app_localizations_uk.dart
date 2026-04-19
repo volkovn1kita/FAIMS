@@ -1065,21 +1065,55 @@ class AppLocalizationsUk extends AppLocalizations {
   String get errorUserIsLastAdmin =>
       'Неможливо видалити єдиного адміністратора організації. Спочатку призначте іншого адміністратора.';
 
-  @override String get kitTemplates => 'Шаблони аптечок';
-  @override String get systemTemplates => 'Системні (МОЗ України)';
-  @override String get customTemplates => 'Власні шаблони';
-  @override String get addTemplate => 'Новий шаблон';
-  @override String get editTemplate => 'Редагувати шаблон';
-  @override String get noTemplates => 'Шаблони відсутні';
-  @override String get noCustomTemplates => 'Власні шаблони не створені';
-  @override String get templateItemsCount => 'позицій';
-  @override String get templateName => 'Назва шаблону';
-  @override String get templateNameHint => 'Напр.: Аптечка офісу';
-  @override String get templateDescription => 'Опис (необов\'язково)';
-  @override String get templateDescriptionHint => 'Напр.: Для адміністративних приміщень';
-  @override String get templateItems => 'Медикаменти шаблону';
-  @override String get kitTemplate => 'Шаблон аптечки (необов\'язково)';
-  @override String get noTemplate => 'Без шаблону';
-  @override String get noTemplateHint => 'Медикаменти будете додавати вручну';
-  @override String get templateApplyError => 'Аптечку збережено, але шаблон не вдалося застосувати';
+  @override
+  String get kitTemplates => 'Шаблони аптечок';
+
+  @override
+  String get systemTemplates => 'Системні (МОЗ України)';
+
+  @override
+  String get customTemplates => 'Власні шаблони';
+
+  @override
+  String get addTemplate => 'Новий шаблон';
+
+  @override
+  String get editTemplate => 'Редагувати шаблон';
+
+  @override
+  String get noTemplates => 'Шаблони відсутні';
+
+  @override
+  String get noCustomTemplates => 'Власні шаблони не створені';
+
+  @override
+  String get templateItemsCount => 'позицій';
+
+  @override
+  String get templateName => 'Назва шаблону';
+
+  @override
+  String get templateNameHint => 'Напр.: Аптечка офісу';
+
+  @override
+  String get templateDescription => 'Опис (необов\'язково)';
+
+  @override
+  String get templateDescriptionHint => 'Напр.: Для адміністративних приміщень';
+
+  @override
+  String get templateItems => 'Медикаменти шаблону';
+
+  @override
+  String get kitTemplate => 'Шаблон аптечки (необов\'язково)';
+
+  @override
+  String get noTemplate => 'Без шаблону';
+
+  @override
+  String get noTemplateHint => 'Медикаменти будете додавати вручну';
+
+  @override
+  String get templateApplyError =>
+      'Аптечку збережено, але шаблон не вдалося застосувати';
 }

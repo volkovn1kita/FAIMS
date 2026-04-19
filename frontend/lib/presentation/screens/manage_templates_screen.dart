@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:faims/core/app_theme.dart';
 import 'package:faims/data/dtos/kit_template_dto.dart';
+import 'package:faims/data/dtos/measurement_unit.dart';
 import 'package:faims/data/services/kit_template_api_service.dart';
 import 'package:faims/l10n/app_localizations.dart';
 import 'package:faims/presentation/screens/add_edit_template_screen.dart';
@@ -44,7 +45,7 @@ class _ManageTemplatesScreenState extends State<ManageTemplatesScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(l10n.confirmDelete),
+        title: Text(l10n.delete),
         content: Text('Видалити шаблон "${template.name}"?'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(l10n.cancel)),
@@ -206,7 +207,7 @@ class _ManageTemplatesScreenState extends State<ManageTemplatesScreen> {
                   }
                 },
                 itemBuilder: (_) => [
-                  PopupMenuItem(value: 'edit', child: Row(children: [const Icon(Icons.edit_rounded, size: 18), const SizedBox(width: 8), Text(l10n.edit)])),
+                  PopupMenuItem(value: 'edit', child: Row(children: [const Icon(Icons.edit_rounded, size: 18), const SizedBox(width: 8), Text(l10n.editTemplate)])),
                   PopupMenuItem(value: 'delete', child: Row(children: [const Icon(Icons.delete_rounded, size: 18, color: Colors.red), const SizedBox(width: 8), Text(l10n.delete, style: const TextStyle(color: Colors.red))])),
                 ],
               ),

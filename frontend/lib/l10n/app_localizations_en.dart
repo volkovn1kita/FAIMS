@@ -1063,21 +1063,55 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorUserIsLastAdmin =>
       'Cannot delete the only administrator. Assign another administrator first.';
 
-  @override String get kitTemplates => 'Kit Templates';
-  @override String get systemTemplates => 'System (MOH Ukraine)';
-  @override String get customTemplates => 'Custom Templates';
-  @override String get addTemplate => 'New Template';
-  @override String get editTemplate => 'Edit Template';
-  @override String get noTemplates => 'No templates found';
-  @override String get noCustomTemplates => 'No custom templates created';
-  @override String get templateItemsCount => 'items';
-  @override String get templateName => 'Template Name';
-  @override String get templateNameHint => 'E.g.: Office Kit';
-  @override String get templateDescription => 'Description (optional)';
-  @override String get templateDescriptionHint => 'E.g.: For administrative rooms';
-  @override String get templateItems => 'Template Medications';
-  @override String get kitTemplate => 'Kit Template (optional)';
-  @override String get noTemplate => 'No template';
-  @override String get noTemplateHint => 'You will add medications manually';
-  @override String get templateApplyError => 'Kit saved, but template could not be applied';
+  @override
+  String get kitTemplates => 'Kit Templates';
+
+  @override
+  String get systemTemplates => 'System (MOH Ukraine)';
+
+  @override
+  String get customTemplates => 'Custom Templates';
+
+  @override
+  String get addTemplate => 'New Template';
+
+  @override
+  String get editTemplate => 'Edit Template';
+
+  @override
+  String get noTemplates => 'No templates found';
+
+  @override
+  String get noCustomTemplates => 'No custom templates created';
+
+  @override
+  String get templateItemsCount => 'items';
+
+  @override
+  String get templateName => 'Template Name';
+
+  @override
+  String get templateNameHint => 'E.g.: Office Kit';
+
+  @override
+  String get templateDescription => 'Description (optional)';
+
+  @override
+  String get templateDescriptionHint => 'E.g.: For administrative rooms';
+
+  @override
+  String get templateItems => 'Template Medications';
+
+  @override
+  String get kitTemplate => 'Kit Template (optional)';
+
+  @override
+  String get noTemplate => 'No template';
+
+  @override
+  String get noTemplateHint => 'You will add medications manually';
+
+  @override
+  String get templateApplyError =>
+      'Kit saved, but template could not be applied';
 }

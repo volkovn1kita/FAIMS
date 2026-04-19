@@ -1966,9 +1966,29 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'How to set up the FAIMS system'**
   String get helpGuideSubtitle;
+
+  /// No description provided for @helpStepDesc1.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to the «Manage Departments» section via the main menu. Tap «+» and enter the department name (e.g. Medical Service, Turbine Shop).'**
   String get helpStepDesc1;
+
+  /// No description provided for @helpStepDesc2.
+  ///
+  /// In en, this message translates to:
+  /// **'Open the created department and tap «Add Room». Enter the room name (e.g. First Aid Post №1, Machine Hall).'**
   String get helpStepDesc2;
+
+  /// No description provided for @helpStepDesc3.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to «Manage Users». Tap «+» and fill in the employee details. The «User» role allows assigning the person as responsible for a kit.'**
   String get helpStepDesc3;
+
+  /// No description provided for @helpStepDesc4.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to «Manage Kits». Tap «+» and select the department, room, and responsible person. After creating the kit — add medications via the kit view.'**
   String get helpStepDesc4;
 
   /// No description provided for @errorRoomHasKit.
@@ -2025,22 +2045,106 @@ abstract class AppLocalizations {
   /// **'Cannot delete the only administrator. Assign another administrator first.'**
   String get errorUserIsLastAdmin;
 
+  /// No description provided for @kitTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Kit Templates'**
   String get kitTemplates;
+
+  /// No description provided for @systemTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'System (MOH Ukraine)'**
   String get systemTemplates;
+
+  /// No description provided for @customTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom Templates'**
   String get customTemplates;
+
+  /// No description provided for @addTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'New Template'**
   String get addTemplate;
+
+  /// No description provided for @editTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Template'**
   String get editTemplate;
+
+  /// No description provided for @noTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'No templates found'**
   String get noTemplates;
+
+  /// No description provided for @noCustomTemplates.
+  ///
+  /// In en, this message translates to:
+  /// **'No custom templates created'**
   String get noCustomTemplates;
+
+  /// No description provided for @templateItemsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'items'**
   String get templateItemsCount;
+
+  /// No description provided for @templateName.
+  ///
+  /// In en, this message translates to:
+  /// **'Template Name'**
   String get templateName;
+
+  /// No description provided for @templateNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'E.g.: Office Kit'**
   String get templateNameHint;
+
+  /// No description provided for @templateDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Description (optional)'**
   String get templateDescription;
+
+  /// No description provided for @templateDescriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'E.g.: For administrative rooms'**
   String get templateDescriptionHint;
+
+  /// No description provided for @templateItems.
+  ///
+  /// In en, this message translates to:
+  /// **'Template Medications'**
   String get templateItems;
+
+  /// No description provided for @kitTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'Kit Template (optional)'**
   String get kitTemplate;
+
+  /// No description provided for @noTemplate.
+  ///
+  /// In en, this message translates to:
+  /// **'No template'**
   String get noTemplate;
+
+  /// No description provided for @noTemplateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'You will add medications manually'**
   String get noTemplateHint;
+
+  /// No description provided for @templateApplyError.
+  ///
+  /// In en, this message translates to:
+  /// **'Kit saved, but template could not be applied'**
   String get templateApplyError;
 }
 
