@@ -43,7 +43,19 @@ public class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<FirstAidKit>()
             .HasIndex(k => k.UniqueNumber)
-            .IsUnique();
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = false");
+
+        // Partial unique indexes: soft-deleted kits free their room/user slots
+        modelBuilder.Entity<FirstAidKit>()
+            .HasIndex(k => k.RoomId)
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = false");
+
+        modelBuilder.Entity<FirstAidKit>()
+            .HasIndex(k => k.ResponsibleUserId)
+            .IsUnique()
+            .HasFilter("\"IsDeleted\" = false");
 
         modelBuilder.Entity<User>().HasQueryFilter(e =>
             e.OrganizationId == CurrentOrganizationId && !e.IsDeleted);
