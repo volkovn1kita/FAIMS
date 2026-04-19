@@ -127,6 +127,7 @@ public static class DatabaseSeeder
         Console.WriteLine("Очищення існуючих даних...");
 
         await WipeAsync(db);
+        await SeedSystemTemplatesAsync(db);
 
         Console.WriteLine("Генерація нових даних...");
 
@@ -350,5 +351,86 @@ public static class DatabaseSeeder
         await db.RefreshTokens.ExecuteDeleteAsync();
         await db.Users.IgnoreQueryFilters().ExecuteDeleteAsync();
         await db.Organizations.ExecuteDeleteAsync();
+        await db.KitTemplateItems.IgnoreQueryFilters().ExecuteDeleteAsync();
+        await db.KitTemplates.IgnoreQueryFilters().ExecuteDeleteAsync();
+    }
+
+    /// <summary>
+    /// Сіє системні шаблони з Наказу МОЗ України №187 від 07.07.98.
+    /// OrganizationId = null + IsSystem = true → видні всім організаціям.
+    /// </summary>
+    private static async Task SeedSystemTemplatesAsync(ApplicationDbContext db)
+    {
+        var templates = new List<KitTemplate>
+        {
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Автомобільна аптечка-1",
+                Description = "Для легкових авто та вантажівок з кількістю пасажирів до 9 осіб",
+                IsSystem = true,
+                RegulatoryReference = "МОЗ України, Наказ №187 від 07.07.98",
+                OrganizationId = null,
+                Items = new List<KitTemplateItem>
+                {
+                    new() { Name = "Джгут для зупинки кровотечі", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Бинт стерильний 5м×10см", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Серветки з хлоргексидином 6×10см", MinimumQuantity = 2, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Серветки кровоспинні з фурагіном 6×10см", MinimumQuantity = 2, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Пакет перев'язочний стерильний", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Лейкопластир в рулоні 5×5м", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Пластир бактерицидний 2,3×7,2см", MinimumQuantity = 4, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Косинка медична перев'язочна 50×50см", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Розчин йоду 5% 10мл", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Буторфанолу тартрат 0,2% шприц-тюбик", MinimumQuantity = 2, Unit = MeasurementUnit.Ampoules },
+                    new() { Name = "Нітрогліцерин 1% в капсулах", MinimumQuantity = 20, Unit = MeasurementUnit.Tablets },
+                    new() { Name = "Ножиці з тупими кінцями", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Рукавички медичні", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Плівка для штучної вентиляції легенів", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Сульфаціл натрію 20% шприц-тюбик", MinimumQuantity = 2, Unit = MeasurementUnit.Ampoules },
+                    new() { Name = "Булавки англійські", MinimumQuantity = 6, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Портативний апарат для вентиляції легенів", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                }
+            },
+            new()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Автомобільна аптечка-2",
+                Description = "Для пасажирського транспорту з кількістю пасажирів понад 9 осіб",
+                IsSystem = true,
+                RegulatoryReference = "МОЗ України, Наказ №187 від 07.07.98",
+                OrganizationId = null,
+                Items = new List<KitTemplateItem>
+                {
+                    new() { Name = "Джгут для зупинки кровотечі", MinimumQuantity = 3, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Бинт стерильний 5м×10см", MinimumQuantity = 6, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Серветки з хлоргексидином 6×10см", MinimumQuantity = 9, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Серветки кровоспинні з фурагіном 6×10см", MinimumQuantity = 9, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Пакет перев'язочний стерильний", MinimumQuantity = 4, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Лейкопластир в рулоні 5×5м", MinimumQuantity = 3, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Пластир бактерицидний 2,3×7,2см", MinimumQuantity = 10, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Косинка медична перев'язочна 50×50см", MinimumQuantity = 3, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Шворка для фіксації шин 10м", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Розчин йоду 5% 10мл", MinimumQuantity = 2, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Буторфанолу тартрат 0,2% шприц-тюбик", MinimumQuantity = 6, Unit = MeasurementUnit.Ampoules },
+                    new() { Name = "Нітрогліцерин 1% в капсулах", MinimumQuantity = 40, Unit = MeasurementUnit.Tablets },
+                    new() { Name = "Ножиці з тупими кінцями", MinimumQuantity = 2, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Рукавички медичні", MinimumQuantity = 4, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Плівка для штучної вентиляції легенів", MinimumQuantity = 4, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Гіпотермічний пакет-контейнер", MinimumQuantity = 4, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Сульфаціл натрію 20% шприц-тюбик", MinimumQuantity = 4, Unit = MeasurementUnit.Ampoules },
+                    new() { Name = "Булавки англійські", MinimumQuantity = 12, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Термопокривало", MinimumQuantity = 4, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Комірці для фіксації шийного відділу (комплект)", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Шина SAM SPLINT для верхніх кінцівок", MinimumQuantity = 4, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Шина SAM SPLINT для нижніх кінцівок", MinimumQuantity = 6, Unit = MeasurementUnit.Pieces },
+                    new() { Name = "Портативний апарат АМБУ для вентиляції легенів", MinimumQuantity = 1, Unit = MeasurementUnit.Pieces },
+                }
+            }
+        };
+
+        await db.KitTemplates.AddRangeAsync(templates);
+        await db.SaveChangesAsync();
+        Console.WriteLine($"  ✓ Системні шаблони: {templates.Count} шт.");
     }
 }

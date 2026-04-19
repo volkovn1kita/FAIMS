@@ -2024,6 +2024,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Cannot delete the only administrator. Assign another administrator first.'**
   String get errorUserIsLastAdmin;
+
+  String get kitTemplates;
+  String get systemTemplates;
+  String get customTemplates;
+  String get addTemplate;
+  String get editTemplate;
+  String get noTemplates;
+  String get noCustomTemplates;
+  String get templateItemsCount;
+  String get templateName;
+  String get templateNameHint;
+  String get templateDescription;
+  String get templateDescriptionHint;
+  String get templateItems;
+  String get kitTemplate;
+  String get noTemplate;
+  String get noTemplateHint;
+  String get templateApplyError;
 }
 
 class _AppLocalizationsDelegate

@@ -11,6 +11,7 @@ import 'package:faims/presentation/screens/manage_kits_screen.dart';
 import 'package:faims/presentation/screens/my_profile_screen.dart';
 import 'package:faims/presentation/screens/settings_screen.dart';
 import 'package:faims/presentation/screens/reports_screen.dart';
+import 'package:faims/presentation/screens/manage_templates_screen.dart';
 import 'package:faims/core/app_theme.dart';
 import 'package:faims/presentation/widgets/skeleton_loader.dart';
 import 'package:go_router/go_router.dart';
@@ -230,6 +231,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   onTap: () {
                     if (!isWeb) Navigator.pop(context);
                     Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ReportsScreen()));
+                  },
+                ),
+                _buildDrawerItem(
+                  icon: Icons.content_paste_rounded,
+                  title: l10n.kitTemplates,
+                  onTap: () {
+                    if (!isWeb) Navigator.pop(context);
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => const ManageTemplatesScreen()));
                   },
                 ),
                 _buildDrawerItem(

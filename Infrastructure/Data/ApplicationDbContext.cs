@@ -24,6 +24,8 @@ public class ApplicationDbContext : DbContext
     public DbSet<Journal> Journals { get; set; } = null!;
     public DbSet<Organization> Organizations { get; set; } = null!;
     public DbSet<RefreshToken> RefreshTokens { get; set; } = null!;
+    public DbSet<KitTemplate> KitTemplates { get; set; } = null!;
+    public DbSet<KitTemplateItem> KitTemplateItems { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -60,5 +62,18 @@ public class ApplicationDbContext : DbContext
             .WithMany(u => u.RefreshTokens)
             .HasForeignKey(rt => rt.UserId)
             .OnDelete(DeleteBehavior.Cascade);
+
+        // Системні шаблони (IsSystem=true, OrganizationId=null) видно всім організаціям.
+        // Кастомні — тільки своїй організації.
+        modelBuilder.Entity<KitTemplate>().HasQueryFilter(t =>
+            !t.IsDeleted && (t.IsSystem || t.OrganizationId == CurrentOrganizationId));
+
+        modelBuilder.Entity<KitTemplate>()
+            .HasMany(t => t.Items)
+            .WithOne(i => i.KitTemplate)
+            .HasForeignKey(i => i.KitTemplateId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<KitTemplateItem>().HasQueryFilter(i => !i.IsDeleted);
     }
 }

@@ -2,6 +2,8 @@ import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:faims/data/dtos/create_kit_dto.dart';
 import 'package:faims/data/services/first_aid_kit_api_service.dart';
+import 'package:faims/data/services/kit_template_api_service.dart';
+import 'package:faims/data/dtos/kit_template_dto.dart';
 import 'package:faims/l10n/app_localizations.dart';
 import 'package:faims/core/app_theme.dart';
 import 'package:uuid/uuid.dart';
@@ -23,6 +25,7 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   final _formKey = GlobalKey<FormState>();
   final FirstAidKitRepository _kitRepository = FirstAidKitRepository();
   final FirstAidKitApiService _firstAidKitApiService = FirstAidKitApiService();
+  final KitTemplateApiService _templateApiService = KitTemplateApiService();
   final Uuid _uuid = const Uuid();
 
   final Set<String> _occupiedUserIds = {};
@@ -34,10 +37,12 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
   DepartmentDto? _selectedDepartment;
   RoomDto? _selectedRoom;
   UserDto? _selectedResponsibleUser;
+  KitTemplateDto? _selectedTemplate; // шаблон для нової аптечки
 
   List<DepartmentDto> _departments = [];
   List<RoomDto> _roomsInSelectedDepartment = [];
   List<UserDto> _responsibleUsers = [];
+  List<KitTemplateDto> _templates = [];
 
   bool _isLoading = true;
   bool _isSaving = false;
@@ -67,6 +72,16 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
       final loadedUsers = await _kitRepository.getResponsibleUsers();
       final loadedDepartments = await _kitRepository.getDepartments();
       final allKits = await _kitRepository.getFirstAidKits();
+
+      // Завантажуємо шаблони тільки при створенні нової аптечки
+      if (widget.kitId == null) {
+        try {
+          final templates = await _templateApiService.getAllTemplates();
+          if (mounted) setState(() => _templates = templates);
+        } catch (_) {
+          // Шаблони опціональні — помилку ігноруємо
+        }
+      }
 
       _occupiedUserIds.clear();
       _occupiedRoomIds.clear();
@@ -182,7 +197,24 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
           roomId: _selectedRoom!.id,
           responsibleUserId: _selectedResponsibleUser!.id,
         );
-        await _firstAidKitApiService.createKit(dto);
+        final newKitId = await _firstAidKitApiService.createKit(dto);
+
+        // Якщо обрано шаблон — застосовуємо його до нової аптечки
+        if (_selectedTemplate != null && newKitId != null) {
+          try {
+            await _templateApiService.applyTemplateToKit(
+              kitId: newKitId,
+              templateId: _selectedTemplate!.id,
+            );
+          } catch (_) {
+            // Аптечка вже збережена — помилку застосування шаблону показуємо але не блокуємо
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.templateApplyError), backgroundColor: Colors.orange),
+              );
+            }
+          }
+        }
       } else {
         final dto = UpdateKitDto(
           id: widget.kitId!,
@@ -316,6 +348,16 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
                               onChanged: (val) => setState(() => _selectedResponsibleUser = val),
                             ),
                           ]),
+
+                          // Шаблон (тільки при створенні нової аптечки)
+                          if (widget.kitId == null && _templates.isNotEmpty) ...[
+                            const SizedBox(height: 24),
+                            _buildSectionTitle(l10n.kitTemplate),
+                            _buildCard([
+                              _buildTemplateSelector(l10n, theme),
+                            ]),
+                          ],
+
                           const SizedBox(height: 100),
                         ],
                       ),
@@ -444,6 +486,72 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildTemplateSelector(AppLocalizations l10n, ThemeData theme) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Без шаблону
+        RadioListTile<KitTemplateDto?>(
+          value: null,
+          groupValue: _selectedTemplate,
+          onChanged: (v) => setState(() => _selectedTemplate = null),
+          title: Text(l10n.noTemplate, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+          subtitle: Text(l10n.noTemplateHint, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
+          contentPadding: EdgeInsets.zero,
+          dense: true,
+          activeColor: AppTheme.primary,
+        ),
+        const Divider(height: 16),
+        // Системні шаблони
+        if (_templates.any((t) => t.isSystem))
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(children: [
+              const Icon(Icons.verified_rounded, size: 14, color: Colors.teal),
+              const SizedBox(width: 4),
+              Text(l10n.systemTemplates, style: const TextStyle(fontSize: 12, color: Colors.teal, fontWeight: FontWeight.w600)),
+            ]),
+          ),
+        ..._templates.where((t) => t.isSystem).map((t) => _buildTemplateRadio(t, theme)),
+        // Власні шаблони
+        if (_templates.any((t) => !t.isSystem)) ...[
+          const Divider(height: 16),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 4),
+            child: Row(children: [
+              Icon(Icons.tune_rounded, size: 14, color: AppTheme.primary),
+              const SizedBox(width: 4),
+              Text(l10n.customTemplates, style: TextStyle(fontSize: 12, color: AppTheme.primary, fontWeight: FontWeight.w600)),
+            ]),
+          ),
+          ..._templates.where((t) => !t.isSystem).map((t) => _buildTemplateRadio(t, theme)),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildTemplateRadio(KitTemplateDto template, ThemeData theme) {
+    return RadioListTile<KitTemplateDto?>(
+      value: template,
+      groupValue: _selectedTemplate,
+      onChanged: (v) => setState(() => _selectedTemplate = v),
+      title: Text(template.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+      subtitle: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (template.description != null)
+            Text(template.description!, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
+          if (template.regulatoryReference != null)
+            Text(template.regulatoryReference!, style: const TextStyle(fontSize: 11, color: Colors.teal)),
+          Text('${template.items.length} позицій', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant)),
+        ],
+      ),
+      contentPadding: EdgeInsets.zero,
+      dense: true,
+      activeColor: AppTheme.primary,
     );
   }
 

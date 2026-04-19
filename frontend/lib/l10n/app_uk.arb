@@ -441,5 +441,22 @@
   "errorIncorrectOldPassword": "Невірний поточний пароль.",
   "errorOldPasswordRequired": "Поточний пароль є обов'язковим для зміни.",
   "errorGeneral": "Виникла помилка. Спробуйте ще раз.",
-  "errorUserIsLastAdmin": "Неможливо видалити єдиного адміністратора організації. Спочатку призначте іншого адміністратора."
+  "errorUserIsLastAdmin": "Неможливо видалити єдиного адміністратора організації. Спочатку призначте іншого адміністратора.",
+  "kitTemplates": "Шаблони аптечок",
+  "systemTemplates": "Системні (МОЗ України)",
+  "customTemplates": "Власні шаблони",
+  "addTemplate": "Новий шаблон",
+  "editTemplate": "Редагувати шаблон",
+  "noTemplates": "Шаблони відсутні",
+  "noCustomTemplates": "Власні шаблони не створені",
+  "templateItemsCount": "позицій",
+  "templateName": "Назва шаблону",
+  "templateNameHint": "Напр.: Аптечка офісу",
+  "templateDescription": "Опис (необов'язково)",
+  "templateDescriptionHint": "Напр.: Для адміністративних приміщень",
+  "templateItems": "Медикаменти шаблону",
+  "kitTemplate": "Шаблон аптечки (необов'язково)",
+  "noTemplate": "Без шаблону",
+  "noTemplateHint": "Медикаменти будете додавати вручну",
+  "templateApplyError": "Аптечку збережено, але шаблон не вдалося застосувати"
 }

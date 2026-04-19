@@ -446,7 +446,8 @@ class FirstAidKitApiService {
     }
   }
 
-  Future<void> createKit(CreateKitDto kitDto) async {
+  /// Створює аптечку і повертає її ID (потрібен для застосування шаблону)
+  Future<String?> createKit(CreateKitDto kitDto) async {
     final Uri uri = Uri.parse('$_baseUrl/kits');
     try {
       final headers = await _getHeaders();
@@ -462,7 +463,12 @@ class FirstAidKitApiService {
           );
 
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
-        return;
+        // Backend повертає GUID нової аптечки в тілі відповіді
+        if (response.body.isNotEmpty) {
+          final body = response.body.trim().replaceAll('"', '');
+          return body;
+        }
+        return null;
       } else if (response.statusCode == 401 || response.statusCode == 403) {
         if (response.statusCode == 401) SessionService.instance.forceLogout();
         throw Exception('Authorization error: ${response.statusCode}. Please log in again.');
