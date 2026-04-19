@@ -356,6 +356,26 @@ public static class DatabaseSeeder
     }
 
     /// <summary>
+    /// Гарантує наявність системних шаблонів у БД.
+    /// Викликається при КОЖНОМУ старті сервера — безпечно (ідемпотентно).
+    /// Якщо шаблони вже є — нічого не робить.
+    /// </summary>
+    public static async Task EnsureSystemTemplatesAsync(ApplicationDbContext db)
+    {
+        var alreadySeeded = await db.KitTemplates
+            .IgnoreQueryFilters()
+            .AnyAsync(t => t.IsSystem && !t.IsDeleted);
+
+        if (alreadySeeded)
+        {
+            Console.WriteLine("  ✓ Системні шаблони вже існують — пропускаємо.");
+            return;
+        }
+
+        await SeedSystemTemplatesAsync(db);
+    }
+
+    /// <summary>
     /// Сіє системні шаблони з Наказу МОЗ України №187 від 07.07.98.
     /// OrganizationId = null + IsSystem = true → видні всім організаціям.
     /// </summary>

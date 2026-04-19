@@ -299,26 +299,47 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
 
   // ── Один рядок медикаменту ─────────────────────────────────────────
   Widget _buildItemRow(int idx, _ItemEntry item, ThemeData theme, AppLocalizations l10n) {
+    final labelStyle = TextStyle(
+      fontSize: 11,
+      fontWeight: FontWeight.w600,
+      color: theme.colorScheme.onSurfaceVariant,
+      letterSpacing: 0.3,
+    );
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Номер + кнопка видалення
+          // ── Заголовок: номер + кнопка видалення ──
           Row(
             children: [
-              Text(
-                '${idx + 1}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w800,
-                  color: AppTheme.primary,
+              Container(
+                width: 22,
+                height: 22,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Center(
+                  child: Text(
+                    '${idx + 1}',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      color: AppTheme.primary,
+                    ),
+                  ),
                 ),
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: 8),
               Text(
-                '/',
-                style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
+                l10n.medicationName,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface,
+                ),
               ),
               const Spacer(),
               if (_items.length > 1)
@@ -335,45 +356,60 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
                 ),
             ],
           ),
-          const SizedBox(height: 10),
-
-          // Поле назви
-          TextFormField(
-            controller: item.nameController,
-            decoration: _inputDecoration(l10n.medicationName, theme),
-            validator: (v) => (v == null || v.trim().isEmpty) ? l10n.fieldRequired : null,
-          ),
           const SizedBox(height: 8),
 
-          // Кількість + одиниця
+          // ── Поле: назва препарату ──
+          TextFormField(
+            controller: item.nameController,
+            decoration: _inputDecoration('напр. Бинт стерильний 5м×10см', theme),
+            validator: (v) => (v == null || v.trim().isEmpty) ? l10n.fieldRequired : null,
+          ),
+          const SizedBox(height: 10),
+
+          // ── Мін. кількість + одиниця виміру ──
           Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Expanded(
                 flex: 2,
-                child: TextFormField(
-                  controller: item.quantityController,
-                  keyboardType: TextInputType.number,
-                  decoration: _inputDecoration(l10n.minimumQuantity, theme),
-                  validator: (v) {
-                    final n = int.tryParse(v ?? '');
-                    return (n == null || n < 1) ? l10n.invalidQuantityError : null;
-                  },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.minimumQuantity, style: labelStyle),
+                    const SizedBox(height: 4),
+                    TextFormField(
+                      controller: item.quantityController,
+                      keyboardType: TextInputType.number,
+                      decoration: _inputDecoration('1', theme),
+                      validator: (v) {
+                        final n = int.tryParse(v ?? '');
+                        return (n == null || n < 1) ? l10n.invalidQuantityError : null;
+                      },
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 flex: 3,
-                child: DropdownButtonFormField<MeasurementUnit>(
-                  initialValue: item.unit,
-                  decoration: _inputDecoration(l10n.unit, theme),
-                  dropdownColor: theme.brightness == Brightness.dark ? AppTheme.darkCard : Colors.white,
-                  items: MeasurementUnit.values
-                      .map((u) => DropdownMenuItem(
-                            value: u,
-                            child: Text(u.localizedName(context), style: const TextStyle(fontSize: 13)),
-                          ))
-                      .toList(),
-                  onChanged: (u) => setState(() => item.unit = u ?? item.unit),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(l10n.unit, style: labelStyle),
+                    const SizedBox(height: 4),
+                    DropdownButtonFormField<MeasurementUnit>(
+                      initialValue: item.unit,
+                      decoration: _inputDecoration('', theme),
+                      dropdownColor: theme.brightness == Brightness.dark ? AppTheme.darkCard : Colors.white,
+                      items: MeasurementUnit.values
+                          .map((u) => DropdownMenuItem(
+                                value: u,
+                                child: Text(u.localizedName(context), style: const TextStyle(fontSize: 13)),
+                              ))
+                          .toList(),
+                      onChanged: (u) => setState(() => item.unit = u ?? item.unit),
+                    ),
+                  ],
                 ),
               ),
             ],

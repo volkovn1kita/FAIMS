@@ -184,6 +184,10 @@ using (var scope = app.Services.CreateScope())
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
     await db.Database.MigrateAsync();
     Log.Information("Database migrations applied.");
+
+    // Системні шаблони — завжди при старті, незалежно від --seed
+    await DatabaseSeeder.EnsureSystemTemplatesAsync(db);
+    Log.Information("System templates ensured.");
 }
 
 if (args.Contains("--seed"))
