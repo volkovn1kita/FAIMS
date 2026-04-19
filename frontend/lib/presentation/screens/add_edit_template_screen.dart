@@ -269,7 +269,7 @@ class _AddEditTemplateScreenState extends State<AddEditTemplateScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: DropdownButtonFormField<MeasurementUnit>(
-                  value: item.unit,
+                  initialValue: item.unit,
                   decoration: _inputDecoration(l10n.unit, theme),
                   dropdownColor: isDark ? AppTheme.darkCard : Colors.white,
                   items: MeasurementUnit.values.map((u) => DropdownMenuItem(

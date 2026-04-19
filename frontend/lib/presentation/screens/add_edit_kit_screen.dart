@@ -494,15 +494,12 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Без шаблону
-        RadioListTile<KitTemplateDto?>(
-          value: null,
-          groupValue: _selectedTemplate,
-          onChanged: (v) => setState(() => _selectedTemplate = null),
-          title: Text(l10n.noTemplate, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-          subtitle: Text(l10n.noTemplateHint, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
-          contentPadding: EdgeInsets.zero,
-          dense: true,
-          activeColor: AppTheme.primary,
+        _buildTemplateRadioRow(
+          isSelected: _selectedTemplate == null,
+          onTap: () => setState(() => _selectedTemplate = null),
+          title: l10n.noTemplate,
+          subtitle: l10n.noTemplateHint,
+          theme: theme,
         ),
         const Divider(height: 16),
         // Системні шаблони
@@ -533,25 +530,91 @@ class _AddEditKitScreenState extends State<AddEditKitScreen> {
     );
   }
 
-  Widget _buildTemplateRadio(KitTemplateDto template, ThemeData theme) {
-    return RadioListTile<KitTemplateDto?>(
-      value: template,
-      groupValue: _selectedTemplate,
-      onChanged: (v) => setState(() => _selectedTemplate = v),
-      title: Text(template.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (template.description != null)
-            Text(template.description!, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
-          if (template.regulatoryReference != null)
-            Text(template.regulatoryReference!, style: const TextStyle(fontSize: 11, color: Colors.teal)),
-          Text('${template.items.length} позицій', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant)),
-        ],
+  /// Власний індикатор радіо-кнопки без deprecated Radio widget
+  Widget _radioDot(bool isSelected) {
+    return Container(
+      width: 20,
+      height: 20,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: isSelected ? AppTheme.primary : Colors.grey.shade400,
+          width: 2,
+        ),
       ),
-      contentPadding: EdgeInsets.zero,
-      dense: true,
-      activeColor: AppTheme.primary,
+      child: isSelected
+          ? Center(
+              child: Container(
+                width: 10,
+                height: 10,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppTheme.primary,
+                ),
+              ),
+            )
+          : null,
+    );
+  }
+
+  Widget _buildTemplateRadioRow({
+    required bool isSelected,
+    required VoidCallback onTap,
+    required String title,
+    required String subtitle,
+    required ThemeData theme,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        child: Row(
+          children: [
+            _radioDot(isSelected),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                  Text(subtitle, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTemplateRadio(KitTemplateDto template, ThemeData theme) {
+    final isSelected = _selectedTemplate?.id == template.id;
+    return InkWell(
+      onTap: () => setState(() => _selectedTemplate = template),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+        child: Row(
+          children: [
+            _radioDot(isSelected),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(template.name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                  if (template.description != null)
+                    Text(template.description!, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurfaceVariant)),
+                  if (template.regulatoryReference != null)
+                    Text(template.regulatoryReference!, style: const TextStyle(fontSize: 11, color: Colors.teal)),
+                  Text('${template.items.length} позицій', style: TextStyle(fontSize: 11, color: theme.colorScheme.onSurfaceVariant)),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
