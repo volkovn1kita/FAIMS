@@ -89,19 +89,31 @@ public class FirstAidKitRepository : IFirstAidKitRepository
             .Include(k => k.Medications)
             .FirstOrDefaultAsync(k => k.Id == id);
     }
-    public async Task<FirstAidKit?> GetKitByRoomIdAsync (Guid roomId)
+    public async Task<FirstAidKit?> GetKitByRoomIdAsync(Guid roomId)
     {
-        return await _dbContext.FirstAidKits.FirstOrDefaultAsync(k => k.RoomId == roomId);
+        // IgnoreQueryFilters: the unique DB index on RoomId applies to all rows (even soft-deleted),
+        // so we must check all rows to avoid a silent 409 on insert.
+        return await _dbContext.FirstAidKits
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(k => k.RoomId == roomId && !k.IsDeleted);
     }
     public async Task<FirstAidKit?> GetKitByUniqueNumberAsync(string uniqueNumber)
     {
-        return await _dbContext.FirstAidKits.FirstOrDefaultAsync(k => k.UniqueNumber == uniqueNumber);
+        // IgnoreQueryFilters: UniqueNumber has a global unique index (across all orgs/soft-deleted).
+        // We check !IsDeleted so soft-deleted kits don't block pre-checks — their numbers are
+        // freed by DeleteKitAsync which clears UniqueNumber on delete.
+        return await _dbContext.FirstAidKits
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(k => k.UniqueNumber == uniqueNumber && !k.IsDeleted);
     }
 
     public Task DeleteKitAsync(FirstAidKit kit)
     {
         kit.IsDeleted = true;
         kit.DeletedAt = DateTime.UtcNow;
+        // Free the UniqueNumber so it can be reused after soft-delete.
+        // The DB unique index still applies to deleted rows, so we clear it here.
+        kit.UniqueNumber = $"DELETED-{kit.Id}-{DateTime.UtcNow.Ticks}";
         _dbContext.FirstAidKits.Update(kit);
         return Task.CompletedTask;
     }

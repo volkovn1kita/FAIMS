@@ -48,6 +48,12 @@ public class FirstAidKitService : IFirstAidKitService
             throw new NotFoundException("Room is not found");
         }
 
+        var existingKitInRoom = await _kitRepository.GetKitByRoomIdAsync(dto.RoomId);
+        if (existingKitInRoom != null)
+        {
+            throw new ValidationException("This room already has a first aid kit assigned to it.");
+        }
+
         var user = await _userRepository.GetByIdAsync(dto.ResponsibleUserId);
         if (user == null)
         {
@@ -78,7 +84,7 @@ public class FirstAidKitService : IFirstAidKitService
              ex.InnerException?.Message.Contains("duplicate") == true ||
              ex.InnerException?.Message.Contains("23505") == true))
         {
-            throw new ConflictException($"A kit with unique number '{dto.UniqueNumber}' already exists.");
+            throw new ConflictException($"A conflict occurred: the unique number, room, or responsible user is already in use.");
         }
 
         return newKit.Id;

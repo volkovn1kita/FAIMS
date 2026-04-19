@@ -132,7 +132,7 @@ public class KitTemplateService : IKitTemplateService
             var medication = new Medication
             {
                 Name = item.Name,
-                Quantity = item.MinimumQuantity,
+                Quantity = 0,
                 MinimumQuantity = item.MinimumQuantity,
                 Unit = item.Unit,
                 ExpirationDate = placeholderDate,
