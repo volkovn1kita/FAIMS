@@ -3,10 +3,30 @@ import 'package:go_router/go_router.dart';
 import 'package:faims/presentation/screens/login_screen.dart';
 import 'package:faims/presentation/screens/home_screen.dart';
 import 'package:faims/presentation/screens/user_home_screen.dart';
+import 'package:faims/presentation/screens/privacy_policy_screen.dart';
+import 'package:faims/utils/privacy_consent_service.dart';
 
 final GoRouter appRouter = GoRouter(
   initialLocation: '/login',
+  redirect: (context, state) async {
+    // Never redirect when already on the privacy screen (avoid infinite loop)
+    if (state.matchedLocation == '/privacy-policy') return null;
+    final accepted = await PrivacyConsentService().isAccepted();
+    if (!accepted) return '/privacy-policy';
+    return null;
+  },
   routes: [
+    GoRoute(
+      path: '/privacy-policy',
+      pageBuilder: (context, state) => CustomTransitionPage(
+        key: state.pageKey,
+        child: const PrivacyPolicyScreen(),
+        transitionDuration: const Duration(milliseconds: 300),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          return FadeTransition(opacity: animation, child: child);
+        },
+      ),
+    ),
     GoRoute(
       path: '/login',
       pageBuilder: (context, state) => CustomTransitionPage(
