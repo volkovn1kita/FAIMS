@@ -210,7 +210,7 @@ class AppLocalizationsEn extends AppLocalizations {
       'Registration error. Please check your connection.';
 
   @override
-  String get registerClinicTitle => 'Clinic Registration';
+  String get registerClinicTitle => 'Organization Registration';
 
   @override
   String get registerClinicSubtitle =>
@@ -220,10 +220,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get organizationDataLabel => 'ORGANIZATION DATA';
 
   @override
-  String get clinicNameLabel => 'Clinic / Hospital Name *';
+  String get clinicNameLabel => 'Organization Name *';
 
   @override
-  String get clinicNameHint => 'First City Hospital';
+  String get clinicNameHint => 'City Hospital No.1, ABC Corp, School No.15';
 
   @override
   String get addressOptionalLabel => 'Address (optional)';
@@ -259,10 +259,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get passwordHint => '••••••••';
 
   @override
-  String get createClinicButton => 'Create Clinic';
+  String get createClinicButton => 'Register Organization';
 
   @override
-  String get newClinicQuestion => 'New clinic?';
+  String get newClinicQuestion => 'New organization?';
 
   @override
   String get registerButtonText => 'Register';

@@ -44,6 +44,11 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Keystore signing credentials — NEVER commit these
+key.properties
+*.jks
+*.keystore
+
 # --- .NET / ASP.NET Core ---
 [Bb]in/
 [Oo]bj/

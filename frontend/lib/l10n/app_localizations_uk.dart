@@ -209,7 +209,7 @@ class AppLocalizationsUk extends AppLocalizations {
   String get registrationError => 'Помилка реєстрації. Перевірте з\'єднання.';
 
   @override
-  String get registerClinicTitle => 'Реєстрація клініки';
+  String get registerClinicTitle => 'Реєстрація організації';
 
   @override
   String get registerClinicSubtitle =>
@@ -219,10 +219,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get organizationDataLabel => 'ДАНІ ОРГАНІЗАЦІЇ';
 
   @override
-  String get clinicNameLabel => 'Назва клініки / лікарні *';
+  String get clinicNameLabel => 'Назва організації *';
 
   @override
-  String get clinicNameHint => 'First City Hospital';
+  String get clinicNameHint => 'Лікарня №1, ТОВ «Укрбуд», Школа №15';
 
   @override
   String get addressOptionalLabel => 'Адреса (необов\'язково)';
@@ -258,10 +258,10 @@ class AppLocalizationsUk extends AppLocalizations {
   String get passwordHint => '••••••••';
 
   @override
-  String get createClinicButton => 'Створити клініку';
+  String get createClinicButton => 'Зареєструвати організацію';
 
   @override
-  String get newClinicQuestion => 'Нова клініка?';
+  String get newClinicQuestion => 'Нова організація?';
 
   @override
   String get registerButtonText => 'Зареєструвати';

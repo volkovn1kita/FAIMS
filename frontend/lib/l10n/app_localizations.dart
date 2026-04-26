@@ -485,7 +485,7 @@ abstract class AppLocalizations {
   /// No description provided for @registerClinicTitle.
   ///
   /// In en, this message translates to:
-  /// **'Clinic Registration'**
+  /// **'Organization Registration'**
   String get registerClinicTitle;
 
   /// No description provided for @registerClinicSubtitle.
@@ -503,13 +503,13 @@ abstract class AppLocalizations {
   /// No description provided for @clinicNameLabel.
   ///
   /// In en, this message translates to:
-  /// **'Clinic / Hospital Name *'**
+  /// **'Organization Name *'**
   String get clinicNameLabel;
 
   /// No description provided for @clinicNameHint.
   ///
   /// In en, this message translates to:
-  /// **'First City Hospital'**
+  /// **'City Hospital No.1, ABC Corp, School No.15'**
   String get clinicNameHint;
 
   /// No description provided for @addressOptionalLabel.
@@ -581,13 +581,13 @@ abstract class AppLocalizations {
   /// No description provided for @createClinicButton.
   ///
   /// In en, this message translates to:
-  /// **'Create Clinic'**
+  /// **'Register Organization'**
   String get createClinicButton;
 
   /// No description provided for @newClinicQuestion.
   ///
   /// In en, this message translates to:
-  /// **'New clinic?'**
+  /// **'New organization?'**
   String get newClinicQuestion;
 
   /// No description provided for @registerButtonText.
