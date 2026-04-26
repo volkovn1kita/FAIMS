@@ -14,11 +14,9 @@ class LocaleProvider extends ChangeNotifier {
   void _loadLocale() async {
     final prefs = await SharedPreferences.getInstance();
     final languageCode = prefs.getString(_localeKey);
-    
-    if (languageCode != null) {
-      _locale = Locale(languageCode);
-      notifyListeners();
-    }
+    // Default to Ukrainian if no preference saved yet
+    _locale = Locale(languageCode ?? 'uk');
+    notifyListeners();
   }
 
   Future<void> setLocale(Locale newLocale) async {

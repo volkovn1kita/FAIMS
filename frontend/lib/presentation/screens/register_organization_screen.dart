@@ -212,9 +212,17 @@ class _RegisterOrganizationScreenState extends State<RegisterOrganizationScreen>
                             height: 24,
                             child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                           )
-                        : Text(
-                            l10n.createClinicButton,
-                            style: TextStyle(fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+                        : FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              l10n.createClinicButton,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 0.3,
+                              ),
+                            ),
                           ),
                   ),
                 ),

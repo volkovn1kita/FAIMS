@@ -17,6 +17,7 @@ using Backend.Middleware;
 using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.RateLimiting;
 using Serilog;
+using Microsoft.AspNetCore.DataProtection;
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()
@@ -177,17 +178,28 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
 
+// DataProtection: persist keys to a mounted volume so they survive container restarts.
+// We use JWT bearer auth only — DataProtection is not critical, but configuring it
+// here eliminates the "keys may not be persisted" and "no XML encryptor" warnings.
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo("/app/data-protection-keys"))
+    .SetApplicationName("faims");
+
 var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    var startupLog = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+    startupLog.LogInformation("Applying database migrations...");
     await db.Database.MigrateAsync();
-    Log.Information("Database migrations applied.");
+    startupLog.LogInformation("✅ Database migrations applied.");
 
     // Системні шаблони — завжди при старті, незалежно від --seed
+    startupLog.LogInformation("Ensuring system templates...");
     await DatabaseSeeder.EnsureSystemTemplatesAsync(db);
-    Log.Information("System templates ensured.");
+    startupLog.LogInformation("✅ System templates ensured.");
 }
 
 if (args.Contains("--seed"))
@@ -211,7 +223,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseSerilogRequestLogging();
-app.UseHttpsRedirection();
+// UseHttpsRedirection is intentionally removed — Caddy handles TLS termination.
+// Adding it would cause "Failed to determine the https port" warnings.
 app.UseRouting();
 
 app.UseRateLimiter(); 

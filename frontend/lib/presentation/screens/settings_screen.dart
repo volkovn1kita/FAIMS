@@ -131,7 +131,7 @@ class SettingsScreen extends StatelessWidget {
                           context: context,
                           title: 'English',
                           flag: '🇬🇧',
-                          isSelected: localeProvider.locale?.languageCode == 'en' || localeProvider.locale == null,
+                          isSelected: localeProvider.locale?.languageCode == 'en',
                           onTap: () => localeProvider.setLocale(const Locale('en')),
                           isLast: true,
                         ),
