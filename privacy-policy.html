@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Політика конфіденційності — FAIMS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      color: #1a1a2e;
+      line-height: 1.7;
+    }
+    header {
+      background: #1a6b3c;
+      color: white;
+      padding: 40px 24px 32px;
+      text-align: center;
+    }
+    header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+    header p  { font-size: 14px; opacity: 0.8; }
+    .container { max-width: 760px; margin: 0 auto; padding: 32px 24px 80px; }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .num {
+      min-width: 28px;
+      height: 28px;
+      background: rgba(26,107,60,0.1);
+      color: #1a6b3c;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .card h2 { font-size: 16px; font-weight: 700; padding-top: 3px; }
+    .card p, .card li { font-size: 14px; color: #444; }
+    ul { padding-left: 18px; }
+    ul li { margin-bottom: 6px; }
+    .intro {
+      background: rgba(26,107,60,0.06);
+      border: 1px solid rgba(26,107,60,0.2);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .intro p { font-size: 14px; color: #333; }
+    .intro .meta { font-size: 12px; color: #888; margin-bottom: 10px; }
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🛡 Політика конфіденційності</h1>
+  <p>FAIMS — First Aid Inventory Management System</p>
+</header>
+
+<div class="container">
+
+  <div class="intro">
+    <p class="meta">Версія 1.0 &nbsp;·&nbsp; Дата набрання чинності: 24 квітня 2026 р.</p>
+    <p>
+      Ця Політика конфіденційності пояснює, які персональні дані збирає додаток FAIMS,
+      як їх використовує та захищає. Використовуючи додаток, ви підтверджуєте, що
+      ознайомились із цим документом та погоджуєтесь з його умовами.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">1</div><h2>Які дані ми збираємо</h2></div>
+    <ul>
+      <li>Прізвище, ім'я та по батькові (ПІБ)</li>
+      <li>Адреса електронної пошти (email)</li>
+      <li>Хешований пароль (BCrypt, cost factor 12)</li>
+      <li>FCM-токен пристрою (для push-сповіщень)</li>
+      <li>Журнал операцій (додавання, використання, списання медикаментів)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">2</div><h2>Мета збору та обробки</h2></div>
+    <ul>
+      <li>Ідентифікація та автентифікація користувача</li>
+      <li>Надсилання push-сповіщень про терміни придатності медикаментів</li>
+      <li>Формування звітів і журналу операцій організації</li>
+      <li>Розмежування доступу (ролі Адміністратор / Користувач)</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">3</div><h2>Зберігання та захист даних</h2></div>
+    <ul>
+      <li>Дані зберігаються на серверах DigitalOcean (Франкфурт, Німеччина, ЄС)</li>
+      <li>Передача даних — виключно через HTTPS/TLS</li>
+      <li>Токени авторизації — JWT з обмеженим терміном дії</li>
+      <li>Термін зберігання — 3 роки з моменту останньої активності</li>
+      <li>Резервне копіювання засобами DigitalOcean із шифруванням даних</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">4</div><h2>Ваші права (GDPR / ЗУ «Про захист персональних даних»)</h2></div>
+    <ul>
+      <li>Отримати копію своїх персональних даних</li>
+      <li>Виправити неточні або застарілі дані</li>
+      <li>Видалити акаунт та всі пов'язані дані (право на забуття)</li>
+      <li>Відкликати згоду на обробку в будь-який момент</li>
+      <li>Подати скаргу до органу захисту персональних даних</li>
+    </ul>
+    <p style="margin-top:12px;">
+      Для видалення акаунту: <strong>Профіль → Небезпечна зона → Видалити акаунт</strong>.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">5</div><h2>Передача даних третім особам</h2></div>
+    <p style="margin-bottom:10px;">
+      Дані не продаються і не передаються третім особам. Виняток — технічні партнери:
+    </p>
+    <ul>
+      <li><strong>Firebase (Google LLC)</strong> — доставка push-сповіщень</li>
+      <li><strong>DigitalOcean LLC</strong> — хмарне зберігання та хостинг (Франкфурт, ЄС)</li>
+    </ul>
+    <p style="margin-top:10px;">Обидва партнери сертифіковані відповідно до стандартів GDPR.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">6</div><h2>Зміни до Політики</h2></div>
+    <p>
+      У разі суттєвих змін ми сповістимо вас через додаток і попросимо підтвердити
+      згоду повторно. Подальше використання додатку після повідомлення означає
+      прийняття оновленої Політики.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">7</div><h2>Контактна інформація</h2></div>
+    <p>З питань захисту персональних даних звертайтеся:</p>
+    <ul style="margin-top:10px;">
+      <li>Email: <a href="mailto:volkovn936@gmail.com">volkovn936@gmail.com</a></li>
+      <li>GitHub: <a href="https://github.com/volkovn1kita/FAIMS" target="_blank">github.com/volkovn1kita/FAIMS</a></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 FAIMS · Всі права захищені
+</footer>
+
+</body>
+</html>
