@@ -69,15 +69,10 @@ public class ApplicationDbContext : DbContext
             e.OrganizationId == CurrentOrganizationId && !e.IsDeleted);
         modelBuilder.Entity<Journal>().HasQueryFilter(e =>
             e.OrganizationId == CurrentOrganizationId && !e.IsDeleted);
-        // IsRequired() keeps UserId NOT NULL in the DB schema.
-        // The navigation User? is nullable so EF Core treats the relationship as
-        // optional — this suppresses the query-filter compatibility warning while
-        // keeping the FK constraint intact.
         modelBuilder.Entity<RefreshToken>()
             .HasOne(rt => rt.User)
             .WithMany(u => u.RefreshTokens)
             .HasForeignKey(rt => rt.UserId)
-            .IsRequired()
             .OnDelete(DeleteBehavior.Cascade);
 
         // Системні шаблони (IsSystem=true, OrganizationId=null) видно всім організаціям.
