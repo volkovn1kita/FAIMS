@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Видалення акаунту — FAIMS</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      color: #1a1a2e;
+      line-height: 1.7;
+    }
+    header {
+      background: #1a6b3c;
+      color: white;
+      padding: 40px 24px 32px;
+      text-align: center;
+    }
+    header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
+    header p  { font-size: 14px; opacity: 0.8; }
+    .container { max-width: 760px; margin: 0 auto; padding: 32px 24px 80px; }
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+    }
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .num {
+      min-width: 28px;
+      height: 28px;
+      background: rgba(26,107,60,0.1);
+      color: #1a6b3c;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 13px;
+    }
+    .num.red {
+      background: rgba(180,30,30,0.1);
+      color: #b41e1e;
+    }
+    .card h2 { font-size: 16px; font-weight: 700; padding-top: 3px; }
+    .card p, .card li { font-size: 14px; color: #444; }
+    ul { padding-left: 18px; }
+    ul li { margin-bottom: 6px; }
+    .intro {
+      background: rgba(26,107,60,0.06);
+      border: 1px solid rgba(26,107,60,0.2);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .intro p { font-size: 14px; color: #333; }
+    .intro .meta { font-size: 12px; color: #888; margin-bottom: 10px; }
+    .steps {
+      counter-reset: step;
+      padding-left: 0;
+      list-style: none;
+    }
+    .steps li {
+      counter-increment: step;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .steps li::before {
+      content: counter(step);
+      min-width: 24px;
+      height: 24px;
+      background: #1a6b3c;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .warn {
+      background: rgba(180,30,30,0.06);
+      border: 1px solid rgba(180,30,30,0.2);
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 14px;
+      font-size: 13px;
+      color: #b41e1e;
+    }
+    a { color: #1a6b3c; }
+    footer {
+      text-align: center;
+      padding: 24px;
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🗑 Видалення акаунту</h1>
+  <p>FAIMS — First Aid Inventory Management System</p>
+</header>
+
+<div class="container">
+
+  <div class="intro">
+    <p class="meta">Версія 1.0 &nbsp;·&nbsp; Дата набрання чинності: 24 квітня 2026 р.</p>
+    <p>
+      Ця сторінка пояснює, як видалити свій акаунт і всі пов'язані з ним дані в додатку FAIMS.
+      Видалення є безповоротним — відновлення даних після видалення неможливе.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">1</div><h2>Спосіб 1 — безпосередньо в додатку</h2></div>
+    <p style="margin-bottom: 12px;">Найшвидший спосіб — видалити акаунт прямо в додатку:</p>
+    <ul class="steps">
+      <li>Відкрийте додаток FAIMS і увійдіть у свій акаунт</li>
+      <li>Перейдіть до розділу <strong>Профіль</strong> (іконка у нижньому меню)</li>
+      <li>Прокрутіть вниз до розділу <strong>Небезпечна зона</strong></li>
+      <li>Натисніть <strong>Видалити акаунт</strong></li>
+      <li>Підтвердьте видалення у діалоговому вікні</li>
+    </ul>
+    <div class="warn">
+      ⚠️ Ця дія незворотна. Усі ваші дані будуть видалені негайно.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">2</div><h2>Спосіб 2 — запит через електронну пошту</h2></div>
+    <p style="margin-bottom: 12px;">Якщо ви не можете увійти в додаток, надішліть запит на видалення:</p>
+    <ul>
+      <li>Email: <a href="mailto:volkovn936@gmail.com?subject=Delete%20my%20FAIMS%20account">volkovn936@gmail.com</a></li>
+      <li>Тема листа: <strong>Delete my FAIMS account</strong></li>
+      <li>У тілі листа вкажіть email-адресу акаунту, який потрібно видалити</li>
+    </ul>
+    <p style="margin-top: 12px; font-size: 13px; color: #888;">Термін обробки запиту — до 30 календарних днів.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num red">!</div><h2>Що буде видалено</h2></div>
+    <ul>
+      <li>Обліковий запис (email, ім'я, пароль)</li>
+      <li>Дані аптечок та медикаментів</li>
+      <li>Журнал операцій (додавання, використання, списання)</li>
+      <li>FCM-токен пристрою (push-сповіщення)</li>
+      <li>Всі пов'язані організаційні дані (якщо ви єдиний адміністратор)</li>
+    </ul>
+    <p style="margin-top: 12px; font-size: 13px; color: #888;">
+      Резервні копії зберігаються не більше 30 днів після видалення, після чого знищуються безповоротно.
+    </p>
+  </div>
+
+  <div class="card">
+    <div class="card-header"><div class="num">3</div><h2>Контактна інформація</h2></div>
+    <p>З питань видалення даних та захисту персональних інформації:</p>
+    <ul style="margin-top: 10px;">
+      <li>Email: <a href="mailto:volkovn936@gmail.com">volkovn936@gmail.com</a></li>
+      <li>GitHub: <a href="https://github.com/volkovn1kita/FAIMS" target="_blank">github.com/volkovn1kita/FAIMS</a></li>
+      <li><a href="./privacy-policy.html">← Повернутись до Політики конфіденційності</a></li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  © 2026 FAIMS · Всі права захищені
+</footer>
+
+</body>
+</html>
