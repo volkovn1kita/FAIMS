@@ -7,7 +7,7 @@ class PrivacyConsentService {
   static const String _acceptedAtKey = 'privacy_policy_accepted_at';
 
   /// Bump this when the privacy policy text changes significantly.
-  static const String currentVersion = '1.0';
+  static const String currentVersion = '1.1';
 
   /// Returns true only if the user accepted the current version of the policy.
   Future<bool> isAccepted() async {

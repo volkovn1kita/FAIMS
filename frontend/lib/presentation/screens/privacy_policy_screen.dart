@@ -36,22 +36,22 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text(
-          'Відхилити Політику?',
+          'Decline Policy?',
           style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
         ),
         content: const Text(
-          'Без прийняття Політики конфіденційності використання FAIMS неможливе. '
-          'Ваші дані не будуть збережені.',
+          'Without accepting the Privacy Policy, FAIMS cannot be used. '
+          'Your data will not be saved.',
           style: TextStyle(fontSize: 14, height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Назад', style: TextStyle(color: AppTheme.primary)),
+            child: const Text('Back', style: TextStyle(color: AppTheme.primary)),
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text('Вийти з додатку', style: TextStyle(color: Colors.red.shade600)),
+            child: Text('Exit app', style: TextStyle(color: Colors.red.shade600)),
           ),
         ],
       ),
@@ -86,7 +86,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
             ),
             const SizedBox(width: 10),
             Text(
-              'Політика конфіденційності',
+              'Privacy Policy',
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
@@ -127,7 +127,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Версія 1.0 · Дата набрання чинності: 24 квітня 2026 р.',
+                          'Version 1.1 · Effective date: May 14, 2026',
                           style: TextStyle(
                             fontSize: 12,
                             color: theme.colorScheme.onSurfaceVariant,
@@ -135,8 +135,8 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                         ),
                         const SizedBox(height: 10),
                         Text(
-                          'Будь ласка, ознайомтеся з цією Політикою конфіденційності перед використанням додатку. '
-                          'Вона пояснює, які дані ми збираємо, як їх використовуємо та захищаємо.',
+                          'Please read this Privacy Policy before using the app. '
+                          'It explains what data we collect, how we use it, and how we protect it.',
                           style: TextStyle(
                             fontSize: 13,
                             height: 1.5,
@@ -153,13 +153,13 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     theme: theme,
                     isDark: isDark,
                     number: '1',
-                    title: 'Які дані ми збираємо',
-                    content: 'Ми збираємо та зберігаємо такі персональні дані:\n\n'
-                        '• Прізвище, ім\'я та по батькові (ПІБ)\n'
-                        '• Адреса електронної пошти (email)\n'
-                        '• Хешований пароль (алгоритм BCrypt, cost factor 12)\n'
-                        '• FCM-токен пристрою (для push-сповіщень про терміни придатності)\n'
-                        '• Журнал операцій (дії в системі: додавання, використання, списання медикаментів)',
+                    title: 'What data we collect',
+                    content: 'We collect and store the following personal data:\n\n'
+                        '• Full name\n'
+                        '• Email address\n'
+                        '• Hashed password (BCrypt algorithm, cost factor 12)\n'
+                        '• FCM device token (for push notifications about medication expiry)\n'
+                        '• Operation log (actions in the system: adding, using, writing off medications)',
                   ),
                   const SizedBox(height: 12),
 
@@ -167,12 +167,12 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     theme: theme,
                     isDark: isDark,
                     number: '2',
-                    title: 'Мета збору та обробки',
-                    content: 'Зібрані дані використовуються виключно для:\n\n'
-                        '• Ідентифікації та автентифікації користувача\n'
-                        '• Надсилання push-сповіщень про термін придатності медикаментів\n'
-                        '• Формування звітів і журналу операцій організації\n'
-                        '• Розмежування доступу (ролі Адміністратор / Користувач)',
+                    title: 'Purpose of collection and processing',
+                    content: 'Collected data is used exclusively for:\n\n'
+                        '• User identification and authentication\n'
+                        '• Sending push notifications about medication expiry dates\n'
+                        '• Generating reports and the organization\'s operation log\n'
+                        '• Role-based access control (Administrator / User)',
                   ),
                   const SizedBox(height: 12),
 
@@ -180,12 +180,12 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     theme: theme,
                     isDark: isDark,
                     number: '3',
-                    title: 'Зберігання та захист даних',
-                    content: '• Дані зберігаються на серверах DigitalOcean (Франкфурт, Німеччина, ЄС)\n'
-                        '• Передача даних — виключно через HTTPS/TLS\n'
-                        '• Токени авторизації — JWT з обмеженим терміном дії\n'
-                        '• Термін зберігання персональних даних — 3 роки з моменту останньої активності\n'
-                        '• Резервне копіювання здійснюється засобами DigitalOcean із шифруванням даних',
+                    title: 'Data storage and protection',
+                    content: '• Data is stored on DigitalOcean servers (Frankfurt, Germany, EU)\n'
+                        '• Data transmission is exclusively via HTTPS/TLS\n'
+                        '• Authorization tokens are JWT with a limited lifetime\n'
+                        '• Personal data retention period — 3 years from the last activity\n'
+                        '• Backups are performed by DigitalOcean with data encryption',
                   ),
                   const SizedBox(height: 12),
 
@@ -193,15 +193,15 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     theme: theme,
                     isDark: isDark,
                     number: '4',
-                    title: 'Ваші права (GDPR / ЗУ «Про захист персональних даних»)',
-                    content: 'Відповідно до чинного законодавства ви маєте право:\n\n'
-                        '• Отримати копію своїх персональних даних\n'
-                        '• Виправити неточні або застарілі дані\n'
-                        '• Видалити свій акаунт та всі пов\'язані дані (право на забуття)\n'
-                        '• Відкликати згоду на обробку в будь-який момент\n'
-                        '• Подати скаргу до органу захисту персональних даних\n\n'
-                        'Для видалення акаунту скористайтеся функцією «Видалити акаунт» '
-                        'у розділі «Профіль → Небезпечна зона».',
+                    title: 'Your rights (GDPR)',
+                    content: 'Under applicable law you have the right to:\n\n'
+                        '• Obtain a copy of your personal data\n'
+                        '• Correct inaccurate or outdated data\n'
+                        '• Delete your account and all associated data (right to be forgotten)\n'
+                        '• Withdraw consent for processing at any time\n'
+                        '• Lodge a complaint with a data protection authority\n\n'
+                        'To delete your account, use the "Delete account" option '
+                        'in the "Profile → Danger Zone" section.',
                   ),
                   const SizedBox(height: 12),
 
@@ -209,12 +209,12 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     theme: theme,
                     isDark: isDark,
                     number: '5',
-                    title: 'Передача даних третім особам',
-                    content: 'Ваші дані не продаються і не передаються третім особам. '
-                        'Виняток становлять технічні партнери, без яких робота сервісу неможлива:\n\n'
-                        '• Firebase (Google LLC) — доставка push-сповіщень\n'
-                        '• DigitalOcean LLC — хмарне зберігання та хостинг (дата-центр у Франкфурті, ЄС)\n\n'
-                        'Обидва партнери є сертифікованими операторами даних відповідно до стандартів GDPR.',
+                    title: 'Sharing data with third parties',
+                    content: 'Your data is not sold or transferred to third parties. '
+                        'Exceptions are technical partners without whom the service cannot operate:\n\n'
+                        '• Firebase (Google LLC) — push notification delivery\n'
+                        '• DigitalOcean LLC — cloud storage and hosting (Frankfurt data centre, EU)\n\n'
+                        'Both partners are certified data processors in accordance with GDPR standards.',
                   ),
                   const SizedBox(height: 12),
 
@@ -222,10 +222,10 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     theme: theme,
                     isDark: isDark,
                     number: '6',
-                    title: 'Зміни до Політики',
-                    content: 'У разі суттєвих змін до цієї Політики конфіденційності '
-                        'ми сповістимо вас через додаток і попросимо підтвердити згоду повторно. '
-                        'Подальше використання додатку після повідомлення означає прийняття оновленої Політики.',
+                    title: 'Changes to this Policy',
+                    content: 'In the event of material changes to this Privacy Policy, '
+                        'we will notify you through the app and ask you to confirm your consent again. '
+                        'Continued use of the app after the notification constitutes acceptance of the updated Policy.',
                   ),
                   const SizedBox(height: 12),
 
@@ -233,11 +233,11 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                     theme: theme,
                     isDark: isDark,
                     number: '7',
-                    title: 'Контактна інформація',
-                    content: 'З питань щодо захисту персональних даних або для реалізації '
-                        'ваших прав звертайтеся:\n\n'
-                        'Email: volkovn936@gmail.com\n'
-                        'Сайт: github.com/volkovn1kita/FAIMS',
+                    title: 'Contact information',
+                    content: 'For questions about personal data protection or to exercise '
+                        'your rights, please contact us:\n\n'
+                        'Email: volchonik634@gmail.com\n'
+                        'Site: github.com/volkovn1kita/FAIMS',
                   ),
 
                   const SizedBox(height: 24),
@@ -294,7 +294,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                            'Я прочитав та погоджуюсь з Політикою конфіденційності FAIMS',
+                            'I have read and agree to the FAIMS Privacy Policy',
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
@@ -333,7 +333,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                             ),
                           )
                         : const Text(
-                            'Продовжити',
+                            'Continue',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w700,
@@ -348,7 +348,7 @@ class _PrivacyPolicyScreenState extends State<PrivacyPolicyScreen> {
                 TextButton(
                   onPressed: _handleDecline,
                   child: Text(
-                    'Відхилити та вийти',
+                    'Decline and exit',
                     style: TextStyle(
                       fontSize: 13,
                       color: theme.colorScheme.onSurfaceVariant,

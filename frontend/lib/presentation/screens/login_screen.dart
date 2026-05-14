@@ -2,8 +2,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:faims/core/app_theme.dart';
 import 'package:faims/l10n/app_localizations.dart';
+import 'package:faims/presentation/providers/locale_provider.dart';
 import 'package:faims/presentation/screens/register_organization_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import '../../data/dtos/login_dto.dart';
 import '../../domain/repositories/auth_repository.dart';
 
@@ -196,8 +198,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
+        child: Stack(
+          children: [
+            Center(
+              child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 24.0),
             child: AnimatedOpacity(
               opacity: _contentOpacity,
@@ -361,7 +365,55 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
             ),
           ),
+            ),
+            Positioned(
+              top: 8,
+              right: 16,
+              child: _buildLanguageToggle(),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildLanguageToggle() {
+    final theme = Theme.of(context);
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, _) {
+        final isUk = localeProvider.locale?.languageCode != 'en';
+        return Container(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: theme.colorScheme.outlineVariant.withValues(alpha: 0.3),
+            ),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _langBtn('🇺🇦', 'uk', isUk, localeProvider),
+              _langBtn('🇬🇧', 'en', !isUk, localeProvider),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _langBtn(String flag, String code, bool selected, LocaleProvider p) {
+    return GestureDetector(
+      onTap: () => p.setLocale(Locale(code)),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: selected ? AppTheme.primary.withValues(alpha: 0.15) : Colors.transparent,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Text(flag, style: const TextStyle(fontSize: 18)),
       ),
     );
   }
