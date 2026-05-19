@@ -206,7 +206,7 @@ public class FirstAidKitRepository : IFirstAidKitRepository
             .IgnoreQueryFilters()
             .Include(m => m.FirstAidKit)
             .ThenInclude(k => k.ResponsibleUser)
-            .Where(m => m.ExpirationDate >= startWindow && m.ExpirationDate <= endWindow)
+            .Where(m => !m.IsDeleted && m.ExpirationDate >= startWindow && m.ExpirationDate <= endWindow)
             .ToListAsync();
     }
 
@@ -217,7 +217,7 @@ public class FirstAidKitRepository : IFirstAidKitRepository
             .IgnoreQueryFilters()
             .Include(m => m.FirstAidKit)
             .ThenInclude(k => k.ResponsibleUser)
-            .Where(m => m.Quantity < m.MinimumQuantity)
+            .Where(m => !m.IsDeleted && m.Quantity < m.MinimumQuantity)
             .ToListAsync();
     }
 
