@@ -25,6 +25,17 @@ namespace Backend.Services
         {
             _logger.LogInformation("💊 Background Service started.");
 
+            // Wait until the next 12:00 Kyiv time so notifications fire predictably,
+            // not on every container restart / redeploy.
+            var kyivZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Kiev");
+            var nowKyiv = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, kyivZone);
+            var nextRunKyiv = nowKyiv.Date.AddHours(12);
+            if (nextRunKyiv <= nowKyiv) nextRunKyiv = nextRunKyiv.AddDays(1);
+            var nextRunUtc = TimeZoneInfo.ConvertTimeToUtc(nextRunKyiv, kyivZone);
+            var initialDelay = nextRunUtc - DateTime.UtcNow;
+            _logger.LogInformation("⏰ First check at {NextRun} Kyiv time (UTC: {Utc})", nextRunKyiv, nextRunUtc);
+            await Task.Delay(initialDelay, stoppingToken);
+
             while (!stoppingToken.IsCancellationRequested)
             {
                 try
