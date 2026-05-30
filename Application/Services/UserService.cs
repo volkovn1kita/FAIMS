@@ -379,7 +379,7 @@ namespace Application.Services
                 throw new NotFoundException($"User with ID {userId} not found.");
             }
 
-            user.FcmToken = token;
+            user.FcmToken = string.IsNullOrEmpty(token) ? null : token;
             user.UpdatedDate = DateTime.UtcNow;
 
             await _userRepository.SaveChangesAsync();

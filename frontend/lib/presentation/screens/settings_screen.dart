@@ -1,12 +1,74 @@
+import 'dart:developer' as developer;
 import 'package:flutter/material.dart';
 import 'package:faims/l10n/app_localizations.dart';
 import 'package:faims/presentation/providers/locale_provider.dart';
 import 'package:faims/presentation/providers/theme_provider.dart';
 import 'package:faims/core/app_theme.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import '../../data/services/auth_api_service.dart';
+import '../../domain/repositories/auth_repository.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  static const String _notifKey = 'notifications_enabled';
+
+  bool _notificationsEnabled = true;
+  bool _isTogglingNotifications = false;
+
+  final _authRepository = AuthRepository();
+  final _apiService = AuthApiService();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNotificationPreference();
+  }
+
+  Future<void> _loadNotificationPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (mounted) {
+      setState(() {
+        _notificationsEnabled = prefs.getBool(_notifKey) ?? true;
+      });
+    }
+  }
+
+  Future<void> _toggleNotifications(bool value) async {
+    if (_isTogglingNotifications) return;
+    setState(() => _isTogglingNotifications = true);
+
+    try {
+      final token = await _authRepository.getToken();
+      if (token == null) return;
+
+      if (value) {
+        // Enable: get FCM token and register it on the server
+        final fcmToken = await FirebaseMessaging.instance.getToken();
+        if (fcmToken != null) {
+          await _apiService.updateFcmToken(token, fcmToken);
+        }
+      } else {
+        // Disable: send empty string → backend treats it as null → no notifications
+        await _apiService.updateFcmToken(token, '');
+      }
+
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool(_notifKey, value);
+      if (mounted) setState(() => _notificationsEnabled = value);
+    } catch (e) {
+      developer.log('Error toggling notifications: $e', name: 'SettingsScreen');
+    } finally {
+      if (mounted) setState(() => _isTogglingNotifications = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,6 +116,7 @@ class SettingsScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ── Appearance ───────────────────────────────────
                   _sectionLabel(l10n.appearance, theme),
                   Container(
                     decoration: BoxDecoration(
@@ -104,6 +167,71 @@ class SettingsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 28),
 
+                  // ── Notifications ────────────────────────────────
+                  _sectionLabel(l10n.notifications, theme),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: isDark ? AppTheme.darkCard : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4)),
+                      ],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 6.0),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: _notificationsEnabled
+                                  ? AppTheme.primary.withValues(alpha: 0.1)
+                                  : Colors.grey.shade100,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              _notificationsEnabled
+                                  ? Icons.notifications_rounded
+                                  : Icons.notifications_off_rounded,
+                              color: _notificationsEnabled
+                                  ? AppTheme.primary
+                                  : Colors.grey.shade400,
+                              size: 22,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Text(
+                              l10n.pushNotifications,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: theme.colorScheme.onSurface,
+                              ),
+                            ),
+                          ),
+                          _isTogglingNotifications
+                              ? const SizedBox(
+                                  width: 24,
+                                  height: 24,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2.5,
+                                    color: AppTheme.primary,
+                                  ),
+                                )
+                              : Switch.adaptive(
+                                  value: _notificationsEnabled,
+                                  activeThumbColor: AppTheme.primaryLight,
+                                  activeTrackColor: AppTheme.primaryLight.withValues(alpha: 0.4),
+                                  onChanged: _toggleNotifications,
+                                ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 28),
+
+                  // ── Language ─────────────────────────────────────
                   _sectionLabel(l10n.languageLabel, theme),
                   Container(
                     decoration: BoxDecoration(

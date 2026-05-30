@@ -1116,4 +1116,10 @@ class AppLocalizationsUk extends AppLocalizations {
   @override
   String get templateApplyError =>
       'Аптечку збережено, але шаблон не вдалося застосувати';
+
+  @override
+  String get notifications => 'Сповіщення';
+
+  @override
+  String get pushNotifications => 'Push-сповіщення';
 }

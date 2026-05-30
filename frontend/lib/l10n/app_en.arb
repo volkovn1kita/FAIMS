@@ -794,5 +794,9 @@
   "noTemplateHint": "You will add medications manually",
   "@noTemplateHint": {},
   "templateApplyError": "Kit saved, but template could not be applied",
-  "@templateApplyError": {}
+  "@templateApplyError": {},
+  "notifications": "Notifications",
+  "@notifications": {},
+  "pushNotifications": "Push Notifications",
+  "@pushNotifications": {}
 }

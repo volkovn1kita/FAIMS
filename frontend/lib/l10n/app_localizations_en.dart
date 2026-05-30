@@ -1114,4 +1114,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get templateApplyError =>
       'Kit saved, but template could not be applied';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get pushNotifications => 'Push Notifications';
 }

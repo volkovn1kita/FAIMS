@@ -458,5 +458,7 @@
   "kitTemplate": "Шаблон аптечки (необов'язково)",
   "noTemplate": "Без шаблону",
   "noTemplateHint": "Медикаменти будете додавати вручну",
-  "templateApplyError": "Аптечку збережено, але шаблон не вдалося застосувати"
+  "templateApplyError": "Аптечку збережено, але шаблон не вдалося застосувати",
+  "notifications": "Сповіщення",
+  "pushNotifications": "Push-сповіщення"
 }

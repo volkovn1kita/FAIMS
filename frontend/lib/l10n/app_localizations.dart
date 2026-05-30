@@ -2146,6 +2146,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Kit saved, but template could not be applied'**
   String get templateApplyError;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @pushNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Push Notifications'**
+  String get pushNotifications;
 }
 
 class _AppLocalizationsDelegate
