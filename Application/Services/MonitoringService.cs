@@ -32,9 +32,10 @@ public class MonitoringService : IMonitoringService
     {
         var allMedications = await _kitRepository.GetAllMedicationsAsync();
         var criticalMedications = allMedications
-        .Where(m => m.Status == ExpirationStatus.Critical
-                    || m.Status == ExpirationStatus.Warning
-                    || m.Status == ExpirationStatus.Expired)
+        .Where(m => m.Quantity > 0  // empty batches shouldn't trigger expiration alarms
+                    && (m.Status == ExpirationStatus.Critical
+                        || m.Status == ExpirationStatus.Warning
+                        || m.Status == ExpirationStatus.Expired))
         .ToList();
         return criticalMedications;
     }
@@ -42,10 +43,18 @@ public class MonitoringService : IMonitoringService
     public async Task<IEnumerable<Medication>> GetLowQuantityMedicationsAsync()
     {
         var allMedications = await _kitRepository.GetAllMedicationsAsync();
-        var lowQuantityMeds = allMedications
-            .Where(m => m.Quantity < m.MinimumQuantity)
+
+        // A medication is low only when the SUM across its batches (same kit + name + unit)
+        // is below the group's minimum. Return all batches belonging to genuinely-low groups
+        // so downstream callers can still see per-batch detail.
+        var lowGroupKeys = allMedications
+            .GroupBy(m => (m.FirstAidKitId, m.Name, m.Unit))
+            .Where(g => g.Sum(m => m.Quantity) < g.Max(m => m.MinimumQuantity))
+            .Select(g => g.Key)
+            .ToHashSet();
+
+        return allMedications
+            .Where(m => lowGroupKeys.Contains((m.FirstAidKitId, m.Name, m.Unit)))
             .ToList();
-        
-        return lowQuantityMeds;
     }
 }

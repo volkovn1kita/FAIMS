@@ -16,13 +16,14 @@ public class MonitoringServiceTests
         _service = new MonitoringService(_kitRepo);
     }
 
-    private static Medication Med(DateTime expiration, int qty = 10, int minQty = 5) => new()
+    private static Medication Med(DateTime expiration, int qty = 10, int minQty = 5, string name = "Test", Guid? kitId = null) => new()
     {
-        Name = "Test",
+        Name = name,
         Quantity = qty,
         MinimumQuantity = minQty,
         Unit = MeasurementUnit.Tablets,
         ExpirationDate = expiration,
+        FirstAidKitId = kitId ?? Guid.NewGuid(),
     };
 
     [Fact]
@@ -88,15 +89,15 @@ public class MonitoringServiceTests
     public async Task GetLowQuantityMedications_ReturnsOnlyBelowMinimum()
     {
         _kitRepo.GetAllMedicationsAsync().Returns([
-            Med(DateTime.UtcNow.AddDays(200), qty: 2, minQty: 5),
-            Med(DateTime.UtcNow.AddDays(200), qty: 10, minQty: 5),
-            Med(DateTime.UtcNow.AddDays(200), qty: 0, minQty: 3),
+            Med(DateTime.UtcNow.AddDays(200), qty: 2, minQty: 5, name: "A"),
+            Med(DateTime.UtcNow.AddDays(200), qty: 10, minQty: 5, name: "B"),
+            Med(DateTime.UtcNow.AddDays(200), qty: 0, minQty: 3, name: "C"),
         ]);
 
         var result = (await _service.GetLowQuantityMedicationsAsync()).ToList();
 
         Assert.Equal(2, result.Count);
-        Assert.All(result, m => Assert.True(m.Quantity < m.MinimumQuantity));
+        Assert.DoesNotContain(result, m => m.Name == "B");
     }
 
     [Fact]
@@ -109,5 +110,51 @@ public class MonitoringServiceTests
         var result = await _service.GetLowQuantityMedicationsAsync();
 
         Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetLowQuantityMedications_AggregatesBatchesOfSameMedicationInOneKit()
+    {
+        // Two batches of the same medication in the same kit, summed = 12 which is
+        // above the minimum of 6. The empty (Quantity=0) phantom batch must NOT cause
+        // a false low-stock flag — this is the production bug scenario.
+        var kitId = Guid.NewGuid();
+        _kitRepo.GetAllMedicationsAsync().Returns([
+            Med(DateTime.UtcNow.AddDays(100), qty: 0,  minQty: 6, name: "Bandage", kitId: kitId),
+            Med(DateTime.UtcNow.AddDays(200), qty: 12, minQty: 6, name: "Bandage", kitId: kitId),
+        ]);
+
+        var result = await _service.GetLowQuantityMedicationsAsync();
+
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task GetLowQuantityMedications_FlagsGroup_WhenSumBelowMinimum()
+    {
+        var kitId = Guid.NewGuid();
+        _kitRepo.GetAllMedicationsAsync().Returns([
+            Med(DateTime.UtcNow.AddDays(100), qty: 1, minQty: 6, name: "Bandage", kitId: kitId),
+            Med(DateTime.UtcNow.AddDays(200), qty: 2, minQty: 6, name: "Bandage", kitId: kitId),
+        ]);
+
+        var result = (await _service.GetLowQuantityMedicationsAsync()).ToList();
+
+        Assert.Equal(2, result.Count);
+        Assert.All(result, m => Assert.Equal("Bandage", m.Name));
+    }
+
+    [Fact]
+    public async Task GetCriticalMedications_IgnoresEmptyBatches()
+    {
+        _kitRepo.GetAllMedicationsAsync().Returns([
+            Med(DateTime.UtcNow.AddDays(-1), qty: 0, minQty: 5, name: "Empty"),
+            Med(DateTime.UtcNow.AddDays(-1), qty: 4, minQty: 5, name: "Real"),
+        ]);
+
+        var result = (await _service.GetCriticalMedicationsAsync()).ToList();
+
+        Assert.Single(result);
+        Assert.Equal("Real", result[0].Name);
     }
 }

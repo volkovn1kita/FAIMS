@@ -197,28 +197,49 @@ public class FirstAidKitRepository : IFirstAidKitRepository
     public async Task<IEnumerable<Medication>> GetMedicationsExpiringOnDateWithUsersAsync(DateTime date)
     {
         var targetUtc = DateTime.SpecifyKind(date.Date, DateTimeKind.Utc);
-        
+
         var startWindow = targetUtc.AddHours(-12);
         var endWindow = targetUtc.AddHours(36);
 
+        // Quantity > 0: empty batches have no real expiration relevance.
         return await _dbContext.Medications
             .AsNoTracking()
             .IgnoreQueryFilters()
             .Include(m => m.FirstAidKit)
             .ThenInclude(k => k.ResponsibleUser)
-            .Where(m => !m.IsDeleted && m.ExpirationDate >= startWindow && m.ExpirationDate <= endWindow)
+            .Where(m => !m.IsDeleted
+                        && m.Quantity > 0
+                        && m.ExpirationDate >= startWindow
+                        && m.ExpirationDate <= endWindow)
             .ToListAsync();
     }
 
     public async Task<IEnumerable<Medication>> GetLowStockMedicationsWithUsersAsync()
     {
-        return await _dbContext.Medications
+        // Fetch every active batch and aggregate per (kit, name, unit) — a single batch
+        // below its own minimum doesn't mean the medication is low if sibling batches
+        // make up the total. Returns ONE representative per genuinely-low group with
+        // Quantity/MinimumQuantity overwritten to the group's totals so downstream
+        // notifications report aggregated numbers consistent with the UI.
+        var allMeds = await _dbContext.Medications
             .AsNoTracking()
             .IgnoreQueryFilters()
             .Include(m => m.FirstAidKit)
             .ThenInclude(k => k.ResponsibleUser)
-            .Where(m => !m.IsDeleted && m.Quantity < m.MinimumQuantity)
+            .Where(m => !m.IsDeleted)
             .ToListAsync();
+
+        return allMeds
+            .GroupBy(m => (m.FirstAidKitId, m.Name, m.Unit))
+            .Where(g => g.Sum(m => m.Quantity) < g.Max(m => m.MinimumQuantity))
+            .Select(g =>
+            {
+                var rep = g.OrderBy(m => m.ExpirationDate).First();
+                rep.Quantity = g.Sum(m => m.Quantity);
+                rep.MinimumQuantity = g.Max(m => m.MinimumQuantity);
+                return rep;
+            })
+            .ToList();
     }
 
 }

@@ -539,6 +539,13 @@ public class FirstAidKitService : IFirstAidKitService
         medication.Quantity -= quantityUsed;
         medication.UpdatedDate = DateTime.UtcNow;
 
+        // Auto-retire fully-depleted batches so they don't pollute low-stock reports/notifications.
+        if (medication.Quantity == 0)
+        {
+            medication.IsDeleted = true;
+            medication.DeletedAt = DateTime.UtcNow;
+        }
+
         await _kitRepository.UpdateMedicationInKit(medication);
 
         await _journalRepository.AddEntryAsync(new Journal
@@ -599,11 +606,17 @@ public class FirstAidKitService : IFirstAidKitService
         medication.Quantity -= quantityWrittenOff;
         medication.UpdatedDate = DateTime.UtcNow;
 
+        if (medication.Quantity == 0)
+        {
+            medication.IsDeleted = true;
+            medication.DeletedAt = DateTime.UtcNow;
+        }
+
         await _kitRepository.UpdateMedicationInKit(medication);
 
         await _journalRepository.AddEntryAsync(new Journal
         {
-            ActionType = JournalAction.WrittenOff, 
+            ActionType = JournalAction.WrittenOff,
             Reason = $"Medication '{medication.Name}' written off. Quantity changed from {oldQuantity} to {medication.Quantity}. Written off {quantityWrittenOff} {medication.Unit}. Reason: {reason}",
             FirstAidKitId = medication.FirstAidKitId,
             MedicationName = medication.Name,

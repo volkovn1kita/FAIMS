@@ -46,21 +46,33 @@ public class ReportingService : IReportingService
             ));
         }
 
-        var lowQuantityOnly = lowQuantityItems
-            .Where(med => !expirationCritical.Any(c => c.Id == med.Id))
-            .ToList();
+        // Collapse low items by (Kit, Name, Unit) so a medication with multiple batches
+        // appears once with summed quantity — same grouping the UI uses.
+        var criticalIdSet = expirationCritical.Select(c => c.Id).ToHashSet();
+        var lowGroups = lowQuantityItems
+            .GroupBy(m => new { m.FirstAidKitId, m.Name, m.Unit });
 
-        foreach (var med in lowQuantityOnly)
+        foreach (var group in lowGroups)
         {
-            kitsDictionary.TryGetValue(med.FirstAidKitId, out var kit);
+            var totalQuantity = group.Sum(m => m.Quantity);
+            var minimumQuantity = group.Max(m => m.MinimumQuantity);
+            if (totalQuantity >= minimumQuantity) continue;
+
+            // Skip batches already listed under expiration-critical to avoid duplicates.
+            var representative = group
+                .Where(m => !criticalIdSet.Contains(m.Id))
+                .OrderBy(m => m.ExpirationDate)
+                .FirstOrDefault() ?? group.OrderBy(m => m.ExpirationDate).First();
+
+            kitsDictionary.TryGetValue(group.Key.FirstAidKitId, out var kit);
 
             criticalItems.Add(new ReportCriticalItemDto(
-                MedicationId: med.Id,
+                MedicationId: representative.Id,
                 KitName: kit?.Name ?? "Unknown first aid kit",
-                MedicationName: med.Name,
-                Quantity: med.Quantity,
-                Status: med.Status, 
-                Reason: $"Low number ({med.Quantity} < {med.MinimumQuantity})"
+                MedicationName: representative.Name,
+                Quantity: totalQuantity,
+                Status: representative.Status,
+                Reason: $"Low number ({totalQuantity} < {minimumQuantity})"
             ));
         }
 
@@ -78,11 +90,14 @@ public class ReportingService : IReportingService
             var medications = kit.Medications;
 
             var criticalCount = 0;
-            var lowQuantityCount = 0;
-            var expiredCount = 0; 
+            var expiredCount = 0;
 
+            // Expiration counts are per-batch but skip empty (Quantity=0) batches —
+            // an empty record has no meaningful "expiry" to worry about.
             foreach (var med in medications)
             {
+                if (med.Quantity <= 0) continue;
+
                 if (med.ExpirationDate <= DateTime.UtcNow)
                 {
                     expiredCount++;
@@ -92,13 +107,15 @@ public class ReportingService : IReportingService
                 {
                     criticalCount++;
                 }
-
-                if (med.Quantity < med.MinimumQuantity)
-                {
-                    lowQuantityCount++;
-                }
             }
-            
+
+            // Low-quantity is computed on AGGREGATED batches (same Name + Unit),
+            // mirroring how the UI groups them. Two batches of the same med summed must
+            // be below the group's minimum to count as low.
+            var lowQuantityCount = medications
+                .GroupBy(m => new { m.Name, m.Unit })
+                .Count(g => g.Sum(m => m.Quantity) < g.Max(m => m.MinimumQuantity));
+
             string overallStatus = "OK";
             if (expiredCount > 0 || criticalCount > 0)
             {
@@ -129,12 +146,25 @@ public class ReportingService : IReportingService
         var reportItems = new List<ReportItemDto>();
 
         var lowQuantityMeds = await _monitoringService.GetLowQuantityMedicationsAsync();
-        var deficitItems = lowQuantityMeds
-            .GroupBy(m => new { m.Name, Unit = m.Unit.ToString() })
+
+        // Compute deficit per kit-group first (sum-quantity vs group-minimum),
+        // then aggregate across kits for the system-wide purchasing list.
+        var perKitDeficits = lowQuantityMeds
+            .GroupBy(m => new { m.FirstAidKitId, m.Name, Unit = m.Unit.ToString() })
+            .Select(g => new
+            {
+                g.Key.Name,
+                g.Key.Unit,
+                Deficit = g.Max(m => m.MinimumQuantity) - g.Sum(m => m.Quantity)
+            })
+            .Where(x => x.Deficit > 0);
+
+        var deficitItems = perKitDeficits
+            .GroupBy(x => new { x.Name, x.Unit })
             .Select(g => new ReportItemDto
             {
                 MedicationName = g.Key.Name,
-                Quantity = g.Sum(m => m.MinimumQuantity - m.Quantity),
+                Quantity = g.Sum(x => x.Deficit),
                 Unit = g.Key.Unit,
                 Reason = "current_deficit"
             });
