@@ -138,7 +138,11 @@ public class FirstAidKitService : IFirstAidKitService
 
         foreach (var kit in kits)
         {
-            int criticalCount = kit.Medications.Count(m => m.ExpirationDate <= DateTime.UtcNow.AddDays(30));
+            // Critical = within 30 days AND not yet expired (matches GetKitByIdAsync /
+            // GetKitByResponsibleUserIdAsync so the same kit shows the same number on every screen).
+            int criticalCount = kit.Medications.Count(m =>
+                m.ExpirationDate <= DateTime.UtcNow.AddDays(30)
+                && m.ExpirationDate > DateTime.UtcNow);
             int expiredCount = kit.Medications.Count(m => m.ExpirationDate <= DateTime.UtcNow);
             int lowQuantityCount = kit.Medications.Count(m => m.Quantity < m.MinimumQuantity);
 
