@@ -296,6 +296,19 @@ namespace Application.Services
                 }
             }
 
+            // If promoting to Administrator, ensure the user isn't currently responsible for a kit —
+            // the kit-update validation forbids admins as responsible, so we'd otherwise leave
+            // the system in an inconsistent state.
+            if (dto.Role == UserRole.Administrator && userToUpdate.Role != UserRole.Administrator)
+            {
+                var assignedKit = await _kitRepository.GetKitByResponsibleUserIdAsync(userId);
+                if (assignedKit != null)
+                {
+                    throw new ValidationException(
+                        "Cannot promote user to Administrator while they are responsible for a kit. Reassign the kit to another user first.");
+                }
+            }
+
             userToUpdate.FirstName = dto.FirstName;
             userToUpdate.LastName = dto.LastName;
             userToUpdate.Email = dto.Email;
